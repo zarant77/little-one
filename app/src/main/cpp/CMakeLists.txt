@@ -4,6 +4,8 @@ project(littleone C)
 
 add_library(littleone SHARED
     ../../../../src/main.c
+    ../../../../src/platform_android.c
+    ../../../../src/renderer.c
 )
 
 target_include_directories(littleone PRIVATE
