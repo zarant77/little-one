@@ -2,8 +2,9 @@
 
 #include <stdint.h>
 
-#define RENDERER_PLAYER_SIZE 64
-#define RENDERER_SMASH_PLAYER_HEIGHT 88
+#include "entity_config.h"
+
+#define RENDERER_SMASH_EXTRA_HEIGHT 24
 #define RENDERER_GROUND_MARGIN 48
 #define RENDERER_GROUND_LINE_HEIGHT 2
 #define RENDERER_GROUND_MARKER_SPACING 96
@@ -85,7 +86,7 @@ static int renderer_is_player_pixel(int x, int y, int rect_x, int rect_y, int re
             y,
             rect_x,
             rect_y,
-            RENDERER_PLAYER_SIZE,
+            entity_config_get_player()->visual.width,
             rect_height
     );
 }
@@ -99,7 +100,10 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     int height = buffer->height;
     int rect_x = (int)game->playerX;
     int rect_y = (int)game->playerY;
-    int rect_height = game->playerSmashing ? RENDERER_SMASH_PLAYER_HEIGHT : RENDERER_PLAYER_SIZE;
+    int rect_height = entity_config_get_player()->visual.height;
+    if (game->playerSmashing) {
+        rect_height += RENDERER_SMASH_EXTRA_HEIGHT;
+    }
 
     if (buffer->format == WINDOW_FORMAT_RGB_565) {
         uint16_t* pixels = (uint16_t*)buffer->bits;

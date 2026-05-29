@@ -1,20 +1,26 @@
 #include "game.h"
 
-static const float PLAYER_SIZE = 64.0f;
-static const float PLAYER_SPEED = 220.0f;
+#include "entity_config.h"
+
 static const float GRAVITY = 1400.0f;
-static const float JUMP_VELOCITY = -620.0f;
-static const float SMASH_VELOCITY = 1200.0f;
 static const float GROUND_MARGIN = 48.0f;
 static const float WORLD_SPEED = 120.0f;
 static const float WORLD_SCROLL_WRAP = 10000.0f;
+
+static float game_player_width(void) {
+    return (float)entity_config_get_player()->visual.width;
+}
+
+static float game_player_height(void) {
+    return (float)entity_config_get_player()->visual.height;
+}
 
 static float game_ground_y(const GameState* game) {
     return (float)game->screenHeight - GROUND_MARGIN;
 }
 
 static void game_clamp_player_x(GameState* game) {
-    float max_x = (float)game->screenWidth - PLAYER_SIZE;
+    float max_x = (float)game->screenWidth - game_player_width();
 
     if (max_x < 0.0f) {
         max_x = 0.0f;
@@ -31,7 +37,7 @@ static void game_clamp_player_x(GameState* game) {
 
 static void game_clamp_player_to_ground(GameState* game) {
     float ground_y = game_ground_y(game);
-    float player_bottom = game->playerY + PLAYER_SIZE;
+    float player_bottom = game->playerY + game_player_height();
 
     if (game->playerY < 0.0f) {
         game->playerY = 0.0f;
@@ -41,7 +47,7 @@ static void game_clamp_player_to_ground(GameState* game) {
     }
 
     if (player_bottom >= ground_y) {
-        game->playerY = ground_y - PLAYER_SIZE;
+        game->playerY = ground_y - game_player_height();
         if (game->playerY < 0.0f) {
             game->playerY = 0.0f;
         }
@@ -86,7 +92,7 @@ void game_set_screen_size(GameState* game, float width, float height) {
 
     if (old_screen_width <= 0 || old_screen_height <= 0) {
         game->playerX = 0.0f;
-        game->playerY = game_ground_y(game) - PLAYER_SIZE;
+        game->playerY = game_ground_y(game) - game_player_height();
         game->playerVelocityX = 0.0f;
         game->playerVelocityY = 0.0f;
         game->playerGrounded = 1;
@@ -112,21 +118,21 @@ void game_update(GameState* game, const InputState* input, float dt) {
     game->playerVelocityX = 0.0f;
 
     if (input != 0 && input->left) {
-        game->playerVelocityX = -PLAYER_SPEED;
+        game->playerVelocityX = -entity_config_get_player()->moveSpeed;
     }
 
     if (input != 0 && input->right) {
-        game->playerVelocityX = PLAYER_SPEED;
+        game->playerVelocityX = entity_config_get_player()->moveSpeed;
     }
 
     if (input != 0 && input->actionPressed) {
         if (game->playerGrounded) {
-            game->playerVelocityY = JUMP_VELOCITY;
+            game->playerVelocityY = entity_config_get_player()->jumpVelocity;
             game->playerGrounded = 0;
             game->playerSmashing = 0;
             game->playerCanSmash = 1;
         } else if (game->playerCanSmash) {
-            game->playerVelocityY = SMASH_VELOCITY;
+            game->playerVelocityY = entity_config_get_player()->smashVelocity;
             game->playerSmashing = 1;
             game->playerCanSmash = 0;
         }
