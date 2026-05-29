@@ -20,6 +20,9 @@ typedef struct {
     const char* id;
     int hp;
     float moveSpeed;
+    int scoreValue;
+    float yMin;
+    float yMax;
     EntityVisualConfig visual;
 } EnemyConfig;
 

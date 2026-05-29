@@ -1,5 +1,7 @@
 # Little One
 
+<p><img width="200" height="200" src="./logo.png"></p>
+
 ```text
 The world is dangerous.
 You are small.
@@ -23,7 +25,7 @@ Early prototype.
 Current APK size:
 
 ```text
-~41 KB
+~62 KB
 ```
 
 The application launches on a real Android device and is built entirely from native C code.

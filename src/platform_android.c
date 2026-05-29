@@ -18,6 +18,7 @@
 
 typedef struct AndroidPlatform {
     ANativeWindow* window;
+    pthread_mutex_t window_mutex;
     AInputQueue* input_queue;
     AInputQueue* attached_input_queue;
     pthread_mutex_t input_queue_mutex;
@@ -26,6 +27,11 @@ typedef struct AndroidPlatform {
     volatile int loop_running;
     GameState game;
     InputState input;
+    double fps_elapsed;
+    double fps_frame_time_total;
+    int fps_frame_count;
+    int null_window_logged;
+    int reset_frame_time;
 } AndroidPlatform;
 
 static AndroidPlatform* platform_from_activity(ANativeActivity* activity) {
@@ -39,12 +45,17 @@ static double platform_now_seconds(void) {
     return (double)time.tv_sec + ((double)time.tv_nsec / 1000000000.0);
 }
 
-static void platform_sleep_frame(void) {
-    struct timespec frame_time;
-    frame_time.tv_sec = 0;
-    frame_time.tv_nsec = 16666667;
+static void platform_sleep_seconds(double seconds) {
+    struct timespec sleep_time;
 
-    nanosleep(&frame_time, NULL);
+    if (seconds <= 0.0) {
+        return;
+    }
+
+    sleep_time.tv_sec = (time_t)seconds;
+    sleep_time.tv_nsec = (long)((seconds - (double)sleep_time.tv_sec) * 1000000000.0);
+
+    nanosleep(&sleep_time, NULL);
 }
 
 static int platform_motion_action_index(int action) {
@@ -60,9 +71,37 @@ static void platform_handle_motion_event(
     int action = AMotionEvent_getAction(event);
     int action_type = action & AMOTION_EVENT_ACTION_MASK;
     int action_index = platform_motion_action_index(action);
+    size_t pointer_count = AMotionEvent_getPointerCount(event);
+    int log_index = action_index;
+
+    if (pointer_count > 0) {
+        if (log_index < 0 || (size_t)log_index >= pointer_count) {
+            log_index = 0;
+        }
+
+        int pointer_id = AMotionEvent_getPointerId(event, log_index);
+        float x = AMotionEvent_getX(event, log_index);
+        float y = AMotionEvent_getY(event, log_index);
+
+        LOGI(
+                "Motion event action=%d pointerCount=%zu pointerId=%d x=%.1f y=%.1f",
+                action_type,
+                pointer_count,
+                pointer_id,
+                x,
+                y
+        );
+    } else {
+        LOGI("Motion event action=%d pointerCount=0", action_type);
+    }
 
     if (action_type == AMOTION_EVENT_ACTION_DOWN
             || action_type == AMOTION_EVENT_ACTION_POINTER_DOWN) {
+        if (action_index < 0 || (size_t)action_index >= pointer_count) {
+            LOGI("Motion event ignored because action index is invalid");
+            return;
+        }
+
         int pointer_id = AMotionEvent_getPointerId(event, action_index);
         float x = AMotionEvent_getX(event, action_index);
         float y = AMotionEvent_getY(event, action_index);
@@ -101,6 +140,11 @@ static void platform_handle_motion_event(
 
     if (action_type == AMOTION_EVENT_ACTION_UP
             || action_type == AMOTION_EVENT_ACTION_POINTER_UP) {
+        if (action_index < 0 || (size_t)action_index >= pointer_count) {
+            LOGI("Motion event ignored because action index is invalid");
+            return;
+        }
+
         int pointer_id = AMotionEvent_getPointerId(event, action_index);
 
         input_handle_touch(
@@ -158,12 +202,12 @@ static void platform_process_input(AndroidPlatform* platform, float screen_width
         return;
     }
 
-    ALooper_pollOnce(0, NULL, NULL, NULL);
-
     while (AInputQueue_getEvent(queue, &event) >= 0) {
         int handled = 0;
 
         if (AInputQueue_preDispatchEvent(queue, event)) {
+            AInputQueue_finishEvent(queue, event, 0);
+            LOGI("Input event pre-dispatched and finished handled=0");
             continue;
         }
 
@@ -173,47 +217,117 @@ static void platform_process_input(AndroidPlatform* platform, float screen_width
         }
 
         AInputQueue_finishEvent(queue, event, handled);
+        LOGI("Input event finished handled=%d", handled);
     }
 
     pthread_mutex_unlock(&platform->input_queue_mutex);
 }
 
 static int platform_draw(AndroidPlatform* platform, float dt) {
-    if (platform == NULL || platform->window == NULL) {
+    ANativeWindow* window;
+
+    if (platform == NULL) {
+        return 0;
+    }
+
+    pthread_mutex_lock(&platform->window_mutex);
+    window = platform->window;
+    if (window == NULL) {
+        pthread_mutex_unlock(&platform->window_mutex);
+        if (!platform->null_window_logged) {
+            LOGI("Render skipped because window is null");
+            platform->null_window_logged = 1;
+        }
+        platform_process_input(platform, (float)platform->game.screenWidth);
         return 0;
     }
 
     ANativeWindow_Buffer buffer;
-    if (ANativeWindow_lock(platform->window, &buffer, NULL) != 0) {
+    if (ANativeWindow_lock(window, &buffer, NULL) != 0) {
+        pthread_mutex_unlock(&platform->window_mutex);
         LOGE("Failed to lock native window");
         return 0;
     }
 
+    platform->null_window_logged = 0;
     game_set_screen_size(&platform->game, (float)buffer.width, (float)buffer.height);
     platform_process_input(platform, (float)buffer.width);
     game_update(&platform->game, &platform->input, dt);
     input_end_frame(&platform->input);
     renderer_draw_frame(&buffer, &platform->game);
-    ANativeWindow_unlockAndPost(platform->window);
+    ANativeWindow_unlockAndPost(window);
+    pthread_mutex_unlock(&platform->window_mutex);
 
     return 1;
 }
 
+static int platform_take_reset_frame_time(AndroidPlatform* platform) {
+    int reset_frame_time;
+
+    pthread_mutex_lock(&platform->window_mutex);
+    reset_frame_time = platform->reset_frame_time;
+    platform->reset_frame_time = 0;
+    pthread_mutex_unlock(&platform->window_mutex);
+
+    return reset_frame_time;
+}
+
+static void platform_update_fps(AndroidPlatform* platform, float frame_time) {
+    if (platform == NULL) {
+        return;
+    }
+
+    platform->fps_elapsed += frame_time;
+    platform->fps_frame_time_total += frame_time;
+    platform->fps_frame_count += 1;
+
+    if (platform->fps_elapsed < 1.0) {
+        return;
+    }
+
+    platform->game.fps = (int)((double)platform->fps_frame_count / platform->fps_elapsed + 0.5);
+    platform->game.averageFrameMs = (int)((platform->fps_frame_time_total * 1000.0)
+            / (double)platform->fps_frame_count);
+
+    LOGI(
+            "fps=%d avgFrameMs=%d entities=%d",
+            platform->game.fps,
+            platform->game.averageFrameMs,
+            platform->game.activeEntityCount
+    );
+
+    platform->fps_elapsed = 0.0;
+    platform->fps_frame_time_total = 0.0;
+    platform->fps_frame_count = 0;
+}
+
 static void* platform_game_loop(void* data) {
     AndroidPlatform* platform = (AndroidPlatform*)data;
+    const double target_frame_seconds = 1.0 / 60.0;
     double last_time = platform_now_seconds();
 
     ALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
+    LOGI("Game loop start");
 
     while (platform->loop_running) {
-        double now = platform_now_seconds();
-        float dt = (float)(now - last_time);
-        last_time = now;
+        double frame_start = platform_now_seconds();
+        float dt = (float)(frame_start - last_time);
+        double frame_elapsed;
 
-        platform_draw(platform, dt);
-        platform_sleep_frame();
+        last_time = frame_start;
+        if (platform_take_reset_frame_time(platform) || dt > 0.1f) {
+            dt = (float)target_frame_seconds;
+        }
+
+        if (platform_draw(platform, dt)) {
+            platform_update_fps(platform, dt);
+        }
+
+        frame_elapsed = platform_now_seconds() - frame_start;
+        platform_sleep_seconds(target_frame_seconds - frame_elapsed);
     }
 
+    LOGI("Game loop stop");
     return NULL;
 }
 
@@ -294,10 +408,13 @@ static void platform_on_native_window_created(
     }
 
     LOGI("Native window created");
-    platform->window = window;
-
     ANativeWindow_setBuffersGeometry(window, 0, 0, WINDOW_FORMAT_RGBA_8888);
-    platform_start_game_loop(platform);
+
+    pthread_mutex_lock(&platform->window_mutex);
+    platform->window = window;
+    platform->null_window_logged = 0;
+    platform->reset_frame_time = 1;
+    pthread_mutex_unlock(&platform->window_mutex);
 }
 
 static void platform_on_native_window_destroyed(
@@ -312,8 +429,11 @@ static void platform_on_native_window_destroyed(
     }
 
     LOGI("Native window destroyed");
-    platform_stop_game_loop(platform);
-    platform->window = NULL;
+    pthread_mutex_lock(&platform->window_mutex);
+    if (platform->window == window) {
+        platform->window = NULL;
+    }
+    pthread_mutex_unlock(&platform->window_mutex);
 }
 
 static void platform_on_destroy(ANativeActivity* activity) {
@@ -324,6 +444,9 @@ static void platform_on_destroy(ANativeActivity* activity) {
 
     LOGI("Native activity destroyed");
     platform_stop_game_loop(platform);
+    pthread_mutex_lock(&platform->window_mutex);
+    platform->window = NULL;
+    pthread_mutex_unlock(&platform->window_mutex);
     pthread_mutex_lock(&platform->input_queue_mutex);
     if (platform->attached_input_queue != NULL) {
         AInputQueue_detachLooper(platform->attached_input_queue);
@@ -331,6 +454,7 @@ static void platform_on_destroy(ANativeActivity* activity) {
     }
     pthread_mutex_unlock(&platform->input_queue_mutex);
     pthread_mutex_destroy(&platform->input_queue_mutex);
+    pthread_mutex_destroy(&platform->window_mutex);
     activity->instance = NULL;
 
     free(platform);
@@ -351,7 +475,13 @@ void platform_android_on_create(
     }
 
     activity->instance = platform;
+    pthread_mutex_init(&platform->window_mutex, NULL);
     pthread_mutex_init(&platform->input_queue_mutex, NULL);
+    platform->fps_elapsed = 0.0;
+    platform->fps_frame_time_total = 0.0;
+    platform->fps_frame_count = 0;
+    platform->null_window_logged = 0;
+    platform->reset_frame_time = 1;
     game_init(&platform->game);
     input_init(&platform->input);
 
@@ -362,4 +492,5 @@ void platform_android_on_create(
     activity->callbacks->onDestroy = platform_on_destroy;
 
     LOGI("Little One native activity created");
+    platform_start_game_loop(platform);
 }

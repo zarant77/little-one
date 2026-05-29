@@ -1,6 +1,11 @@
 #include "game.h"
 
+#include <android/log.h>
+
+#include "config.h"
 #include "entity_config.h"
+
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
 
 static const float GRAVITY = 1400.0f;
 static const float GROUND_MARGIN = 48.0f;
@@ -59,6 +64,7 @@ static void game_clamp_player_x(GameState* game) {
 static void game_clamp_player_to_ground(GameState* game) {
     float ground_y = game_ground_y(game);
     float player_bottom = game->playerY + game_player_height();
+    int was_grounded = game->playerGrounded;
 
     if (game->playerY < 0.0f) {
         game->playerY = 0.0f;
@@ -76,6 +82,11 @@ static void game_clamp_player_to_ground(GameState* game) {
         game->playerGrounded = 1;
         game->playerSmashing = 0;
         game->playerCanSmash = 0;
+        if (!was_grounded) {
+            LOGI("Landing");
+        }
+    } else {
+        game->playerGrounded = 0;
     }
 }
 
@@ -99,6 +110,7 @@ static void game_spawn_entity(GameState* game) {
     Entity* entity = game_find_free_entity(game);
     float x = (float)game->screenWidth + SPAWN_RIGHT_PADDING;
     float y;
+    float y_offset;
 
     if (entity == 0 || game->screenWidth <= 0 || game->screenHeight <= 0) {
         return;
@@ -110,7 +122,8 @@ static void game_spawn_entity(GameState* game) {
             return;
         }
 
-        y = game_ground_y(game) - (float)enemy_config->visual.height;
+        y_offset = enemy_config->yMin + game_random_01() * (enemy_config->yMax - enemy_config->yMin);
+        y = game_ground_y(game) + y_offset - (float)enemy_config->visual.height;
         entity_spawn_enemy(entity, enemy_config, x, y);
     } else {
         const ObstacleConfig* obstacle_config = entity_config_get_obstacle(0);
@@ -134,6 +147,8 @@ static void game_update_spawn_timer(GameState* game, float dt) {
 }
 
 static void game_update_entities(GameState* game, float dt) {
+    int active_count = 0;
+
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         Entity* entity = game->entities + entity_index;
 
@@ -144,8 +159,12 @@ static void game_update_entities(GameState* game, float dt) {
         entity_update(entity, game->worldSpeed, dt);
         if (entity->x + (float)entity_get_width(entity) < 0.0f) {
             entity_clear(entity);
+        } else {
+            active_count += 1;
         }
     }
+
+    game->activeEntityCount = active_count;
 }
 
 static int game_rects_overlap(GameRect a, GameRect b) {
@@ -190,8 +209,11 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
         }
 
         if (entity->type == ENTITY_ENEMY && player_was_smashing) {
+            if (entity->enemyConfig != 0) {
+                game->score += entity->enemyConfig->scoreValue;
+            }
             entity_clear(entity);
-            game->score += 1;
+            LOGI("Enemy killed by smash");
             continue;
         }
 
@@ -228,6 +250,9 @@ void game_init(GameState* game) {
     game->gameOver = 0;
     game->score = 0;
     game->bestScore = best_score;
+    game->fps = 0;
+    game->averageFrameMs = 0;
+    game->activeEntityCount = 0;
 }
 
 void game_set_screen_size(GameState* game, float width, float height) {
@@ -299,10 +324,12 @@ void game_update(GameState* game, const InputState* input, float dt) {
             game->playerGrounded = 0;
             game->playerSmashing = 0;
             game->playerCanSmash = 1;
+            LOGI("Jump start");
         } else if (game->playerCanSmash) {
             game->playerVelocityY = entity_config_get_player()->smashVelocity;
             game->playerSmashing = 1;
             game->playerCanSmash = 0;
+            LOGI("Smash start");
         }
     }
 
@@ -314,7 +341,6 @@ void game_update(GameState* game, const InputState* input, float dt) {
     player_was_smashing = game->playerSmashing;
 
     game_clamp_player_x(game);
-    game->playerGrounded = 0;
     game_clamp_player_to_ground(game);
 
     game_update_spawn_timer(game, dt);

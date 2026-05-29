@@ -18,6 +18,9 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
                 "enemy.basic",
                 1,
                 120.0f,
+                1,
+                0.0f,
+                0.0f,
                 {
                         48,
                         48,

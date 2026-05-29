@@ -31,33 +31,107 @@ static const unsigned char RENDERER_DIGIT_SEGMENTS[10] = {
         0x6f,
 };
 
-static void renderer_put_rgba_8888(uint8_t* pixel, uint8_t r, uint8_t g, uint8_t b) {
-    pixel[0] = r;
-    pixel[1] = g;
-    pixel[2] = b;
-    pixel[3] = 255;
-}
-
-static void renderer_put_rgb_565(uint16_t* pixel, uint8_t r, uint8_t g, uint8_t b) {
+static uint16_t renderer_rgb_565(uint8_t r, uint8_t g, uint8_t b) {
     uint16_t r5 = (uint16_t)(r >> 3);
     uint16_t g6 = (uint16_t)(g >> 2);
     uint16_t b5 = (uint16_t)(b >> 3);
 
-    *pixel = (uint16_t)((r5 << 11) | (g6 << 5) | b5);
+    return (uint16_t)((r5 << 11) | (g6 << 5) | b5);
 }
 
-static int renderer_is_inside_rect(
+static void renderer_clear(ANativeWindow_Buffer* buffer) {
+    if (buffer->format == WINDOW_FORMAT_RGB_565) {
+        uint16_t* pixels = (uint16_t*)buffer->bits;
+
+        for (int y = 0; y < buffer->height; ++y) {
+            uint16_t* row = pixels + (y * buffer->stride);
+            for (int x = 0; x < buffer->width; ++x) {
+                row[x] = 0;
+            }
+        }
+
+        return;
+    }
+
+    uint8_t* pixels = (uint8_t*)buffer->bits;
+    for (int y = 0; y < buffer->height; ++y) {
+        uint8_t* row = pixels + ((y * buffer->stride) * 4);
+        for (int x = 0; x < buffer->width; ++x) {
+            uint8_t* pixel = row + (x * 4);
+            pixel[0] = 0;
+            pixel[1] = 0;
+            pixel[2] = 0;
+            pixel[3] = 255;
+        }
+    }
+}
+
+static void renderer_draw_rect(
+        ANativeWindow_Buffer* buffer,
         int x,
         int y,
-        int rect_x,
-        int rect_y,
-        int rect_width,
-        int rect_height
+        int width,
+        int height,
+        uint8_t r,
+        uint8_t g,
+        uint8_t b
 ) {
-    return x >= rect_x
-           && x < rect_x + rect_width
-           && y >= rect_y
-           && y < rect_y + rect_height;
+    int min_x = x;
+    int min_y = y;
+    int max_x = x + width;
+    int max_y = y + height;
+
+    if (min_x < 0) {
+        min_x = 0;
+    }
+    if (min_y < 0) {
+        min_y = 0;
+    }
+    if (max_x > buffer->width) {
+        max_x = buffer->width;
+    }
+    if (max_y > buffer->height) {
+        max_y = buffer->height;
+    }
+    if (min_x >= max_x || min_y >= max_y) {
+        return;
+    }
+
+    if (buffer->format == WINDOW_FORMAT_RGB_565) {
+        uint16_t color = renderer_rgb_565(r, g, b);
+        uint16_t* pixels = (uint16_t*)buffer->bits;
+
+        for (int draw_y = min_y; draw_y < max_y; ++draw_y) {
+            uint16_t* row = pixels + (draw_y * buffer->stride);
+            for (int draw_x = min_x; draw_x < max_x; ++draw_x) {
+                row[draw_x] = color;
+            }
+        }
+
+        return;
+    }
+
+    uint8_t* pixels = (uint8_t*)buffer->bits;
+    for (int draw_y = min_y; draw_y < max_y; ++draw_y) {
+        uint8_t* row = pixels + ((draw_y * buffer->stride) * 4);
+        for (int draw_x = min_x; draw_x < max_x; ++draw_x) {
+            uint8_t* pixel = row + (draw_x * 4);
+            pixel[0] = r;
+            pixel[1] = g;
+            pixel[2] = b;
+            pixel[3] = 255;
+        }
+    }
+}
+
+static int renderer_positive_mod(int value, int divisor) {
+    int result = value % divisor;
+
+    if (result < 0) {
+        result += divisor;
+    }
+
+    return result;
 }
 
 static int renderer_count_digits(int value) {
@@ -71,108 +145,118 @@ static int renderer_count_digits(int value) {
     return digits;
 }
 
-static int renderer_is_digit_segment_pixel(int x, int y, int origin_x, int origin_y, int segment) {
+static void renderer_draw_digit_segment(
+        ANativeWindow_Buffer* buffer,
+        int origin_x,
+        int origin_y,
+        int segment
+) {
     int half_height = RENDERER_DIGIT_HEIGHT / 2;
 
     if (segment == 0) {
-        return renderer_is_inside_rect(
-                x,
-                y,
+        renderer_draw_rect(
+                buffer,
                 origin_x + RENDERER_DIGIT_THICKNESS,
                 origin_y,
                 RENDERER_DIGIT_WIDTH - RENDERER_DIGIT_THICKNESS * 2,
-                RENDERER_DIGIT_THICKNESS
+                RENDERER_DIGIT_THICKNESS,
+                255,
+                255,
+                255
         );
-    }
-
-    if (segment == 1) {
-        return renderer_is_inside_rect(
-                x,
-                y,
+    } else if (segment == 1) {
+        renderer_draw_rect(
+                buffer,
                 origin_x + RENDERER_DIGIT_WIDTH - RENDERER_DIGIT_THICKNESS,
                 origin_y + RENDERER_DIGIT_THICKNESS,
                 RENDERER_DIGIT_THICKNESS,
-                half_height - RENDERER_DIGIT_THICKNESS
+                half_height - RENDERER_DIGIT_THICKNESS,
+                255,
+                255,
+                255
         );
-    }
-
-    if (segment == 2) {
-        return renderer_is_inside_rect(
-                x,
-                y,
+    } else if (segment == 2) {
+        renderer_draw_rect(
+                buffer,
                 origin_x + RENDERER_DIGIT_WIDTH - RENDERER_DIGIT_THICKNESS,
                 origin_y + half_height,
                 RENDERER_DIGIT_THICKNESS,
-                half_height - RENDERER_DIGIT_THICKNESS
+                half_height - RENDERER_DIGIT_THICKNESS,
+                255,
+                255,
+                255
         );
-    }
-
-    if (segment == 3) {
-        return renderer_is_inside_rect(
-                x,
-                y,
+    } else if (segment == 3) {
+        renderer_draw_rect(
+                buffer,
                 origin_x + RENDERER_DIGIT_THICKNESS,
                 origin_y + RENDERER_DIGIT_HEIGHT - RENDERER_DIGIT_THICKNESS,
                 RENDERER_DIGIT_WIDTH - RENDERER_DIGIT_THICKNESS * 2,
-                RENDERER_DIGIT_THICKNESS
+                RENDERER_DIGIT_THICKNESS,
+                255,
+                255,
+                255
         );
-    }
-
-    if (segment == 4) {
-        return renderer_is_inside_rect(
-                x,
-                y,
+    } else if (segment == 4) {
+        renderer_draw_rect(
+                buffer,
                 origin_x,
                 origin_y + half_height,
                 RENDERER_DIGIT_THICKNESS,
-                half_height - RENDERER_DIGIT_THICKNESS
+                half_height - RENDERER_DIGIT_THICKNESS,
+                255,
+                255,
+                255
         );
-    }
-
-    if (segment == 5) {
-        return renderer_is_inside_rect(
-                x,
-                y,
+    } else if (segment == 5) {
+        renderer_draw_rect(
+                buffer,
                 origin_x,
                 origin_y + RENDERER_DIGIT_THICKNESS,
                 RENDERER_DIGIT_THICKNESS,
-                half_height - RENDERER_DIGIT_THICKNESS
+                half_height - RENDERER_DIGIT_THICKNESS,
+                255,
+                255,
+                255
         );
-    }
-
-    if (segment == 6) {
-        return renderer_is_inside_rect(
-                x,
-                y,
+    } else if (segment == 6) {
+        renderer_draw_rect(
+                buffer,
                 origin_x + RENDERER_DIGIT_THICKNESS,
                 origin_y + half_height - RENDERER_DIGIT_THICKNESS / 2,
                 RENDERER_DIGIT_WIDTH - RENDERER_DIGIT_THICKNESS * 2,
-                RENDERER_DIGIT_THICKNESS
+                RENDERER_DIGIT_THICKNESS,
+                255,
+                255,
+                255
         );
     }
-
-    return 0;
 }
 
-static int renderer_is_digit_pixel(int x, int y, int origin_x, int origin_y, int digit) {
-    unsigned char segments;
-
+static void renderer_draw_digit(
+        ANativeWindow_Buffer* buffer,
+        int origin_x,
+        int origin_y,
+        int digit
+) {
     if (digit < 0 || digit > 9) {
-        return 0;
+        return;
     }
 
-    segments = RENDERER_DIGIT_SEGMENTS[digit];
+    unsigned char segments = RENDERER_DIGIT_SEGMENTS[digit];
     for (int segment = 0; segment < 7; ++segment) {
-        if ((segments & (1 << segment)) != 0
-                && renderer_is_digit_segment_pixel(x, y, origin_x, origin_y, segment)) {
-            return 1;
+        if ((segments & (1 << segment)) != 0) {
+            renderer_draw_digit_segment(buffer, origin_x, origin_y, segment);
         }
     }
-
-    return 0;
 }
 
-static int renderer_is_number_pixel(int x, int y, int origin_x, int origin_y, int value) {
+static void renderer_draw_number(
+        ANativeWindow_Buffer* buffer,
+        int origin_x,
+        int origin_y,
+        int value
+) {
     int digits[10];
     int digit_count = 0;
 
@@ -190,167 +274,121 @@ static int renderer_is_number_pixel(int x, int y, int origin_x, int origin_y, in
         int draw_index = digit_count - digit_index - 1;
         int digit_x = origin_x + digit_index * (RENDERER_DIGIT_WIDTH + RENDERER_DIGIT_SPACING);
 
-        if (renderer_is_digit_pixel(x, y, digit_x, origin_y, digits[draw_index])) {
-            return 1;
-        }
+        renderer_draw_digit(buffer, digit_x, origin_y, digits[draw_index]);
     }
-
-    return 0;
 }
 
-static int renderer_is_score_pixel(int x, int y, const GameState* game, int screen_width) {
+static void renderer_draw_background(ANativeWindow_Buffer* buffer, const GameState* game) {
+    int scroll = (int)(game->worldScrollX / RENDERER_PARALLAX_DIVISOR);
+    int first_x = -renderer_positive_mod(scroll, RENDERER_BACKGROUND_MARKER_SPACING);
+
+    for (int x = first_x; x < buffer->width; x += RENDERER_BACKGROUND_MARKER_SPACING) {
+        int marker_index = renderer_positive_mod((x + scroll) / RENDERER_BACKGROUND_MARKER_SPACING, 3);
+        int y = 70 + marker_index * 45;
+
+        renderer_draw_rect(
+                buffer,
+                x,
+                y,
+                RENDERER_BACKGROUND_MARKER_SIZE,
+                RENDERER_BACKGROUND_MARKER_SIZE,
+                48,
+                48,
+                48
+        );
+    }
+}
+
+static void renderer_draw_ground(ANativeWindow_Buffer* buffer, const GameState* game) {
+    int ground_y = game->screenHeight - RENDERER_GROUND_MARGIN;
+    int scroll = (int)game->worldScrollX;
+    int first_x = -renderer_positive_mod(scroll, RENDERER_GROUND_MARKER_SPACING);
+
+    renderer_draw_rect(buffer, 0, ground_y, buffer->width, RENDERER_GROUND_LINE_HEIGHT, 255, 255, 255);
+
+    for (int x = first_x; x < buffer->width; x += RENDERER_GROUND_MARKER_SPACING) {
+        renderer_draw_rect(
+                buffer,
+                x,
+                ground_y - RENDERER_GROUND_MARKER_HEIGHT,
+                RENDERER_GROUND_MARKER_WIDTH,
+                RENDERER_GROUND_MARKER_HEIGHT,
+                255,
+                255,
+                255
+        );
+    }
+}
+
+static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState* game) {
+    for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
+        const Entity* entity = game->entities + entity_index;
+
+        if (!entity->active) {
+            continue;
+        }
+
+        renderer_draw_rect(
+                buffer,
+                (int)entity->x,
+                (int)entity->y,
+                entity_get_width(entity),
+                entity_get_height(entity),
+                255,
+                255,
+                255
+        );
+    }
+}
+
+static void renderer_draw_player(ANativeWindow_Buffer* buffer, const GameState* game) {
+    int height = entity_config_get_player()->visual.height;
+    uint8_t r = 255;
+    uint8_t g = 255;
+    uint8_t b = 255;
+
+    if (game->playerSmashing) {
+        height += RENDERER_SMASH_EXTRA_HEIGHT;
+        g = 64;
+        b = 64;
+    }
+
+    renderer_draw_rect(
+            buffer,
+            (int)game->playerX,
+            (int)game->playerY,
+            entity_config_get_player()->visual.width,
+            height,
+            r,
+            g,
+            b
+    );
+}
+
+static void renderer_draw_diagnostics(ANativeWindow_Buffer* buffer, const GameState* game) {
     int best_digit_count = renderer_count_digits(game->bestScore);
     int best_width = best_digit_count * RENDERER_DIGIT_WIDTH
             + (best_digit_count - 1) * RENDERER_DIGIT_SPACING;
+    int fps_y = buffer->height - RENDERER_DIGIT_HEIGHT - 12;
 
-    return renderer_is_number_pixel(x, y, 12, 12, game->score)
-           || renderer_is_number_pixel(x, y, screen_width - best_width - 12, 12, game->bestScore);
-}
-
-static int renderer_is_ground_line(int y, const GameState* game) {
-    int ground_y = game->screenHeight - RENDERER_GROUND_MARGIN;
-
-    return y >= ground_y && y < ground_y + RENDERER_GROUND_LINE_HEIGHT;
-}
-
-static int renderer_positive_mod(int value, int divisor) {
-    int result = value % divisor;
-
-    if (result < 0) {
-        result += divisor;
+    if (fps_y < 40) {
+        fps_y = 40;
     }
 
-    return result;
-}
-
-static int renderer_is_ground_marker(int x, int y, const GameState* game) {
-    int ground_y = game->screenHeight - RENDERER_GROUND_MARGIN;
-    int scroll = (int)game->worldScrollX;
-    int marker_x = renderer_positive_mod(x + scroll, RENDERER_GROUND_MARKER_SPACING);
-
-    return marker_x < RENDERER_GROUND_MARKER_WIDTH
-           && y >= ground_y - RENDERER_GROUND_MARKER_HEIGHT
-           && y < ground_y;
-}
-
-static int renderer_is_background_marker(int x, int y, const GameState* game) {
-    int scroll = (int)(game->worldScrollX / RENDERER_PARALLAX_DIVISOR);
-    int marker_x = renderer_positive_mod(x + scroll, RENDERER_BACKGROUND_MARKER_SPACING);
-    int marker_row = renderer_positive_mod((x + scroll) / RENDERER_BACKGROUND_MARKER_SPACING, 3);
-    int marker_y = 70 + marker_row * 45;
-
-    return marker_x < RENDERER_BACKGROUND_MARKER_SIZE
-           && y >= marker_y
-           && y < marker_y + RENDERER_BACKGROUND_MARKER_SIZE;
-}
-
-static int renderer_is_player_pixel(int x, int y, int rect_x, int rect_y, int rect_height) {
-    return renderer_is_inside_rect(
-            x,
-            y,
-            rect_x,
-            rect_y,
-            entity_config_get_player()->visual.width,
-            rect_height
-    );
-}
-
-static int renderer_is_entity_pixel(int x, int y, const Entity* entity) {
-    if (entity == 0 || !entity->active) {
-        return 0;
-    }
-
-    return renderer_is_inside_rect(
-            x,
-            y,
-            (int)entity->x,
-            (int)entity->y,
-            entity_get_width(entity),
-            entity_get_height(entity)
-    );
-}
-
-static int renderer_is_any_entity_pixel(int x, int y, const GameState* game) {
-    for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
-        if (renderer_is_entity_pixel(x, y, game->entities + entity_index)) {
-            return 1;
-        }
-    }
-
-    return 0;
+    renderer_draw_number(buffer, 12, 12, game->score);
+    renderer_draw_number(buffer, buffer->width - best_width - 12, 12, game->bestScore);
+    renderer_draw_number(buffer, 12, fps_y, game->fps);
 }
 
 void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
-    if (buffer == NULL || buffer->bits == NULL || game == NULL) {
+    if (buffer == 0 || buffer->bits == 0 || game == 0) {
         return;
     }
 
-    int width = buffer->width;
-    int height = buffer->height;
-    int rect_x = (int)game->playerX;
-    int rect_y = (int)game->playerY;
-    int rect_height = entity_config_get_player()->visual.height;
-    if (game->playerSmashing) {
-        rect_height += RENDERER_SMASH_EXTRA_HEIGHT;
-    }
-
-    if (buffer->format == WINDOW_FORMAT_RGB_565) {
-        uint16_t* pixels = (uint16_t*)buffer->bits;
-
-        for (int y = 0; y < height; ++y) {
-            uint16_t* row = pixels + (y * buffer->stride);
-
-            for (int x = 0; x < width; ++x) {
-                int is_ground = renderer_is_ground_line(y, game);
-                int is_ground_marker = renderer_is_ground_marker(x, y, game);
-                int is_background = renderer_is_background_marker(x, y, game);
-                int is_entity = renderer_is_any_entity_pixel(x, y, game);
-                int is_player = renderer_is_player_pixel(x, y, rect_x, rect_y, rect_height);
-                int is_score = renderer_is_score_pixel(x, y, game, width);
-                int is_foreground = is_ground || is_ground_marker || is_entity || is_player || is_score;
-                uint8_t color = is_foreground ? 255 : 0;
-                uint8_t red = is_background && !is_foreground ? 48 : color;
-                uint8_t green = is_background && !is_foreground ? 48 : color;
-                uint8_t blue = is_background && !is_foreground ? 48 : color;
-
-                if (game->playerSmashing && is_player) {
-                    red = 255;
-                    green = 64;
-                    blue = 64;
-                }
-
-                renderer_put_rgb_565(row + x, red, green, blue);
-            }
-        }
-
-        return;
-    }
-
-    uint8_t* pixels = (uint8_t*)buffer->bits;
-
-    for (int y = 0; y < height; ++y) {
-        uint8_t* row = pixels + ((y * buffer->stride) * 4);
-
-        for (int x = 0; x < width; ++x) {
-            int is_ground = renderer_is_ground_line(y, game);
-            int is_ground_marker = renderer_is_ground_marker(x, y, game);
-            int is_background = renderer_is_background_marker(x, y, game);
-            int is_entity = renderer_is_any_entity_pixel(x, y, game);
-            int is_player = renderer_is_player_pixel(x, y, rect_x, rect_y, rect_height);
-            int is_score = renderer_is_score_pixel(x, y, game, width);
-            int is_foreground = is_ground || is_ground_marker || is_entity || is_player || is_score;
-            uint8_t color = is_foreground ? 255 : 0;
-            uint8_t red = is_background && !is_foreground ? 48 : color;
-            uint8_t green = is_background && !is_foreground ? 48 : color;
-            uint8_t blue = is_background && !is_foreground ? 48 : color;
-
-            if (game->playerSmashing && is_player) {
-                red = 255;
-                green = 64;
-                blue = 64;
-            }
-
-            renderer_put_rgba_8888(row + (x * 4), red, green, blue);
-        }
-    }
+    renderer_clear(buffer);
+    renderer_draw_background(buffer, game);
+    renderer_draw_ground(buffer, game);
+    renderer_draw_entities(buffer, game);
+    renderer_draw_player(buffer, game);
+    renderer_draw_diagnostics(buffer, game);
 }

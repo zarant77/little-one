@@ -23,6 +23,9 @@ typedef struct {
     int gameOver;
     int score;
     int bestScore;
+    int fps;
+    int averageFrameMs;
+    int activeEntityCount;
 } GameState;
 
 void game_init(GameState* game);
