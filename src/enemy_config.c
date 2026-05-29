@@ -13,7 +13,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .width = 160,             // Render and collision width
             .height = 160,            // Render and collision height
             .color = 0xc06e00ff,      // Fallback rectangle color
-            .spriteId = "enemy.boar", // Future sprite identifier
+            .spriteId = SPRITE_BOAR,  // Generated sprite identifier
             .animationId = "walk",    // Future default animation
         },
     },
@@ -29,7 +29,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .width = 200,            // Render and collision width
             .height = 200,           // Render and collision height
             .color = 0x00aa00ff,     // Fallback rectangle color
-            .spriteId = "enemy.ork", // Future sprite identifier
+            .spriteId = SPRITE_ORK,  // Generated sprite identifier
             .animationId = "walk",   // Future default animation
         },
     },
@@ -45,7 +45,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .width = 128,            // Render and collision width
             .height = 64,            // Render and collision height
             .color = 0x666666ff,     // Fallback rectangle color
-            .spriteId = "enemy.rat", // Future sprite identifier
+            .spriteId = SPRITE_RAT,  // Generated sprite identifier
             .animationId = "walk",   // Future default animation
         },
     },

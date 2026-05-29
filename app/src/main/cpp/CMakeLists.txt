@@ -5,6 +5,7 @@ project(littleone C)
 add_library(littleone SHARED
     ../../../../src/entity.c
     ../../../../src/enemy_config.c
+    ../../../../src/generated_sprite.c
     ../../../../src/game.c
     ../../../../src/input.c
     ../../../../src/main.c
