@@ -6,6 +6,15 @@
 typedef struct {
     float playerX;
     float playerY;
+    float playerVelocityX;
+    float playerVelocityY;
+    int playerGrounded;
+    int playerSmashing;
+    int playerCanSmash;
+    int screenWidth;
+    int screenHeight;
+    float worldScrollX;
+    float worldSpeed;
 } GameState;
 
 void game_init(GameState* game);
