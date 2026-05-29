@@ -4,6 +4,7 @@ project(littleone C)
 
 add_library(littleone SHARED
     ../../../../src/game.c
+    ../../../../src/input.c
     ../../../../src/main.c
     ../../../../src/platform_android.c
     ../../../../src/renderer.c
