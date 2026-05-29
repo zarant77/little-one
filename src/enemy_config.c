@@ -1,0 +1,74 @@
+#include "enemy_config.h"
+
+static const EnemyConfig ENEMY_CONFIGS[] = {
+    // Boar
+    {
+        .id = "enemy.boar",  // Stable enemy identifier
+        .hp = 1,             // Hit points
+        .scoreValue = 1,     // Score awarded on kill
+        .moveSpeed = 600.0f, // Horizontal movement speed
+        .yMin = 0.0f,        // Minimum spawn Y offset from ground
+        .yMax = 0.0f,        // Maximum spawn Y offset from ground
+        .visual = {
+            .width = 160,             // Render and collision width
+            .height = 160,            // Render and collision height
+            .color = 0xc06e00ff,      // Fallback rectangle color
+            .spriteId = "enemy.boar", // Future sprite identifier
+            .animationId = "walk",    // Future default animation
+        },
+    },
+    // Ork
+    {
+        .id = "enemy.ork",   // Stable enemy identifier
+        .hp = 1,             // Hit points
+        .scoreValue = 1,     // Score awarded on kill
+        .moveSpeed = 300.0f, // Horizontal movement speed
+        .yMin = 0.0f,        // Minimum spawn Y offset from ground
+        .yMax = 0.0f,        // Maximum spawn Y offset from ground
+        .visual = {
+            .width = 200,            // Render and collision width
+            .height = 200,           // Render and collision height
+            .color = 0x00aa00ff,     // Fallback rectangle color
+            .spriteId = "enemy.ork", // Future sprite identifier
+            .animationId = "walk",   // Future default animation
+        },
+    },
+    // Rat
+    {
+        .id = "enemy.rat",   // Stable enemy identifier
+        .hp = 1,             // Hit points
+        .scoreValue = 1,     // Score awarded on kill
+        .moveSpeed = 900.0f, // Horizontal movement speed
+        .yMin = 0.0f,        // Minimum spawn Y offset from ground
+        .yMax = 0.0f,        // Maximum spawn Y offset from ground
+        .visual = {
+            .width = 128,            // Render and collision width
+            .height = 64,            // Render and collision height
+            .color = 0x666666ff,     // Fallback rectangle color
+            .spriteId = "enemy.rat", // Future sprite identifier
+            .animationId = "walk",   // Future default animation
+        },
+    },
+};
+
+static const int ENEMY_CONFIG_COUNT = sizeof(ENEMY_CONFIGS) / sizeof(ENEMY_CONFIGS[0]);
+
+const EnemyConfig *enemy_config_get_all(int *count)
+{
+    if (count != 0)
+    {
+        *count = ENEMY_CONFIG_COUNT;
+    }
+
+    return ENEMY_CONFIGS;
+}
+
+const EnemyConfig *enemy_config_get(int index)
+{
+    if (index < 0 || index >= ENEMY_CONFIG_COUNT)
+    {
+        return 0;
+    }
+
+    return ENEMY_CONFIGS + index;
+}

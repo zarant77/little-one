@@ -1,0 +1,16 @@
+#ifndef LITTLE_ONE_PLAYER_CONFIG_H
+#define LITTLE_ONE_PLAYER_CONFIG_H
+
+#include "entity_config.h"
+
+typedef struct {
+    int hp;
+    float moveSpeed;
+    float jumpVelocity;
+    float smashVelocity;
+    EntityVisualConfig visual;
+} PlayerConfig;
+
+const PlayerConfig* player_config_get(void);
+
+#endif

@@ -1,7 +1,7 @@
 #include "input.h"
 
-#define INPUT_MOVE_ZONE_PERCENT 0.70f
-#define INPUT_MOVE_THRESHOLD 24.0f
+#include "game_settings.h"
+
 #define INPUT_NO_POINTER -1
 
 static int movement_pointer_id = INPUT_NO_POINTER;
@@ -9,7 +9,7 @@ static int action_pointer_id = INPUT_NO_POINTER;
 static float movement_start_x = 0.0f;
 
 static int input_is_movement_zone(float x, float screen_width) {
-    return x < screen_width * INPUT_MOVE_ZONE_PERCENT;
+    return x < screen_width * LITTLE_ONE_MOVEMENT_TOUCH_ZONE_RATIO;
 }
 
 static void input_clear_movement(InputState* input) {
@@ -34,9 +34,9 @@ static void input_update_movement(InputState* input, float x) {
     input->right = 0;
 
     delta_x = x - movement_start_x;
-    if (delta_x < -INPUT_MOVE_THRESHOLD) {
+    if (delta_x < -LITTLE_ONE_MOVEMENT_DEADZONE_PX) {
         input->left = 1;
-    } else if (delta_x > INPUT_MOVE_THRESHOLD) {
+    } else if (delta_x > LITTLE_ONE_MOVEMENT_DEADZONE_PX) {
         input->right = 1;
     }
 }

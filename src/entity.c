@@ -48,7 +48,7 @@ void entity_update(Entity* entity, float world_speed, float dt) {
 
     speed = world_speed;
     if (entity->type == ENTITY_ENEMY && entity->enemyConfig != 0) {
-        speed = entity->enemyConfig->moveSpeed;
+        speed += entity->enemyConfig->moveSpeed;
     }
 
     entity->x -= speed * dt;

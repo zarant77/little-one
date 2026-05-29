@@ -3,13 +3,14 @@
 #include <android/log.h>
 
 #include "config.h"
-#include "entity_config.h"
+#include "enemy_config.h"
+#include "game_settings.h"
+#include "obstacle_config.h"
+#include "player_config.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
 
-static const float GRAVITY = 1400.0f;
-static const float GROUND_MARGIN = 48.0f;
-static const float WORLD_SPEED = 120.0f;
+static const float GRAVITY = 3000.0f;
 static const float WORLD_SCROLL_WRAP = 10000.0f;
 static const float SPAWN_MIN_SECONDS = 1.5f;
 static const float SPAWN_SECONDS_RANGE = 1.0f;
@@ -24,15 +25,15 @@ typedef struct {
 } GameRect;
 
 static float game_player_width(void) {
-    return (float)entity_config_get_player()->visual.width;
+    return (float)player_config_get()->visual.width;
 }
 
 static float game_player_height(void) {
-    return (float)entity_config_get_player()->visual.height;
+    return (float)player_config_get()->visual.height;
 }
 
 static float game_ground_y(const GameState* game) {
-    return (float)game->screenHeight - GROUND_MARGIN;
+    return (float)game->screenHeight - LITTLE_ONE_GROUND_BOTTOM_MARGIN_PX;
 }
 
 static float game_random_01(void) {
@@ -43,6 +44,21 @@ static float game_random_01(void) {
 
 static float game_next_spawn_time(void) {
     return SPAWN_MIN_SECONDS + game_random_01() * SPAWN_SECONDS_RANGE;
+}
+
+static int game_random_index(int count) {
+    int index;
+
+    if (count <= 0) {
+        return -1;
+    }
+
+    index = (int)(game_random_01() * (float)count);
+    if (index >= count) {
+        index = count - 1;
+    }
+
+    return index;
 }
 
 static void game_clamp_player_x(GameState* game) {
@@ -83,7 +99,9 @@ static void game_clamp_player_to_ground(GameState* game) {
         game->playerSmashing = 0;
         game->playerCanSmash = 0;
         if (!was_grounded) {
+            #if LITTLE_ONE_DEBUG_SMASH
             LOGI("Landing");
+            #endif
         }
     } else {
         game->playerGrounded = 0;
@@ -93,6 +111,16 @@ static void game_clamp_player_to_ground(GameState* game) {
 static void game_clear_entities(GameState* game) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         entity_clear(game->entities + entity_index);
+    }
+}
+
+static void game_shift_entities_y(GameState* game, float y_delta) {
+    for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
+        Entity* entity = game->entities + entity_index;
+
+        if (entity->active) {
+            entity->y += y_delta;
+        }
     }
 }
 
@@ -117,7 +145,13 @@ static void game_spawn_entity(GameState* game) {
     }
 
     if (game_random_01() < 0.5f) {
-        const EnemyConfig* enemy_config = entity_config_get_enemy(0);
+        int enemy_count = 0;
+        int enemy_index;
+        const EnemyConfig* enemy_config;
+
+        enemy_config_get_all(&enemy_count);
+        enemy_index = game_random_index(enemy_count);
+        enemy_config = enemy_config_get(enemy_index);
         if (enemy_config == 0) {
             return;
         }
@@ -126,7 +160,13 @@ static void game_spawn_entity(GameState* game) {
         y = game_ground_y(game) + y_offset - (float)enemy_config->visual.height;
         entity_spawn_enemy(entity, enemy_config, x, y);
     } else {
-        const ObstacleConfig* obstacle_config = entity_config_get_obstacle(0);
+        int obstacle_count = 0;
+        int obstacle_index;
+        const ObstacleConfig* obstacle_config;
+
+        obstacle_config_get_all(&obstacle_count);
+        obstacle_index = game_random_index(obstacle_count);
+        obstacle_config = obstacle_config_get(obstacle_index);
         if (obstacle_config == 0) {
             return;
         }
@@ -213,7 +253,9 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
                 game->score += entity->enemyConfig->scoreValue;
             }
             entity_clear(entity);
+            #if LITTLE_ONE_DEBUG_SMASH
             LOGI("Enemy killed by smash");
+            #endif
             continue;
         }
 
@@ -244,7 +286,7 @@ void game_init(GameState* game) {
     game->screenWidth = 0;
     game->screenHeight = 0;
     game->worldScrollX = 0.0f;
-    game->worldSpeed = WORLD_SPEED;
+    game->worldSpeed = LITTLE_ONE_WORLD_SCROLL_SPEED;
     game_clear_entities(game);
     game->spawnTimer = game_next_spawn_time();
     game->gameOver = 0;
@@ -258,6 +300,10 @@ void game_init(GameState* game) {
 void game_set_screen_size(GameState* game, float width, float height) {
     int old_screen_width;
     int old_screen_height;
+    float old_ground_y;
+    float new_ground_y;
+    float player_ground_offset;
+    int was_grounded;
 
     if (game == 0) {
         return;
@@ -265,18 +311,40 @@ void game_set_screen_size(GameState* game, float width, float height) {
 
     old_screen_width = game->screenWidth;
     old_screen_height = game->screenHeight;
+    old_ground_y = game_ground_y(game);
+    player_ground_offset = 0.0f;
+    was_grounded = game->playerGrounded;
+
+    if (old_screen_width > 0 && old_screen_height > 0) {
+        player_ground_offset = old_ground_y - (game->playerY + game_player_height());
+        if (was_grounded || player_ground_offset < 0.0f) {
+            player_ground_offset = 0.0f;
+        }
+    }
 
     game->screenWidth = (int)width;
     game->screenHeight = (int)height;
+    new_ground_y = game_ground_y(game);
 
     if (old_screen_width <= 0 || old_screen_height <= 0) {
         game->playerX = 0.0f;
-        game->playerY = game_ground_y(game) - game_player_height();
+        game->playerY = new_ground_y - game_player_height();
         game->playerVelocityX = 0.0f;
         game->playerVelocityY = 0.0f;
         game->playerGrounded = 1;
         game->playerSmashing = 0;
         game->playerCanSmash = 0;
+    } else if (old_screen_width != game->screenWidth || old_screen_height != game->screenHeight) {
+        game->playerY = new_ground_y - game_player_height() - player_ground_offset;
+        game_shift_entities_y(game, new_ground_y - old_ground_y);
+        if (was_grounded) {
+            game->playerVelocityY = 0.0f;
+            game->playerGrounded = 1;
+            game->playerSmashing = 0;
+            game->playerCanSmash = 0;
+        } else if (game->playerY + game_player_height() >= new_ground_y) {
+            game->playerVelocityY = 0.0f;
+        }
     }
 
     game_clamp_player_x(game);
@@ -311,25 +379,29 @@ void game_update(GameState* game, const InputState* input, float dt) {
     game->playerVelocityX = 0.0f;
 
     if (input != 0 && input->left) {
-        game->playerVelocityX = -entity_config_get_player()->moveSpeed;
+        game->playerVelocityX = -player_config_get()->moveSpeed;
     }
 
     if (input != 0 && input->right) {
-        game->playerVelocityX = entity_config_get_player()->moveSpeed;
+        game->playerVelocityX = player_config_get()->moveSpeed;
     }
 
     if (input != 0 && input->actionPressed) {
         if (game->playerGrounded) {
-            game->playerVelocityY = entity_config_get_player()->jumpVelocity;
+            game->playerVelocityY = player_config_get()->jumpVelocity;
             game->playerGrounded = 0;
             game->playerSmashing = 0;
             game->playerCanSmash = 1;
+            #if LITTLE_ONE_DEBUG_SMASH
             LOGI("Jump start");
+            #endif
         } else if (game->playerCanSmash) {
-            game->playerVelocityY = entity_config_get_player()->smashVelocity;
+            game->playerVelocityY = player_config_get()->smashVelocity;
             game->playerSmashing = 1;
             game->playerCanSmash = 0;
+            #if LITTLE_ONE_DEBUG_SMASH
             LOGI("Smash start");
+            #endif
         }
     }
 

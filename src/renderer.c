@@ -2,10 +2,10 @@
 
 #include <stdint.h>
 
-#include "entity_config.h"
+#include "game_settings.h"
+#include "player_config.h"
 
 #define RENDERER_SMASH_EXTRA_HEIGHT 24
-#define RENDERER_GROUND_MARGIN 48
 #define RENDERER_GROUND_LINE_HEIGHT 2
 #define RENDERER_GROUND_MARKER_SPACING 96
 #define RENDERER_GROUND_MARKER_WIDTH 8
@@ -122,6 +122,26 @@ static void renderer_draw_rect(
             pixel[3] = 255;
         }
     }
+}
+
+static void renderer_draw_color_rect(
+        ANativeWindow_Buffer* buffer,
+        int x,
+        int y,
+        int width,
+        int height,
+        uint32_t color
+) {
+    renderer_draw_rect(
+            buffer,
+            x,
+            y,
+            width,
+            height,
+            (uint8_t)((color >> 24) & 0xff),
+            (uint8_t)((color >> 16) & 0xff),
+            (uint8_t)((color >> 8) & 0xff)
+    );
 }
 
 static int renderer_positive_mod(int value, int divisor) {
@@ -300,7 +320,7 @@ static void renderer_draw_background(ANativeWindow_Buffer* buffer, const GameSta
 }
 
 static void renderer_draw_ground(ANativeWindow_Buffer* buffer, const GameState* game) {
-    int ground_y = game->screenHeight - RENDERER_GROUND_MARGIN;
+    int ground_y = game->screenHeight - (int)LITTLE_ONE_GROUND_BOTTOM_MARGIN_PX;
     int scroll = (int)game->worldScrollX;
     int first_x = -renderer_positive_mod(scroll, RENDERER_GROUND_MARKER_SPACING);
 
@@ -323,45 +343,44 @@ static void renderer_draw_ground(ANativeWindow_Buffer* buffer, const GameState* 
 static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState* game) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         const Entity* entity = game->entities + entity_index;
+        uint32_t color = 0xffffffff;
 
         if (!entity->active) {
             continue;
         }
 
-        renderer_draw_rect(
+        if (entity->type == ENTITY_ENEMY && entity->enemyConfig != 0) {
+            color = entity->enemyConfig->visual.color;
+        } else if (entity->type == ENTITY_OBSTACLE && entity->obstacleConfig != 0) {
+            color = entity->obstacleConfig->visual.color;
+        }
+
+        renderer_draw_color_rect(
                 buffer,
                 (int)entity->x,
                 (int)entity->y,
                 entity_get_width(entity),
                 entity_get_height(entity),
-                255,
-                255,
-                255
+                color
         );
     }
 }
 
 static void renderer_draw_player(ANativeWindow_Buffer* buffer, const GameState* game) {
-    int height = entity_config_get_player()->visual.height;
-    uint8_t r = 255;
-    uint8_t g = 255;
-    uint8_t b = 255;
+    const PlayerConfig* player_config = player_config_get();
+    int height = player_config->visual.height;
 
     if (game->playerSmashing) {
         height += RENDERER_SMASH_EXTRA_HEIGHT;
-        g = 64;
-        b = 64;
     }
 
-    renderer_draw_rect(
+    renderer_draw_color_rect(
             buffer,
             (int)game->playerX,
             (int)game->playerY,
-            entity_config_get_player()->visual.width,
+            player_config->visual.width,
             height,
-            r,
-            g,
-            b
+            player_config->visual.color
     );
 }
 
@@ -377,7 +396,11 @@ static void renderer_draw_diagnostics(ANativeWindow_Buffer* buffer, const GameSt
 
     renderer_draw_number(buffer, 12, 12, game->score);
     renderer_draw_number(buffer, buffer->width - best_width - 12, 12, game->bestScore);
+    #if LITTLE_ONE_SHOW_FPS
     renderer_draw_number(buffer, 12, fps_y, game->fps);
+    #else
+    (void)fps_y;
+    #endif
 }
 
 void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {

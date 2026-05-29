@@ -4,11 +4,13 @@ project(littleone C)
 
 add_library(littleone SHARED
     ../../../../src/entity.c
-    ../../../../src/entity_config.c
+    ../../../../src/enemy_config.c
     ../../../../src/game.c
     ../../../../src/input.c
     ../../../../src/main.c
+    ../../../../src/obstacle_config.c
     ../../../../src/platform_android.c
+    ../../../../src/player_config.c
     ../../../../src/renderer.c
 )
 
