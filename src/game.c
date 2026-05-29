@@ -191,18 +191,26 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
 
         if (entity->type == ENTITY_ENEMY && player_was_smashing) {
             entity_clear(entity);
+            game->score += 1;
             continue;
         }
 
         game->gameOver = 1;
+        if (game->score > game->bestScore) {
+            game->bestScore = game->score;
+        }
         return;
     }
 }
 
 void game_init(GameState* game) {
+    int best_score;
+
     if (game == 0) {
         return;
     }
+
+    best_score = game->bestScore;
 
     game->playerX = 0.0f;
     game->playerY = 0.0f;
@@ -218,6 +226,8 @@ void game_init(GameState* game) {
     game_clear_entities(game);
     game->spawnTimer = game_next_spawn_time();
     game->gameOver = 0;
+    game->score = 0;
+    game->bestScore = best_score;
 }
 
 void game_set_screen_size(GameState* game, float width, float height) {

@@ -21,6 +21,8 @@ typedef struct {
     Entity entities[MAX_ENTITIES];
     float spawnTimer;
     int gameOver;
+    int score;
+    int bestScore;
 } GameState;
 
 void game_init(GameState* game);
