@@ -3,6 +3,8 @@
 
 #include <android/native_window.h>
 
-void renderer_draw_first_pixel(ANativeWindow_Buffer* buffer);
+#include "game.h"
+
+void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game);
 
 #endif

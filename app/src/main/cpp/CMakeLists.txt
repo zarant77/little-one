@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.22.1)
 project(littleone C)
 
 add_library(littleone SHARED
+    ../../../../src/game.c
     ../../../../src/main.c
     ../../../../src/platform_android.c
     ../../../../src/renderer.c

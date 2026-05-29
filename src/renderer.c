@@ -31,8 +31,8 @@ static int renderer_is_inside_rect(
            && y < rect_y + rect_height;
 }
 
-void renderer_draw_first_pixel(ANativeWindow_Buffer* buffer) {
-    if (buffer == NULL || buffer->bits == NULL) {
+void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
+    if (buffer == NULL || buffer->bits == NULL || game == NULL) {
         return;
     }
 
@@ -48,8 +48,8 @@ void renderer_draw_first_pixel(ANativeWindow_Buffer* buffer) {
         rect_height = height;
     }
 
-    int rect_x = (width - rect_width) / 2;
-    int rect_y = (height - rect_height) / 2;
+    int rect_x = (int)game->playerX;
+    int rect_y = (int)game->playerY;
 
     if (buffer->format == WINDOW_FORMAT_RGB_565) {
         uint16_t* pixels = (uint16_t*)buffer->bits;
