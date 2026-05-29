@@ -1,7 +1,10 @@
 #ifndef LITTLE_ONE_GAME_H
 #define LITTLE_ONE_GAME_H
 
+#include "entity.h"
 #include "input.h"
+
+#define MAX_ENTITIES 16
 
 typedef struct {
     float playerX;
@@ -15,6 +18,9 @@ typedef struct {
     int screenHeight;
     float worldScrollX;
     float worldSpeed;
+    Entity entities[MAX_ENTITIES];
+    float spawnTimer;
+    int gameOver;
 } GameState;
 
 void game_init(GameState* game);

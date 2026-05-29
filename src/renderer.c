@@ -91,6 +91,31 @@ static int renderer_is_player_pixel(int x, int y, int rect_x, int rect_y, int re
     );
 }
 
+static int renderer_is_entity_pixel(int x, int y, const Entity* entity) {
+    if (entity == 0 || !entity->active) {
+        return 0;
+    }
+
+    return renderer_is_inside_rect(
+            x,
+            y,
+            (int)entity->x,
+            (int)entity->y,
+            entity_get_width(entity),
+            entity_get_height(entity)
+    );
+}
+
+static int renderer_is_any_entity_pixel(int x, int y, const GameState* game) {
+    for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
+        if (renderer_is_entity_pixel(x, y, game->entities + entity_index)) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     if (buffer == NULL || buffer->bits == NULL || game == NULL) {
         return;
@@ -115,8 +140,9 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
                 int is_ground = renderer_is_ground_line(y, game);
                 int is_ground_marker = renderer_is_ground_marker(x, y, game);
                 int is_background = renderer_is_background_marker(x, y, game);
+                int is_entity = renderer_is_any_entity_pixel(x, y, game);
                 int is_player = renderer_is_player_pixel(x, y, rect_x, rect_y, rect_height);
-                int is_foreground = is_ground || is_ground_marker || is_player;
+                int is_foreground = is_ground || is_ground_marker || is_entity || is_player;
                 uint8_t color = is_foreground ? 255 : 0;
                 uint8_t red = is_background && !is_foreground ? 48 : color;
                 uint8_t green = is_background && !is_foreground ? 48 : color;
@@ -144,8 +170,9 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
             int is_ground = renderer_is_ground_line(y, game);
             int is_ground_marker = renderer_is_ground_marker(x, y, game);
             int is_background = renderer_is_background_marker(x, y, game);
+            int is_entity = renderer_is_any_entity_pixel(x, y, game);
             int is_player = renderer_is_player_pixel(x, y, rect_x, rect_y, rect_height);
-            int is_foreground = is_ground || is_ground_marker || is_player;
+            int is_foreground = is_ground || is_ground_marker || is_entity || is_player;
             uint8_t color = is_foreground ? 255 : 0;
             uint8_t red = is_background && !is_foreground ? 48 : color;
             uint8_t green = is_background && !is_foreground ? 48 : color;
