@@ -1,6 +1,6 @@
 #include <android/native_activity.h>
 
-#include "platform_android.h"
+#include "platform/platform_android.h"
 
 void ANativeActivity_onCreate(
         ANativeActivity* activity,

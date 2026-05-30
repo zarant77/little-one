@@ -3,14 +3,6 @@
 
 #include <stdint.h>
 
-#define DRAW_COMMAND_SIZE 7
-
-typedef enum {
-    DRAW_RECT = 0,
-    DRAW_CIRCLE = 1,
-    DRAW_TRIANGLE = 2
-} DrawKind;
-
 typedef enum {
     SPRITE_NONE = -1,
     SPRITE_PLAYER = 0,
@@ -19,18 +11,21 @@ typedef enum {
     SPRITE_RAT,
     SPRITE_ROCK,
     SPRITE_STUMP,
-    SPRITE_COUNT
+    SPRITE_ID_COUNT
 } SpriteId;
 
 typedef struct {
-    const uint32_t* data;
-    int command_count;
-    int width;
-    int height;
+    const char* id;
+    int16_t width;
+    int16_t height;
+    int16_t pivot_x;
+    int16_t pivot_y;
+    uint32_t* pixels;
 } GeneratedSprite;
 
-extern const GeneratedSprite PLAYER_SPRITE;
+void generated_sprite_initialize_all(void);
 
 const GeneratedSprite* generated_sprite_get(SpriteId sprite_id);
+const GeneratedSprite* generated_sprite_get_by_id(const char* sprite_id);
 
 #endif

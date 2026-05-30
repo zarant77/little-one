@@ -1,8 +1,8 @@
 #ifndef LITTLE_ONE_ENTITY_H
 #define LITTLE_ONE_ENTITY_H
 
-#include "enemy_config.h"
-#include "obstacle_config.h"
+#include "../config/enemy_config.h"
+#include "../config/obstacle_config.h"
 
 typedef enum {
     ENTITY_NONE,

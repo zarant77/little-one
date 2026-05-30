@@ -9,7 +9,7 @@ static const PlayerConfig PLAYER_CONFIG = {
             .width = 128,          // Render and collision width
             .height = 128,         // Render and collision height
             .color = 0xffffffff,   // Fallback rectangle color
-            .spriteId = SPRITE_PLAYER, // Generated sprite identifier
+            .sprite_id = SPRITE_PLAYER, // Generated sprite identifier
             .animationId = "idle", // Future default animation
         },
 };

@@ -2,11 +2,11 @@
 
 #include <android/log.h>
 
-#include "config.h"
-#include "enemy_config.h"
+#include "../config.h"
+#include "../config/enemy_config.h"
+#include "../config/obstacle_config.h"
+#include "../config/player_config.h"
 #include "game_settings.h"
-#include "obstacle_config.h"
-#include "player_config.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
 
@@ -295,6 +295,10 @@ void game_init(GameState* game) {
     game->fps = 0;
     game->averageFrameMs = 0;
     game->activeEntityCount = 0;
+}
+
+const EntityVisualConfig* game_player_visual_config(void) {
+    return &player_config_get()->visual;
 }
 
 void game_set_screen_size(GameState* game, float width, float height) {

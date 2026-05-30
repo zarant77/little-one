@@ -2,8 +2,7 @@
 
 #include <stdint.h>
 
-#include "game_settings.h"
-#include "player_config.h"
+#include "../game/game_settings.h"
 
 #define RENDERER_GROUND_LINE_HEIGHT 2
 #define RENDERER_GROUND_MARKER_SPACING 96
@@ -48,36 +47,6 @@ static uint8_t renderer_color_g(uint32_t color) {
 
 static uint8_t renderer_color_b(uint32_t color) {
     return (uint8_t)((color >> 8) & 0xff);
-}
-
-static void renderer_draw_pixel(Framebuffer* buffer, int x, int y, uint32_t color) {
-    if (buffer == 0 || buffer->bits == 0) {
-        return;
-    }
-
-    if (x < 0 || y < 0 || x >= buffer->width || y >= buffer->height) {
-        return;
-    }
-
-    if (buffer->format == WINDOW_FORMAT_RGB_565) {
-        uint16_t* pixels = (uint16_t*)buffer->bits;
-        uint16_t* row = pixels + (y * buffer->stride);
-        row[x] = renderer_rgb_565(
-                renderer_color_r(color),
-                renderer_color_g(color),
-                renderer_color_b(color)
-        );
-        return;
-    }
-
-    uint8_t* pixels = (uint8_t*)buffer->bits;
-    uint8_t* row = pixels + ((y * buffer->stride) * 4);
-    uint8_t* pixel = row + (x * 4);
-
-    pixel[0] = renderer_color_r(color);
-    pixel[1] = renderer_color_g(color);
-    pixel[2] = renderer_color_b(color);
-    pixel[3] = 255;
 }
 
 static void renderer_clear(ANativeWindow_Buffer* buffer) {
@@ -185,139 +154,76 @@ static void renderer_draw_color_rect(
     );
 }
 
-static void renderer_draw_centered_rect(
-        Framebuffer* framebuffer,
-        int center_x,
-        int center_y,
-        int width,
-        int height,
-        uint32_t color
-) {
-    renderer_draw_color_rect(
-            framebuffer,
-            center_x - width / 2,
-            center_y - height / 2,
-            width,
-            height,
-            color
-    );
-}
-
-static void renderer_draw_circle(
-        Framebuffer* framebuffer,
-        int center_x,
-        int center_y,
-        int radius,
-        uint32_t color
-) {
-    int min_x = center_x - radius;
-    int max_x = center_x + radius;
-    int min_y = center_y - radius;
-    int max_y = center_y + radius;
-    int radius_squared = radius * radius;
-
-    for (int y = min_y; y <= max_y; ++y) {
-        for (int x = min_x; x <= max_x; ++x) {
-            int dx = x - center_x;
-            int dy = y - center_y;
-
-            if (dx * dx + dy * dy <= radius_squared) {
-                renderer_draw_pixel(framebuffer, x, y, color);
-            }
-        }
-    }
-}
-
-static int renderer_edge(int ax, int ay, int bx, int by, int px, int py) {
-    return (px - ax) * (by - ay) - (py - ay) * (bx - ax);
-}
-
-static void renderer_draw_triangle(
-        Framebuffer* framebuffer,
-        int center_x,
-        int center_y,
-        int width,
-        int height,
-        uint32_t color
-) {
-    int x1 = center_x - width / 2;
-    int y1 = center_y + height / 3;
-    int x2 = center_x + width / 2;
-    int y2 = center_y + height / 3;
-    int x3 = center_x;
-    int y3 = center_y - (2 * height) / 3;
-    int min_x = x1;
-    int max_x = x1;
-    int min_y = y1;
-    int max_y = y1;
-
-    if (x2 < min_x) {
-        min_x = x2;
-    }
-    if (x3 < min_x) {
-        min_x = x3;
-    }
-    if (x2 > max_x) {
-        max_x = x2;
-    }
-    if (x3 > max_x) {
-        max_x = x3;
-    }
-    if (y2 < min_y) {
-        min_y = y2;
-    }
-    if (y3 < min_y) {
-        min_y = y3;
-    }
-    if (y2 > max_y) {
-        max_y = y2;
-    }
-    if (y3 > max_y) {
-        max_y = y3;
-    }
-
-    for (int y = min_y; y <= max_y; ++y) {
-        for (int x = min_x; x <= max_x; ++x) {
-            int edge1 = renderer_edge(x1, y1, x2, y2, x, y);
-            int edge2 = renderer_edge(x2, y2, x3, y3, x, y);
-            int edge3 = renderer_edge(x3, y3, x1, y1, x, y);
-
-            if ((edge1 >= 0 && edge2 >= 0 && edge3 >= 0)
-                    || (edge1 <= 0 && edge2 <= 0 && edge3 <= 0)) {
-                renderer_draw_pixel(framebuffer, x, y, color);
-            }
-        }
-    }
-}
-
 void renderer_draw_generated_sprite(
         Framebuffer* framebuffer,
         const GeneratedSprite* sprite,
-        int x,
-        int y
+        int pivot_x,
+        int pivot_y
 ) {
-    if (framebuffer == 0 || sprite == 0 || sprite->data == 0) {
+    int draw_x;
+    int draw_y;
+
+    if (framebuffer == 0 || framebuffer->bits == 0 || sprite == 0 || sprite->pixels == 0) {
         return;
     }
 
-    for (int command_index = 0; command_index < sprite->command_count; ++command_index) {
-        const uint32_t* command = sprite->data + command_index * DRAW_COMMAND_SIZE;
-        DrawKind kind = (DrawKind)command[0];
-        int center_x = x + (int)command[1];
-        int center_y = y + (int)command[2];
-        int width = (int)command[3];
-        int height = (int)command[4];
-        int rotation = (int)command[5];
-        uint32_t color = command[6];
+    draw_x = pivot_x - sprite->pivot_x;
+    draw_y = pivot_y - sprite->pivot_y;
 
-        (void)rotation;
+    if (framebuffer->format == WINDOW_FORMAT_RGB_565) {
+        uint16_t* framebuffer_pixels = (uint16_t*)framebuffer->bits;
 
-        if (kind == DRAW_RECT) {
-            renderer_draw_centered_rect(framebuffer, center_x, center_y, width, height, color);
-        } else if (kind == DRAW_CIRCLE) {
-            renderer_draw_circle(framebuffer, center_x, center_y, width, color);
-        } else if (kind == DRAW_TRIANGLE) {
-            renderer_draw_triangle(framebuffer, center_x, center_y, width, height, color);
+        for (int source_y = 0; source_y < sprite->height; ++source_y) {
+            int target_y = draw_y + source_y;
+            if (target_y < 0 || target_y >= framebuffer->height) {
+                continue;
+            }
+
+            uint16_t* target_row = framebuffer_pixels + target_y * framebuffer->stride;
+            const uint32_t* source_row = sprite->pixels + source_y * sprite->width;
+
+            for (int source_x = 0; source_x < sprite->width; ++source_x) {
+                int target_x = draw_x + source_x;
+                uint32_t color = source_row[source_x];
+
+                if ((color & 0xff) == 0 || target_x < 0 || target_x >= framebuffer->width) {
+                    continue;
+                }
+
+                target_row[target_x] = renderer_rgb_565(
+                        renderer_color_r(color),
+                        renderer_color_g(color),
+                        renderer_color_b(color)
+                );
+            }
+        }
+
+        return;
+    }
+
+    uint8_t* framebuffer_pixels = (uint8_t*)framebuffer->bits;
+    for (int source_y = 0; source_y < sprite->height; ++source_y) {
+        int target_y = draw_y + source_y;
+        if (target_y < 0 || target_y >= framebuffer->height) {
+            continue;
+        }
+
+        uint8_t* target_row = framebuffer_pixels + (target_y * framebuffer->stride) * 4;
+        const uint32_t* source_row = sprite->pixels + source_y * sprite->width;
+
+        for (int source_x = 0; source_x < sprite->width; ++source_x) {
+            int target_x = draw_x + source_x;
+            uint32_t color = source_row[source_x];
+
+            if ((color & 0xff) == 0 || target_x < 0 || target_x >= framebuffer->width) {
+                continue;
+            }
+
+            uint8_t* target_pixel = target_row + target_x * 4;
+            target_pixel[0] = renderer_color_r(color);
+            target_pixel[1] = renderer_color_g(color);
+            target_pixel[2] = renderer_color_b(color);
+            target_pixel[3] = 255;
         }
     }
 }
@@ -531,10 +437,10 @@ static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState
 
         if (entity->type == ENTITY_ENEMY && entity->enemyConfig != 0) {
             color = entity->enemyConfig->visual.color;
-            sprite_id = entity->enemyConfig->visual.spriteId;
+            sprite_id = entity->enemyConfig->visual.sprite_id;
         } else if (entity->type == ENTITY_OBSTACLE && entity->obstacleConfig != 0) {
             color = entity->obstacleConfig->visual.color;
-            sprite_id = entity->obstacleConfig->visual.spriteId;
+            sprite_id = entity->obstacleConfig->visual.sprite_id;
         }
 
         sprite = generated_sprite_get(sprite_id);
@@ -542,8 +448,8 @@ static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState
             renderer_draw_generated_sprite(
                     buffer,
                     sprite,
-                    (int)entity->x,
-                    (int)entity->y
+                    (int)entity->x + sprite->pivot_x,
+                    (int)entity->y + sprite->pivot_y
             );
             continue;
         }
@@ -563,15 +469,15 @@ static void renderer_draw_player(ANativeWindow_Buffer* buffer, const GameState* 
     const GeneratedSprite* sprite = generated_sprite_get(SPRITE_PLAYER);
 
     if (sprite == 0) {
-        const PlayerConfig* player_config = player_config_get();
+        const EntityVisualConfig* visual = game_player_visual_config();
 
         renderer_draw_color_rect(
                 buffer,
                 (int)game->playerX,
                 (int)game->playerY,
-                player_config->visual.width,
-                player_config->visual.height,
-                player_config->visual.color
+                visual->width,
+                visual->height,
+                visual->color
         );
         return;
     }
@@ -579,8 +485,8 @@ static void renderer_draw_player(ANativeWindow_Buffer* buffer, const GameState* 
     renderer_draw_generated_sprite(
             buffer,
             sprite,
-            (int)game->playerX,
-            (int)game->playerY
+            (int)game->playerX + sprite->pivot_x,
+            (int)game->playerY + sprite->pivot_y
     );
 }
 

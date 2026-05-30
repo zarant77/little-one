@@ -8,11 +8,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "config.h"
-#include "game.h"
-#include "game_settings.h"
-#include "input.h"
-#include "renderer.h"
+#include "../config.h"
+#include "../game/game.h"
+#include "../game/game_settings.h"
+#include "../input/input.h"
+#include "../renderer/renderer.h"
+#include "../sprites/generated_sprite.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
@@ -521,6 +522,7 @@ void platform_android_on_create(
     platform->fps_frame_count = 0;
     platform->null_window_logged = 0;
     platform->reset_frame_time = 1;
+    generated_sprite_initialize_all();
     game_init(&platform->game);
     input_init(&platform->input);
 

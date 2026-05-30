@@ -3,13 +3,13 @@
 
 #include <stdint.h>
 
-#include "generated_sprite.h"
+#include "../sprites/generated_sprite.h"
 
 typedef struct {
     int width;
     int height;
     uint32_t color;
-    SpriteId spriteId;
+    SpriteId sprite_id;
     const char* animationId;
 } EntityVisualConfig;
 

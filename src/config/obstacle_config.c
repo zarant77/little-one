@@ -8,7 +8,7 @@ static const ObstacleConfig OBSTACLE_CONFIGS[] = {
             .width = 80,                  // Render and collision width
             .height = 180,                // Render and collision height
             .color = 0xff0000ff,          // Fallback rectangle color
-            .spriteId = SPRITE_STUMP,     // Generated sprite identifier
+            .sprite_id = SPRITE_STUMP,    // Generated sprite identifier
             .animationId = "idle",        // Future default animation
         },
     },
@@ -19,7 +19,7 @@ static const ObstacleConfig OBSTACLE_CONFIGS[] = {
             .width = 150,                // Render and collision width
             .height = 150,               // Render and collision height
             .color = 0xe500d2ff,         // Fallback rectangle color
-            .spriteId = SPRITE_ROCK,     // Generated sprite identifier
+            .sprite_id = SPRITE_ROCK,    // Generated sprite identifier
             .animationId = "idle",       // Future default animation
         },
     },

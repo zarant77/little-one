@@ -1,6 +1,6 @@
 #include "input.h"
 
-#include "game_settings.h"
+#include "../game/game_settings.h"
 
 #define INPUT_NO_POINTER -1
 

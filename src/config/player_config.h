@@ -1,7 +1,7 @@
 #ifndef LITTLE_ONE_PLAYER_CONFIG_H
 #define LITTLE_ONE_PLAYER_CONFIG_H
 
-#include "entity_config.h"
+#include "../entity/entity_config.h"
 
 typedef struct {
     int hp;

@@ -3,16 +3,16 @@
 
 #include <android/native_window.h>
 
-#include "generated_sprite.h"
-#include "game.h"
+#include "../game/game.h"
+#include "../sprites/generated_sprite.h"
 
 typedef ANativeWindow_Buffer Framebuffer;
 
 void renderer_draw_generated_sprite(
         Framebuffer* framebuffer,
         const GeneratedSprite* sprite,
-        int x,
-        int y
+        int pivot_x,
+        int pivot_y
 );
 
 void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game);
