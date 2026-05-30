@@ -30,13 +30,20 @@ android {
         }
     }
 
+    packaging {
+        resources {
+            excludes += setOf(
+                "kotlin/**",
+                "META-INF/version-control-info.textproto",
+                "META-INF/com/android/build/gradle/app-metadata.properties"
+            )
+        }
+    }
+
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
             version = "3.22.1"
         }
     }
-}
-
-dependencies {
 }
