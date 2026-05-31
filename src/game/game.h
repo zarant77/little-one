@@ -2,6 +2,7 @@
 #define LITTLE_ONE_GAME_H
 
 #include "../entity/entity.h"
+#include "../feedback/screen_shake.h"
 #include "../input/input.h"
 
 #define MAX_ENTITIES 16
@@ -26,6 +27,7 @@ typedef struct {
     int fps;
     int averageFrameMs;
     int activeEntityCount;
+    ScreenShake screenShake;
 } GameState;
 
 void game_init(GameState* game);

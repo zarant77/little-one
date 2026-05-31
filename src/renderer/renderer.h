@@ -44,14 +44,18 @@ void render_background(
         Framebuffer* framebuffer,
         const BackgroundConfig* background,
         int32_t world_scroll_x,
-        int32_t gameplay_ground_y
+        int32_t gameplay_ground_y,
+        int32_t shake_x,
+        int32_t shake_y
 );
 
 void render_ground(
         Framebuffer* framebuffer,
         const GroundVisualConfig* ground,
         int32_t world_scroll_x,
-        int32_t gameplay_ground_y
+        int32_t gameplay_ground_y,
+        int32_t shake_x,
+        int32_t shake_y
 );
 
 void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game);

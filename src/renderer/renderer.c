@@ -785,7 +785,9 @@ static void renderer_draw_parallax_layer(
         Framebuffer* framebuffer,
         const ParallaxLayerConfig* layer,
         int32_t world_scroll_x,
-        int32_t gameplay_ground_y
+        int32_t gameplay_ground_y,
+        int32_t shake_x,
+        int32_t shake_y
 ) {
     const GeneratedSprite* sprite;
     int32_t layer_scroll;
@@ -811,10 +813,10 @@ static void renderer_draw_parallax_layer(
 
     layer_scroll = (int32_t)(((int64_t)world_scroll_x * (int64_t)layer->scroll_num)
             / (int64_t)layer->scroll_den);
-    screen_x = (int32_t)layer->x_offset - layer_scroll;
+    screen_x = (int32_t)layer->x_offset - layer_scroll + shake_x;
     tile_w = sprite->width;
     tile_h = sprite->height;
-    layer_y = gameplay_ground_y - (int32_t)layer->y - tile_h;
+    layer_y = gameplay_ground_y - (int32_t)layer->y - tile_h + shake_y;
 
     if (!layer->repeat_x && !layer->repeat_y) {
         renderer_draw_parallax_tile(framebuffer, sprite, screen_x, layer_y);
@@ -855,7 +857,9 @@ void render_background(
         Framebuffer* framebuffer,
         const BackgroundConfig* background,
         int32_t world_scroll_x,
-        int32_t gameplay_ground_y
+        int32_t gameplay_ground_y,
+        int32_t shake_x,
+        int32_t shake_y
 ) {
     int layer_count;
 
@@ -882,7 +886,9 @@ void render_background(
                 framebuffer,
                 background->layers + layer_index,
                 world_scroll_x,
-                gameplay_ground_y
+                gameplay_ground_y,
+                shake_x,
+                shake_y
         );
     }
 }
@@ -911,7 +917,9 @@ void render_ground(
         Framebuffer* framebuffer,
         const GroundVisualConfig* ground,
         int32_t world_scroll_x,
-        int32_t gameplay_ground_y
+        int32_t gameplay_ground_y,
+        int32_t shake_x,
+        int32_t shake_y
 ) {
     const GeneratedSprite* sprite;
     int32_t screen_x;
@@ -925,20 +933,20 @@ void render_ground(
     }
 
     if (ground == 0 || !ground->enabled || ground->sprite_id == 0) {
-        renderer_draw_ground_fallback_line(framebuffer, gameplay_ground_y);
+        renderer_draw_ground_fallback_line(framebuffer, gameplay_ground_y + shake_y);
         return;
     }
 
     sprite = generated_sprite_get_by_id(ground->sprite_id);
     if (sprite == 0 || sprite->pixels == 0 || sprite->width <= 0 || sprite->height <= 0) {
-        renderer_draw_ground_fallback_line(framebuffer, gameplay_ground_y);
+        renderer_draw_ground_fallback_line(framebuffer, gameplay_ground_y + shake_y);
         return;
     }
 
     tile_w = sprite->width;
     draw_h = ground->height > 0 ? ground->height : sprite->height;
-    draw_y = ground->y != 0 ? ground->y : gameplay_ground_y;
-    screen_x = (int32_t)ground->x_offset - world_scroll_x;
+    draw_y = (ground->y != 0 ? ground->y : gameplay_ground_y) + shake_y;
+    screen_x = (int32_t)ground->x_offset - world_scroll_x + shake_x;
 
     if (!ground->repeat_x) {
         renderer_draw_generated_sprite_scaled(
@@ -985,7 +993,12 @@ static void renderer_draw_ground_debug_line(
 }
 #endif
 
-static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState* game) {
+static void renderer_draw_entities(
+        ANativeWindow_Buffer* buffer,
+        const GameState* game,
+        int32_t shake_x,
+        int32_t shake_y
+) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         const Entity* entity = game->entities + entity_index;
         uint32_t color = 0xffffffff;
@@ -1014,8 +1027,8 @@ static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState
             renderer_draw_generated_sprite_fit(
                     buffer,
                     sprite,
-                    (int)entity->x,
-                    (int)entity->y,
+                    (int)entity->x + shake_x,
+                    (int)entity->y + shake_y,
                     entity_width,
                     entity_height,
                     DEFAULT_SPRITE_FIT_MODE
@@ -1025,8 +1038,8 @@ static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState
 
         renderer_draw_color_rect(
                 buffer,
-                (int)entity->x,
-                (int)entity->y,
+                (int)entity->x + shake_x,
+                (int)entity->y + shake_y,
                 entity_width,
                 entity_height,
                 color
@@ -1034,15 +1047,20 @@ static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState
     }
 }
 
-static void renderer_draw_player(ANativeWindow_Buffer* buffer, const GameState* game) {
+static void renderer_draw_player(
+        ANativeWindow_Buffer* buffer,
+        const GameState* game,
+        int32_t shake_x,
+        int32_t shake_y
+) {
     const EntityVisualConfig* visual = game_player_visual_config();
     const GeneratedSprite* sprite = generated_sprite_get(SPRITE_PLAYER);
 
     if (sprite == 0) {
         renderer_draw_color_rect(
                 buffer,
-                (int)game->playerX,
-                (int)game->playerY,
+                (int)game->playerX + shake_x,
+                (int)game->playerY + shake_y,
                 visual->width,
                 visual->height,
                 visual->color
@@ -1053,8 +1071,8 @@ static void renderer_draw_player(ANativeWindow_Buffer* buffer, const GameState* 
     renderer_draw_generated_sprite_fit(
             buffer,
             sprite,
-            (int)game->playerX,
-            (int)game->playerY,
+            (int)game->playerX + shake_x,
+            (int)game->playerY + shake_y,
             visual->width,
             visual->height,
             DEFAULT_SPRITE_FIT_MODE
@@ -1062,7 +1080,12 @@ static void renderer_draw_player(ANativeWindow_Buffer* buffer, const GameState* 
 }
 
 #if LITTLE_ONE_SHOW_WIREFRAMES
-static void renderer_draw_entity_wireframes(ANativeWindow_Buffer* buffer, const GameState* game) {
+static void renderer_draw_entity_wireframes(
+        ANativeWindow_Buffer* buffer,
+        const GameState* game,
+        int32_t shake_x,
+        int32_t shake_y
+) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         const Entity* entity = game->entities + entity_index;
         int entity_width;
@@ -1081,15 +1104,15 @@ static void renderer_draw_entity_wireframes(ANativeWindow_Buffer* buffer, const 
 
         renderer_draw_size_wireframe_rect(
                 buffer,
-                (int)entity->x,
-                (int)entity->y,
+                (int)entity->x + shake_x,
+                (int)entity->y + shake_y,
                 entity_width,
                 entity_height
         );
         renderer_draw_hurt_zone_outline(
                 buffer,
-                (int)entity->x,
-                (int)entity->y,
+                (int)entity->x + shake_x,
+                (int)entity->y + shake_y,
                 entity_width,
                 entity_height,
                 entity_get_hurt_zone(entity)
@@ -1097,20 +1120,25 @@ static void renderer_draw_entity_wireframes(ANativeWindow_Buffer* buffer, const 
     }
 }
 
-static void renderer_draw_player_wireframe(ANativeWindow_Buffer* buffer, const GameState* game) {
+static void renderer_draw_player_wireframe(
+        ANativeWindow_Buffer* buffer,
+        const GameState* game,
+        int32_t shake_x,
+        int32_t shake_y
+) {
     const EntityVisualConfig* visual = game_player_visual_config();
 
     renderer_draw_size_wireframe_rect(
             buffer,
-            (int)game->playerX,
-            (int)game->playerY,
+            (int)game->playerX + shake_x,
+            (int)game->playerY + shake_y,
             visual->width,
             visual->height
     );
     renderer_draw_hurt_zone_outline(
             buffer,
-            (int)game->playerX,
-            (int)game->playerY,
+            (int)game->playerX + shake_x,
+            (int)game->playerY + shake_y,
             visual->width,
             visual->height,
             game_player_hurt_zone_config()
@@ -1140,6 +1168,8 @@ static void renderer_draw_diagnostics(ANativeWindow_Buffer* buffer, const GameSt
 void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     const BackgroundConfig* background;
     int32_t gameplay_ground_y;
+    int32_t shake_x;
+    int32_t shake_y;
 
     if (buffer == 0 || buffer->bits == 0 || game == 0) {
         return;
@@ -1147,20 +1177,31 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
 
     background = background_config_get();
     gameplay_ground_y = renderer_gameplay_ground_y(game);
+    shake_x = screen_shake_get_x(&game->screenShake);
+    shake_y = screen_shake_get_y(&game->screenShake);
 
-    render_background(buffer, background, (int32_t)game->worldScrollX, gameplay_ground_y);
+    render_background(
+            buffer,
+            background,
+            (int32_t)game->worldScrollX,
+            gameplay_ground_y,
+            shake_x,
+            shake_y
+    );
     render_ground(
             buffer,
             &background->ground_visual,
             (int32_t)game->worldScrollX,
-            gameplay_ground_y
+            gameplay_ground_y,
+            shake_x,
+            shake_y
     );
-    renderer_draw_entities(buffer, game);
-    renderer_draw_player(buffer, game);
+    renderer_draw_entities(buffer, game, shake_x, shake_y);
+    renderer_draw_player(buffer, game, shake_x, shake_y);
     #if LITTLE_ONE_SHOW_WIREFRAMES
-    renderer_draw_entity_wireframes(buffer, game);
-    renderer_draw_player_wireframe(buffer, game);
-    renderer_draw_ground_debug_line(buffer, gameplay_ground_y);
+    renderer_draw_entity_wireframes(buffer, game, shake_x, shake_y);
+    renderer_draw_player_wireframe(buffer, game, shake_x, shake_y);
+    renderer_draw_ground_debug_line(buffer, gameplay_ground_y + shake_y);
     #endif
     renderer_draw_diagnostics(buffer, game);
 }

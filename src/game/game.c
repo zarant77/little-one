@@ -2,10 +2,12 @@
 
 #include <android/log.h>
 
+#include "../audio/audio.h"
 #include "../config.h"
 #include "../config/enemy_config.h"
 #include "../config/obstacle_config.h"
 #include "../config/player_config.h"
+#include "../feedback/game_feedback.h"
 #include "game_settings.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
@@ -74,6 +76,7 @@ static void game_clamp_player_to_ground(GameState* game) {
     float ground_y = game_ground_y(game);
     float player_bottom = game->playerY + game_player_height();
     int was_grounded = game->playerGrounded;
+    int was_smashing = game->playerSmashing;
 
     if (game->playerY < 0.0f) {
         game->playerY = 0.0f;
@@ -92,6 +95,10 @@ static void game_clamp_player_to_ground(GameState* game) {
         game->playerSmashing = 0;
         game->playerCanSmash = 0;
         if (!was_grounded) {
+            if (was_smashing) {
+                audio_play_sound("hit");
+                game_feedback_smash_land(&game->screenShake);
+            }
             #if LITTLE_ONE_DEBUG_SMASH
             LOGI("Landing");
             #endif
@@ -239,6 +246,8 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
         }
 
         game->gameOver = 1;
+        audio_play_sound("death");
+        game_feedback_player_death(&game->screenShake);
         if (game->score > game->bestScore) {
             game->bestScore = game->score;
         }
@@ -274,6 +283,7 @@ void game_init(GameState* game) {
     game->fps = 0;
     game->averageFrameMs = 0;
     game->activeEntityCount = 0;
+    screen_shake_start(&game->screenShake, 0, 0, 1u);
 }
 
 const EntityVisualConfig* game_player_visual_config(void) {
@@ -340,10 +350,17 @@ void game_set_screen_size(GameState* game, float width, float height) {
 
 void game_update(GameState* game, const InputState* input, float dt) {
     int player_was_smashing;
+    int32_t elapsed_ms;
 
     if (game == 0) {
         return;
     }
+
+    elapsed_ms = (int32_t)(dt * 1000.0f);
+    if (elapsed_ms < 0) {
+        elapsed_ms = 0;
+    }
+    screen_shake_update(&game->screenShake, elapsed_ms);
 
     if (game->gameOver) {
         if (input != 0 && input->actionPressed) {
@@ -379,6 +396,7 @@ void game_update(GameState* game, const InputState* input, float dt) {
             game->playerGrounded = 0;
             game->playerSmashing = 0;
             game->playerCanSmash = 1;
+            audio_play_sound("jump");
             #if LITTLE_ONE_DEBUG_SMASH
             LOGI("Jump start");
             #endif

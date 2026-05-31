@@ -8,6 +8,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "../audio/audio.h"
+#include "../audio/music_registry.h"
+#include "../audio/sound_registry.h"
 #include "../config.h"
 #include "../game/game.h"
 #include "../game/game_settings.h"
@@ -507,6 +510,9 @@ static void platform_on_destroy(ANativeActivity* activity) {
     pthread_mutex_unlock(&platform->input_queue_mutex);
     pthread_mutex_destroy(&platform->input_queue_mutex);
     pthread_mutex_destroy(&platform->window_mutex);
+    audio_shutdown();
+    music_registry_shutdown_all();
+    sound_registry_shutdown_all();
     generated_sprite_shutdown_all();
     activity->instance = NULL;
 
@@ -536,6 +542,10 @@ void platform_android_on_create(
     platform->null_window_logged = 0;
     platform->reset_frame_time = 1;
     generated_sprite_initialize_all();
+    sound_registry_initialize_all();
+    music_registry_initialize_all();
+    audio_init();
+    audio_play_music("main_theme");
     game_init(&platform->game);
     input_init(&platform->input);
 
