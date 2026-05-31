@@ -34,6 +34,7 @@ typedef struct AndroidPlatform {
     int fps_frame_count;
     int null_window_logged;
     int reset_frame_time;
+    int buffer_format_logged;
 } AndroidPlatform;
 
 static AndroidPlatform* platform_from_activity(ANativeActivity* activity) {
@@ -280,6 +281,17 @@ static int platform_draw(AndroidPlatform* platform, float dt) {
         return 0;
     }
 
+    if (!platform->buffer_format_logged) {
+        LOGI(
+                "Window buffer locked format=%d width=%d height=%d stride=%d",
+                buffer.format,
+                buffer.width,
+                buffer.height,
+                buffer.stride
+        );
+        platform->buffer_format_logged = 1;
+    }
+
     game_set_screen_size(&platform->game, (float)buffer.width, (float)buffer.height);
     game_update(&platform->game, &platform->input, dt);
     input_end_frame(&platform->input);
@@ -495,6 +507,7 @@ static void platform_on_destroy(ANativeActivity* activity) {
     pthread_mutex_unlock(&platform->input_queue_mutex);
     pthread_mutex_destroy(&platform->input_queue_mutex);
     pthread_mutex_destroy(&platform->window_mutex);
+    generated_sprite_shutdown_all();
     activity->instance = NULL;
 
     free(platform);

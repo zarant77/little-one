@@ -10,6 +10,7 @@ typedef struct {
     float moveSpeed;
     float yMin;
     float yMax;
+    HurtZone hurt_zone;
     EntityVisualConfig visual;
 } EnemyConfig;
 

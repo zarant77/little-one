@@ -11,6 +11,10 @@ typedef enum {
     SPRITE_RAT,
     SPRITE_ROCK,
     SPRITE_STUMP,
+    SPRITE_BG_MOUNTAINS,
+    SPRITE_BG_FOREST,
+    SPRITE_FG_BUSHES,
+    SPRITE_GROUND_GRASS,
     SPRITE_ID_COUNT
 } SpriteId;
 
@@ -24,6 +28,7 @@ typedef struct {
 } GeneratedSprite;
 
 void generated_sprite_initialize_all(void);
+void generated_sprite_shutdown_all(void);
 
 const GeneratedSprite* generated_sprite_get(SpriteId sprite_id);
 const GeneratedSprite* generated_sprite_get_by_id(const char* sprite_id);

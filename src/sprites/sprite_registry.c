@@ -7,6 +7,10 @@ const SpriteDefinition* SPRITE_DEFINITIONS[] = {
         &RAT_SPRITE,
         &ROCK_SPRITE,
         &STUMP_SPRITE,
+        &BG_MOUNTAINS_SPRITE,
+        &BG_FOREST_SPRITE,
+        &FG_BUSHES_SPRITE,
+        &GROUND_GRASS_SPRITE,
 };
 
 const size_t SPRITE_COUNT =

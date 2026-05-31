@@ -1,0 +1,884 @@
+{
+  "format": "cat-paint-sprite",
+  "version": 1,
+  "sprite": {
+    "id": "boar",
+    "width": 510,
+    "height": 464,
+    "pivotX": 255,
+    "pivotY": 232
+  },
+  "nodes": [
+    {
+      "id": "group-mpteo8y8-dr9akt",
+      "type": "group",
+      "name": "Body",
+      "visible": true,
+      "locked": false,
+      "children": [
+        {
+          "id": "primitive-mpted7mn-wt0m60",
+          "type": "primitive",
+          "name": "Primitive 1",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 267,
+            "y": 244,
+            "w": 220,
+            "h": 0,
+            "rotation": 0,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-brpx8r",
+          "type": "primitive",
+          "name": "Primitive 2",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 177,
+            "y": 250,
+            "w": 152,
+            "h": 0,
+            "rotation": 0,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-8los8i",
+          "type": "primitive",
+          "name": "Primitive 3",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 359,
+            "y": 276,
+            "w": 150,
+            "h": 0,
+            "rotation": 0,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-zsmuop",
+          "type": "primitive",
+          "name": "Primitive 4",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 267,
+            "y": 244,
+            "w": 208,
+            "h": 0,
+            "rotation": 0,
+            "color": "#8b4b24",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-za0t01",
+          "type": "primitive",
+          "name": "Primitive 5",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 179,
+            "y": 250,
+            "w": 140,
+            "h": 0,
+            "rotation": 0,
+            "color": "#9a562b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-qg2pzs",
+          "type": "primitive",
+          "name": "Primitive 6",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 363,
+            "y": 276,
+            "w": 136,
+            "h": 0,
+            "rotation": 0,
+            "color": "#7d431f",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-d61cuf",
+          "type": "primitive",
+          "name": "Primitive 7",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 309,
+            "y": 313,
+            "w": 126,
+            "h": 0,
+            "rotation": 0,
+            "color": "#b87542",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-862f0c",
+          "type": "primitive",
+          "name": "Primitive 8",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 369,
+            "y": 304,
+            "w": 108,
+            "h": 0,
+            "rotation": 0,
+            "color": "#c9874f",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-9e1kco",
+          "type": "primitive",
+          "name": "Primitive 25",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "rect",
+            "x": 173,
+            "y": 53,
+            "w": 156,
+            "h": 36,
+            "rotation": -0.42,
+            "color": "#160905",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-mswb3p",
+          "type": "primitive",
+          "name": "Primitive 26",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "rect",
+            "x": 192,
+            "y": 40,
+            "w": 148,
+            "h": 34,
+            "rotation": -0.26,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-zmozgr",
+          "type": "primitive",
+          "name": "Primitive 27",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "rect",
+            "x": 215,
+            "y": 26,
+            "w": 112,
+            "h": 28,
+            "rotation": -0.16,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-hemtnn",
+          "type": "primitive",
+          "name": "Primitive 28",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "rect",
+            "x": 257,
+            "y": 15,
+            "w": 86,
+            "h": 24,
+            "rotation": 0.04,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-vv2gv1",
+          "type": "primitive",
+          "name": "Primitive 41",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 370,
+            "y": 148,
+            "w": 13,
+            "h": 0,
+            "rotation": 0,
+            "color": "#5b2d18",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-vh295p",
+          "type": "primitive",
+          "name": "Primitive 42",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 399,
+            "y": 180,
+            "w": 11,
+            "h": 0,
+            "rotation": 0,
+            "color": "#5b2d18",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-our21w",
+          "type": "primitive",
+          "name": "Primitive 43",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 423,
+            "y": 218,
+            "w": 10,
+            "h": 0,
+            "rotation": 0,
+            "color": "#5b2d18",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-sc0ivh",
+          "type": "primitive",
+          "name": "Primitive 44",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 359,
+            "y": 203,
+            "w": 9,
+            "h": 0,
+            "rotation": 0,
+            "color": "#5b2d18",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-7bnh20",
+          "type": "primitive",
+          "name": "Primitive 45",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 391,
+            "y": 242,
+            "w": 8,
+            "h": 0,
+            "rotation": 0,
+            "color": "#5b2d18",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-v5etgp",
+          "type": "primitive",
+          "name": "Primitive 46",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 219,
+            "y": 66,
+            "w": 12,
+            "h": 0,
+            "rotation": 0,
+            "color": "#3b1b0d",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-4citq6",
+          "type": "primitive",
+          "name": "Primitive 47",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 245,
+            "y": 50,
+            "w": 11,
+            "h": 0,
+            "rotation": 0,
+            "color": "#3b1b0d",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-6jn7qj",
+          "type": "primitive",
+          "name": "Primitive 48",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 271,
+            "y": 39,
+            "w": 10,
+            "h": 0,
+            "rotation": 0,
+            "color": "#3b1b0d",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-9lupde",
+          "type": "primitive",
+          "name": "Primitive 49",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 265,
+            "y": 301,
+            "w": 150,
+            "h": 0,
+            "rotation": 0,
+            "color": "#000000",
+            "alpha": 34
+          }
+        }
+      ]
+    },
+    {
+      "id": "group-mpteihxj-rrgrz8",
+      "type": "group",
+      "name": "Ear",
+      "visible": true,
+      "locked": false,
+      "children": [
+        {
+          "id": "primitive-mpted7mn-4zmg70",
+          "type": "primitive",
+          "name": "Primitive 9",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 45,
+            "y": 83,
+            "w": 92,
+            "h": 132,
+            "rotation": -0.65,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-qlln5y",
+          "type": "primitive",
+          "name": "Primitive 10",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 45,
+            "y": 83,
+            "w": 76,
+            "h": 108,
+            "rotation": -0.65,
+            "color": "#b96c3a",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-wj0cvp",
+          "type": "primitive",
+          "name": "Primitive 11",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 48,
+            "y": 90,
+            "w": 48,
+            "h": 70,
+            "rotation": -0.65,
+            "color": "#f18b6a",
+            "alpha": 255
+          }
+        }
+      ]
+    },
+    {
+      "id": "group-mptei4q2-tsaoth",
+      "type": "group",
+      "name": "Ear",
+      "visible": true,
+      "locked": false,
+      "children": [
+        {
+          "id": "primitive-mpted7mn-3j1ulb",
+          "type": "primitive",
+          "name": "Primitive 12",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 279,
+            "y": 60,
+            "w": 96,
+            "h": 130,
+            "rotation": 0.52,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-lnbeqy",
+          "type": "primitive",
+          "name": "Primitive 13",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 279,
+            "y": 60,
+            "w": 78,
+            "h": 106,
+            "rotation": 0.52,
+            "color": "#b96c3a",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-en1mny",
+          "type": "primitive",
+          "name": "Primitive 14",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 273,
+            "y": 70,
+            "w": 50,
+            "h": 70,
+            "rotation": 0.52,
+            "color": "#f18b6a",
+            "alpha": 255
+          }
+        }
+      ]
+    },
+    {
+      "id": "group-mpteh2b7-ozkcwb",
+      "type": "group",
+      "name": "Eye",
+      "visible": true,
+      "locked": false,
+      "children": [
+        {
+          "id": "primitive-mpted7mn-t39he6",
+          "type": "primitive",
+          "name": "Primitive 15",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 100,
+            "y": 169,
+            "w": 70,
+            "h": 0,
+            "rotation": 0,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-20mnqy",
+          "type": "primitive",
+          "name": "Primitive 16",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 100,
+            "y": 169,
+            "w": 60,
+            "h": 0,
+            "rotation": 0,
+            "color": "#ffffff",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-ggsns2",
+          "type": "primitive",
+          "name": "Primitive 17",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 96,
+            "y": 175,
+            "w": 27,
+            "h": 0,
+            "rotation": 0,
+            "color": "#000000",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-bxye7s",
+          "type": "primitive",
+          "name": "Primitive 18",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 86,
+            "y": 163,
+            "w": 9,
+            "h": 0,
+            "rotation": 0,
+            "color": "#ffffff",
+            "alpha": 255
+          }
+        }
+      ]
+    },
+    {
+      "id": "group-mptehfqj-l7flll",
+      "type": "group",
+      "name": "Eye",
+      "visible": true,
+      "locked": false,
+      "children": [
+        {
+          "id": "primitive-mpted7mn-i5t74j",
+          "type": "primitive",
+          "name": "Primitive 19",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 222,
+            "y": 161,
+            "w": 70,
+            "h": 0,
+            "rotation": 0,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-gna9jg",
+          "type": "primitive",
+          "name": "Primitive 20",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 222,
+            "y": 161,
+            "w": 60,
+            "h": 0,
+            "rotation": 0,
+            "color": "#ffffff",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-uu0kzh",
+          "type": "primitive",
+          "name": "Primitive 21",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 214,
+            "y": 169,
+            "w": 27,
+            "h": 0,
+            "rotation": 0,
+            "color": "#000000",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-n5rtq1",
+          "type": "primitive",
+          "name": "Primitive 22",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 204,
+            "y": 157,
+            "w": 9,
+            "h": 0,
+            "rotation": 0,
+            "color": "#ffffff",
+            "alpha": 255
+          }
+        }
+      ]
+    },
+    {
+      "id": "group-mptef127-n2x5ys",
+      "type": "group",
+      "name": "Tooth",
+      "visible": true,
+      "locked": false,
+      "children": [
+        {
+          "id": "primitive-mpted7mn-ey7w45",
+          "type": "primitive",
+          "name": "Primitive 35",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 54,
+            "y": 270,
+            "w": 70,
+            "h": 144,
+            "rotation": -0.8319665949318804,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-i3bsfo",
+          "type": "primitive",
+          "name": "Primitive 36",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 54,
+            "y": 270,
+            "w": 52,
+            "h": 122,
+            "rotation": -0.8319665949318804,
+            "color": "#fff2d2",
+            "alpha": 255
+          }
+        }
+      ]
+    },
+    {
+      "id": "group-mptefrl9-invoun",
+      "type": "group",
+      "name": "Tooth",
+      "visible": true,
+      "locked": false,
+      "children": [
+        {
+          "id": "primitive-mpted7mn-j4sp6x",
+          "type": "primitive",
+          "name": "Primitive 38",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 275,
+            "y": 241,
+            "w": 72,
+            "h": 148,
+            "rotation": 0.6968702119427799,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-82mr3u",
+          "type": "primitive",
+          "name": "Primitive 39",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "triangle",
+            "x": 275,
+            "y": 241,
+            "w": 54,
+            "h": 126,
+            "rotation": 0.6968702119427799,
+            "color": "#fff2d2",
+            "alpha": 255
+          }
+        }
+      ]
+    },
+    {
+      "id": "group-mptega23-zvc1au",
+      "type": "group",
+      "name": "Nose",
+      "visible": true,
+      "locked": false,
+      "children": [
+        {
+          "id": "primitive-mpted7mn-xzpadw",
+          "type": "primitive",
+          "name": "Primitive 29",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 164,
+            "y": 293,
+            "w": 94,
+            "h": 0,
+            "rotation": 0,
+            "color": "#2a140b",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-vydccq",
+          "type": "primitive",
+          "name": "Primitive 30",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 164,
+            "y": 293,
+            "w": 82,
+            "h": 0,
+            "rotation": 0,
+            "color": "#f06f55",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-ed7ey1",
+          "type": "primitive",
+          "name": "Primitive 31",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 119,
+            "y": 296,
+            "w": 29,
+            "h": 0,
+            "rotation": 0,
+            "color": "#000000",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-n507t1",
+          "type": "primitive",
+          "name": "Primitive 32",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 206,
+            "y": 296,
+            "w": 29,
+            "h": 0,
+            "rotation": 0,
+            "color": "#000000",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-tz3ghm",
+          "type": "primitive",
+          "name": "Primitive 33",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 119,
+            "y": 296,
+            "w": 18,
+            "h": 0,
+            "rotation": 0,
+            "color": "#5b2219",
+            "alpha": 255
+          }
+        },
+        {
+          "id": "primitive-mpted7mn-2y71t3",
+          "type": "primitive",
+          "name": "Primitive 34",
+          "visible": true,
+          "locked": false,
+          "command": {
+            "kind": "circle",
+            "x": 206,
+            "y": 296,
+            "w": 18,
+            "h": 0,
+            "rotation": 0,
+            "color": "#5b2219",
+            "alpha": 255
+          }
+        }
+      ]
+    },
+    {
+      "id": "primitive-mpted7mn-how0vw",
+      "type": "primitive",
+      "name": "Primitive 24",
+      "visible": true,
+      "locked": false,
+      "command": {
+        "kind": "rect",
+        "x": 245,
+        "y": 97,
+        "w": 106,
+        "h": 30,
+        "rotation": 0.3,
+        "color": "#160905",
+        "alpha": 255
+      }
+    },
+    {
+      "id": "primitive-mpteqr7a-ygt3p5",
+      "type": "primitive",
+      "name": "Primitive 24",
+      "visible": true,
+      "locked": false,
+      "command": {
+        "kind": "rect",
+        "x": 58,
+        "y": 119,
+        "w": 106,
+        "h": 30,
+        "rotation": 5.683746658571733,
+        "color": "#160905",
+        "alpha": 255
+      }
+    }
+  ]
+}

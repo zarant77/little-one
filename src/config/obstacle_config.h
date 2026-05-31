@@ -5,6 +5,7 @@
 
 typedef struct {
     const char* id;
+    HurtZone hurt_zone;
     EntityVisualConfig visual;
 } ObstacleConfig;
 

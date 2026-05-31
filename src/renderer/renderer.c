@@ -1,20 +1,25 @@
 #include "renderer.h"
 
+#include <stddef.h>
 #include <stdint.h>
 
+#include "../config/background_config.h"
 #include "../game/game_settings.h"
 
 #define RENDERER_GROUND_LINE_HEIGHT 2
-#define RENDERER_GROUND_MARKER_SPACING 96
-#define RENDERER_GROUND_MARKER_WIDTH 8
-#define RENDERER_GROUND_MARKER_HEIGHT 18
-#define RENDERER_BACKGROUND_MARKER_SPACING 180
-#define RENDERER_BACKGROUND_MARKER_SIZE 5
-#define RENDERER_PARALLAX_DIVISOR 3
 #define RENDERER_DIGIT_WIDTH 12
 #define RENDERER_DIGIT_HEIGHT 20
 #define RENDERER_DIGIT_THICKNESS 3
 #define RENDERER_DIGIT_SPACING 4
+#define DEFAULT_SPRITE_FIT_MODE SPRITE_FIT_CONTAIN
+#define RENDERER_SIZE_WIREFRAME_COLOR 0xffff00ff
+#define RENDERER_HURT_ZONE_WIREFRAME_COLOR 0xff0000ff
+#define RENDERER_GROUND_DEBUG_COLOR 0x00ffffff
+
+/* Canonical Little One colors are 0xRRGGBBAA:
+ * 0xff0000ff red, 0x00ff00ff green, 0x0000ffff blue,
+ * 0x00000033 transparent black with alpha 0x33.
+ */
 
 static const unsigned char RENDERER_DIGIT_SEGMENTS[10] = {
         0x3f,
@@ -29,7 +34,33 @@ static const unsigned char RENDERER_DIGIT_SEGMENTS[10] = {
         0x6f,
 };
 
-static uint16_t renderer_rgb_565(uint8_t r, uint8_t g, uint8_t b) {
+static uint8_t rgba_r(uint32_t color) {
+    return (uint8_t)((color >> 24) & 0xff);
+}
+
+static uint8_t rgba_g(uint32_t color) {
+    return (uint8_t)((color >> 16) & 0xff);
+}
+
+static uint8_t rgba_b(uint32_t color) {
+    return (uint8_t)((color >> 8) & 0xff);
+}
+
+static uint8_t rgba_a(uint32_t color) {
+    return (uint8_t)(color & 0xff);
+}
+
+static uint32_t rgba_pack(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    return ((uint32_t)r << 24)
+            | ((uint32_t)g << 16)
+            | ((uint32_t)b << 8)
+            | (uint32_t)a;
+}
+
+static uint16_t rgba_to_rgb565(uint32_t color) {
+    uint8_t r = rgba_r(color);
+    uint8_t g = rgba_g(color);
+    uint8_t b = rgba_b(color);
     uint16_t r5 = (uint16_t)(r >> 3);
     uint16_t g6 = (uint16_t)(g >> 2);
     uint16_t b5 = (uint16_t)(b >> 3);
@@ -37,41 +68,133 @@ static uint16_t renderer_rgb_565(uint8_t r, uint8_t g, uint8_t b) {
     return (uint16_t)((r5 << 11) | (g6 << 5) | b5);
 }
 
-static uint8_t renderer_color_r(uint32_t color) {
-    return (uint8_t)((color >> 24) & 0xff);
+static uint32_t rgb565_to_rgba(uint16_t color) {
+    uint8_t r = (uint8_t)((((color >> 11) & 0x1f) * 255) / 31);
+    uint8_t g = (uint8_t)((((color >> 5) & 0x3f) * 255) / 63);
+    uint8_t b = (uint8_t)(((color & 0x1f) * 255) / 31);
+
+    return rgba_pack(r, g, b, 0xff);
 }
 
-static uint8_t renderer_color_g(uint32_t color) {
-    return (uint8_t)((color >> 16) & 0xff);
+/* 32-bit Android path writes RGBA8888 bytes:
+ * pixel[0]=R, pixel[1]=G, pixel[2]=B, pixel[3]=A.
+ */
+static uint32_t framebuffer_rgba8888_read(const uint8_t* pixel) {
+    return rgba_pack(pixel[0], pixel[1], pixel[2], pixel[3]);
 }
 
-static uint8_t renderer_color_b(uint32_t color) {
-    return (uint8_t)((color >> 8) & 0xff);
+static void framebuffer_rgba8888_write_opaque(uint8_t* pixel, uint32_t color) {
+    pixel[0] = rgba_r(color);
+    pixel[1] = rgba_g(color);
+    pixel[2] = rgba_b(color);
+    pixel[3] = 255;
 }
 
-static void renderer_clear(ANativeWindow_Buffer* buffer) {
-    if (buffer->format == WINDOW_FORMAT_RGB_565) {
-        uint16_t* pixels = (uint16_t*)buffer->bits;
+static uint32_t renderer_blend_rgba(uint32_t src_color, uint32_t dst_color) {
+    uint8_t src_a = rgba_a(src_color);
+    uint8_t src_r;
+    uint8_t src_g;
+    uint8_t src_b;
+    uint8_t dst_r;
+    uint8_t dst_g;
+    uint8_t dst_b;
+    uint8_t out_r;
+    uint8_t out_g;
+    uint8_t out_b;
 
-        for (int y = 0; y < buffer->height; ++y) {
-            uint16_t* row = pixels + (y * buffer->stride);
-            for (int x = 0; x < buffer->width; ++x) {
-                row[x] = 0;
+    if (src_a == 0) {
+        return dst_color;
+    }
+
+    if (src_a == 255) {
+        return (src_color & 0xffffff00) | 0xff;
+    }
+
+    src_r = rgba_r(src_color);
+    src_g = rgba_g(src_color);
+    src_b = rgba_b(src_color);
+    dst_r = rgba_r(dst_color);
+    dst_g = rgba_g(dst_color);
+    dst_b = rgba_b(dst_color);
+
+    out_r = (uint8_t)(((int)src_r * (int)src_a + (int)dst_r * (255 - (int)src_a)) / 255);
+    out_g = (uint8_t)(((int)src_g * (int)src_a + (int)dst_g * (255 - (int)src_a)) / 255);
+    out_b = (uint8_t)(((int)src_b * (int)src_a + (int)dst_b * (255 - (int)src_a)) / 255);
+
+    return rgba_pack(out_r, out_g, out_b, 0xff);
+}
+
+static int64_t renderer_div_ceil_i64(int64_t numerator, int64_t denominator) {
+    return (numerator + denominator - 1) / denominator;
+}
+
+static int64_t renderer_max_i64(int64_t left, int64_t right) {
+    return left > right ? left : right;
+}
+
+static int64_t renderer_min_i64(int64_t left, int64_t right) {
+    return left < right ? left : right;
+}
+
+void renderer_fill_vertical_gradient(
+        Framebuffer* framebuffer,
+        uint32_t top_color,
+        uint32_t bottom_color
+) {
+    int height_denominator;
+    int top_r;
+    int top_g;
+    int top_b;
+    int top_a;
+    int delta_r;
+    int delta_g;
+    int delta_b;
+    int delta_a;
+
+    if (framebuffer == 0 || framebuffer->bits == 0 || framebuffer->width <= 0 || framebuffer->height <= 0) {
+        return;
+    }
+
+    height_denominator = framebuffer->height > 1 ? framebuffer->height - 1 : 1;
+    top_r = rgba_r(top_color);
+    top_g = rgba_g(top_color);
+    top_b = rgba_b(top_color);
+    top_a = rgba_a(top_color);
+    delta_r = (int)rgba_r(bottom_color) - top_r;
+    delta_g = (int)rgba_g(bottom_color) - top_g;
+    delta_b = (int)rgba_b(bottom_color) - top_b;
+    delta_a = (int)rgba_a(bottom_color) - top_a;
+
+    if (framebuffer->format == WINDOW_FORMAT_RGB_565) {
+        uint16_t* pixels = (uint16_t*)framebuffer->bits;
+
+        for (int y = 0; y < framebuffer->height; ++y) {
+            uint8_t r = (uint8_t)(top_r + (delta_r * y) / height_denominator);
+            uint8_t g = (uint8_t)(top_g + (delta_g * y) / height_denominator);
+            uint8_t b = (uint8_t)(top_b + (delta_b * y) / height_denominator);
+            uint8_t a = (uint8_t)(top_a + (delta_a * y) / height_denominator);
+            uint16_t color = rgba_to_rgb565(rgba_pack(r, g, b, a));
+            uint16_t* row = pixels + (y * framebuffer->stride);
+
+            for (int x = 0; x < framebuffer->width; ++x) {
+                row[x] = color;
             }
         }
 
         return;
     }
 
-    uint8_t* pixels = (uint8_t*)buffer->bits;
-    for (int y = 0; y < buffer->height; ++y) {
-        uint8_t* row = pixels + ((y * buffer->stride) * 4);
-        for (int x = 0; x < buffer->width; ++x) {
-            uint8_t* pixel = row + (x * 4);
-            pixel[0] = 0;
-            pixel[1] = 0;
-            pixel[2] = 0;
-            pixel[3] = 255;
+    uint8_t* pixels = (uint8_t*)framebuffer->bits;
+    for (int y = 0; y < framebuffer->height; ++y) {
+        uint8_t r = (uint8_t)(top_r + (delta_r * y) / height_denominator);
+        uint8_t g = (uint8_t)(top_g + (delta_g * y) / height_denominator);
+        uint8_t b = (uint8_t)(top_b + (delta_b * y) / height_denominator);
+        uint8_t a = (uint8_t)(top_a + (delta_a * y) / height_denominator);
+        uint32_t color = rgba_pack(r, g, b, a);
+        uint8_t* row = pixels + (size_t)y * (size_t)framebuffer->stride * 4;
+
+        for (int x = 0; x < framebuffer->width; ++x) {
+            framebuffer_rgba8888_write_opaque(row + (size_t)x * 4, color);
         }
     }
 }
@@ -108,7 +231,7 @@ static void renderer_draw_rect(
     }
 
     if (buffer->format == WINDOW_FORMAT_RGB_565) {
-        uint16_t color = renderer_rgb_565(r, g, b);
+        uint16_t color = rgba_to_rgb565(rgba_pack(r, g, b, 0xff));
         uint16_t* pixels = (uint16_t*)buffer->bits;
 
         for (int draw_y = min_y; draw_y < max_y; ++draw_y) {
@@ -121,15 +244,13 @@ static void renderer_draw_rect(
         return;
     }
 
+    uint32_t color = rgba_pack(r, g, b, 0xff);
     uint8_t* pixels = (uint8_t*)buffer->bits;
     for (int draw_y = min_y; draw_y < max_y; ++draw_y) {
-        uint8_t* row = pixels + ((draw_y * buffer->stride) * 4);
+        uint8_t* row = pixels + (size_t)draw_y * (size_t)buffer->stride * 4;
         for (int draw_x = min_x; draw_x < max_x; ++draw_x) {
-            uint8_t* pixel = row + (draw_x * 4);
-            pixel[0] = r;
-            pixel[1] = g;
-            pixel[2] = b;
-            pixel[3] = 255;
+            uint8_t* pixel = row + (size_t)draw_x * 4;
+            framebuffer_rgba8888_write_opaque(pixel, color);
         }
     }
 }
@@ -142,59 +263,304 @@ static void renderer_draw_color_rect(
         int height,
         uint32_t color
 ) {
-    renderer_draw_rect(
-            buffer,
-            x,
-            y,
-            width,
-            height,
-            renderer_color_r(color),
-            renderer_color_g(color),
-            renderer_color_b(color)
-    );
-}
+    int min_x = x;
+    int min_y = y;
+    int max_x = x + width;
+    int max_y = y + height;
+    uint8_t alpha = rgba_a(color);
 
-void renderer_draw_generated_sprite(
-        Framebuffer* framebuffer,
-        const GeneratedSprite* sprite,
-        int pivot_x,
-        int pivot_y
-) {
-    int draw_x;
-    int draw_y;
-
-    if (framebuffer == 0 || framebuffer->bits == 0 || sprite == 0 || sprite->pixels == 0) {
+    if (alpha == 0) {
         return;
     }
 
-    draw_x = pivot_x - sprite->pivot_x;
-    draw_y = pivot_y - sprite->pivot_y;
+    if (alpha == 255) {
+        renderer_draw_rect(
+                buffer,
+                x,
+                y,
+                width,
+                height,
+                rgba_r(color),
+                rgba_g(color),
+                rgba_b(color)
+        );
+        return;
+    }
+
+    if (min_x < 0) {
+        min_x = 0;
+    }
+    if (min_y < 0) {
+        min_y = 0;
+    }
+    if (max_x > buffer->width) {
+        max_x = buffer->width;
+    }
+    if (max_y > buffer->height) {
+        max_y = buffer->height;
+    }
+    if (min_x >= max_x || min_y >= max_y) {
+        return;
+    }
+
+    if (buffer->format == WINDOW_FORMAT_RGB_565) {
+        uint16_t* pixels = (uint16_t*)buffer->bits;
+
+        for (int draw_y = min_y; draw_y < max_y; ++draw_y) {
+            uint16_t* row = pixels + draw_y * buffer->stride;
+            for (int draw_x = min_x; draw_x < max_x; ++draw_x) {
+                uint32_t blended = renderer_blend_rgba(color, rgb565_to_rgba(row[draw_x]));
+                row[draw_x] = rgba_to_rgb565(blended);
+            }
+        }
+
+        return;
+    }
+
+    uint8_t* pixels = (uint8_t*)buffer->bits;
+    for (int draw_y = min_y; draw_y < max_y; ++draw_y) {
+        uint8_t* row = pixels + (size_t)draw_y * (size_t)buffer->stride * 4;
+        for (int draw_x = min_x; draw_x < max_x; ++draw_x) {
+            uint8_t* pixel = row + (size_t)draw_x * 4;
+            uint32_t blended = renderer_blend_rgba(color, framebuffer_rgba8888_read(pixel));
+            framebuffer_rgba8888_write_opaque(pixel, blended);
+        }
+    }
+}
+
+#if LITTLE_ONE_SHOW_WIREFRAMES
+static void renderer_draw_circle_outline_points(
+        ANativeWindow_Buffer* buffer,
+        int center_x,
+        int center_y,
+        int x,
+        int y,
+        uint32_t color
+) {
+    renderer_draw_color_rect(buffer, center_x + x, center_y + y, 1, 1, color);
+    renderer_draw_color_rect(buffer, center_x + y, center_y + x, 1, 1, color);
+    renderer_draw_color_rect(buffer, center_x - x, center_y + y, 1, 1, color);
+    renderer_draw_color_rect(buffer, center_x - y, center_y + x, 1, 1, color);
+    renderer_draw_color_rect(buffer, center_x + x, center_y - y, 1, 1, color);
+    renderer_draw_color_rect(buffer, center_x + y, center_y - x, 1, 1, color);
+    renderer_draw_color_rect(buffer, center_x - x, center_y - y, 1, 1, color);
+    renderer_draw_color_rect(buffer, center_x - y, center_y - x, 1, 1, color);
+}
+
+static void renderer_draw_hurt_zone_outline(
+        ANativeWindow_Buffer* buffer,
+        int entity_x,
+        int entity_y,
+        int entity_width,
+        int entity_height,
+        const HurtZone* zone
+) {
+    int center_x;
+    int center_y;
+    int x;
+    int y;
+    int decision;
+
+    if (zone == 0 || zone->radius < 0) {
+        return;
+    }
+
+    center_x = (int)hurt_zone_world_x((int32_t)entity_x, entity_width, zone);
+    center_y = (int)hurt_zone_world_y((int32_t)entity_y, entity_height, zone);
+    x = zone->radius;
+    y = 0;
+    decision = 1 - x;
+
+    while (x >= y) {
+        renderer_draw_circle_outline_points(
+                buffer,
+                center_x,
+                center_y,
+                x,
+                y,
+                RENDERER_HURT_ZONE_WIREFRAME_COLOR
+        );
+
+        y += 1;
+        if (decision <= 0) {
+            decision += 2 * y + 1;
+        } else {
+            x -= 1;
+            decision += 2 * (y - x) + 1;
+        }
+    }
+}
+
+static void renderer_draw_size_wireframe_rect(
+        ANativeWindow_Buffer* buffer,
+        int x,
+        int y,
+        int width,
+        int height
+) {
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+
+    renderer_draw_color_rect(buffer, x, y, width, 1, RENDERER_SIZE_WIREFRAME_COLOR);
+    renderer_draw_color_rect(buffer, x, y + height - 1, width, 1, RENDERER_SIZE_WIREFRAME_COLOR);
+    renderer_draw_color_rect(buffer, x, y, 1, height, RENDERER_SIZE_WIREFRAME_COLOR);
+    renderer_draw_color_rect(buffer, x + width - 1, y, 1, height, RENDERER_SIZE_WIREFRAME_COLOR);
+}
+#endif
+
+void renderer_draw_generated_sprite_fit(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height,
+        SpriteFitMode fit_mode
+) {
+    int64_t dst_left;
+    int64_t dst_top;
+    int64_t dst_right;
+    int64_t dst_bottom;
+    int64_t draw_left;
+    int64_t draw_top;
+    int64_t draw_width;
+    int64_t draw_height;
+    int64_t draw_right;
+    int64_t draw_bottom;
+    int64_t clip_left_i64;
+    int64_t clip_top_i64;
+    int64_t clip_right_i64;
+    int64_t clip_bottom_i64;
+    int64_t source_scaled_to_dst;
+    int64_t dst_scaled_to_source;
+    int clip_left;
+    int clip_top;
+    int clip_right;
+    int clip_bottom;
+
+    if (framebuffer == 0
+            || framebuffer->bits == 0
+            || sprite == 0
+            || sprite->pixels == 0
+            || sprite->width <= 0
+            || sprite->height <= 0
+            || dst_width <= 0
+            || dst_height <= 0) {
+        return;
+    }
+
+    dst_left = (int64_t)dst_x;
+    dst_top = (int64_t)dst_y;
+    dst_right = dst_left + (int64_t)dst_width;
+    dst_bottom = dst_top + (int64_t)dst_height;
+    draw_left = dst_left;
+    draw_top = dst_top;
+    draw_width = (int64_t)dst_width;
+    draw_height = (int64_t)dst_height;
+
+    if (dst_right <= 0
+            || dst_bottom <= 0
+            || dst_left >= framebuffer->width
+            || dst_top >= framebuffer->height) {
+        return;
+    }
+
+    if (fit_mode == SPRITE_FIT_CONTAIN || fit_mode == SPRITE_FIT_COVER) {
+        source_scaled_to_dst = (int64_t)sprite->width * (int64_t)dst_height;
+        dst_scaled_to_source = (int64_t)dst_width * (int64_t)sprite->height;
+
+        if (fit_mode == SPRITE_FIT_CONTAIN) {
+            if (source_scaled_to_dst > dst_scaled_to_source) {
+                draw_width = (int64_t)dst_width;
+                draw_height = ((int64_t)dst_width * (int64_t)sprite->height)
+                        / (int64_t)sprite->width;
+            } else {
+                draw_width = ((int64_t)dst_height * (int64_t)sprite->width)
+                        / (int64_t)sprite->height;
+                draw_height = (int64_t)dst_height;
+            }
+        } else {
+            if (source_scaled_to_dst > dst_scaled_to_source) {
+                draw_width = renderer_div_ceil_i64(
+                        (int64_t)dst_height * (int64_t)sprite->width,
+                        (int64_t)sprite->height
+                );
+                draw_height = (int64_t)dst_height;
+            } else {
+                draw_width = (int64_t)dst_width;
+                draw_height = renderer_div_ceil_i64(
+                        (int64_t)dst_width * (int64_t)sprite->height,
+                        (int64_t)sprite->width
+                );
+            }
+        }
+
+        if (draw_width <= 0) {
+            draw_width = 1;
+        }
+        if (draw_height <= 0) {
+            draw_height = 1;
+        }
+
+        draw_left = dst_left + ((int64_t)dst_width - draw_width) / 2;
+        draw_top = dst_top + ((int64_t)dst_height - draw_height) / 2;
+    }
+
+    draw_right = draw_left + draw_width;
+    draw_bottom = draw_top + draw_height;
+
+    clip_left_i64 = renderer_max_i64(renderer_max_i64(0, dst_left), draw_left);
+    clip_top_i64 = renderer_max_i64(renderer_max_i64(0, dst_top), draw_top);
+    clip_right_i64 = renderer_min_i64(
+            renderer_min_i64((int64_t)framebuffer->width, dst_right),
+            draw_right
+    );
+    clip_bottom_i64 = renderer_min_i64(
+            renderer_min_i64((int64_t)framebuffer->height, dst_bottom),
+            draw_bottom
+    );
+
+    if (clip_left_i64 >= clip_right_i64 || clip_top_i64 >= clip_bottom_i64) {
+        return;
+    }
+
+    clip_left = (int)clip_left_i64;
+    clip_top = (int)clip_top_i64;
+    clip_right = (int)clip_right_i64;
+    clip_bottom = (int)clip_bottom_i64;
 
     if (framebuffer->format == WINDOW_FORMAT_RGB_565) {
         uint16_t* framebuffer_pixels = (uint16_t*)framebuffer->bits;
 
-        for (int source_y = 0; source_y < sprite->height; ++source_y) {
-            int target_y = draw_y + source_y;
-            if (target_y < 0 || target_y >= framebuffer->height) {
-                continue;
-            }
-
+        for (int target_y = clip_top; target_y < clip_bottom; ++target_y) {
+            int64_t dst_local_y = (int64_t)target_y - draw_top;
+            int source_y = (int)(dst_local_y * (int64_t)sprite->height / draw_height);
             uint16_t* target_row = framebuffer_pixels + target_y * framebuffer->stride;
-            const uint32_t* source_row = sprite->pixels + source_y * sprite->width;
+            const uint32_t* source_row =
+                    sprite->pixels + (size_t)source_y * (size_t)sprite->width;
 
-            for (int source_x = 0; source_x < sprite->width; ++source_x) {
-                int target_x = draw_x + source_x;
-                uint32_t color = source_row[source_x];
+            for (int target_x = clip_left; target_x < clip_right; ++target_x) {
+                int64_t dst_local_x = (int64_t)target_x - draw_left;
+                int source_x = (int)(dst_local_x * (int64_t)sprite->width / draw_width);
+                uint32_t source_color = source_row[source_x];
+                uint8_t source_alpha = rgba_a(source_color);
+                uint32_t color;
 
-                if ((color & 0xff) == 0 || target_x < 0 || target_x >= framebuffer->width) {
+                if (source_alpha == 0) {
                     continue;
                 }
 
-                target_row[target_x] = renderer_rgb_565(
-                        renderer_color_r(color),
-                        renderer_color_g(color),
-                        renderer_color_b(color)
-                );
+                if (source_alpha == 255) {
+                    color = source_color;
+                } else {
+                    color = renderer_blend_rgba(
+                            source_color,
+                            rgb565_to_rgba(target_row[target_x])
+                    );
+                }
+
+                target_row[target_x] = rgba_to_rgb565(color);
             }
         }
 
@@ -202,40 +568,57 @@ void renderer_draw_generated_sprite(
     }
 
     uint8_t* framebuffer_pixels = (uint8_t*)framebuffer->bits;
-    for (int source_y = 0; source_y < sprite->height; ++source_y) {
-        int target_y = draw_y + source_y;
-        if (target_y < 0 || target_y >= framebuffer->height) {
-            continue;
-        }
+    for (int target_y = clip_top; target_y < clip_bottom; ++target_y) {
+        int64_t dst_local_y = (int64_t)target_y - draw_top;
+        int source_y = (int)(dst_local_y * (int64_t)sprite->height / draw_height);
+        uint8_t* target_row =
+                framebuffer_pixels + (size_t)target_y * (size_t)framebuffer->stride * 4;
+        const uint32_t* source_row =
+                sprite->pixels + (size_t)source_y * (size_t)sprite->width;
 
-        uint8_t* target_row = framebuffer_pixels + (target_y * framebuffer->stride) * 4;
-        const uint32_t* source_row = sprite->pixels + source_y * sprite->width;
+        for (int target_x = clip_left; target_x < clip_right; ++target_x) {
+            int64_t dst_local_x = (int64_t)target_x - draw_left;
+            int source_x = (int)(dst_local_x * (int64_t)sprite->width / draw_width);
+            uint32_t source_color = source_row[source_x];
+            uint8_t source_alpha = rgba_a(source_color);
+            uint32_t color;
 
-        for (int source_x = 0; source_x < sprite->width; ++source_x) {
-            int target_x = draw_x + source_x;
-            uint32_t color = source_row[source_x];
-
-            if ((color & 0xff) == 0 || target_x < 0 || target_x >= framebuffer->width) {
+            if (source_alpha == 0) {
                 continue;
             }
 
-            uint8_t* target_pixel = target_row + target_x * 4;
-            target_pixel[0] = renderer_color_r(color);
-            target_pixel[1] = renderer_color_g(color);
-            target_pixel[2] = renderer_color_b(color);
-            target_pixel[3] = 255;
+            if (source_alpha == 255) {
+                color = source_color;
+            } else {
+                uint8_t* target_pixel = target_row + (size_t)target_x * 4;
+                color = renderer_blend_rgba(
+                        source_color,
+                        framebuffer_rgba8888_read(target_pixel)
+                );
+            }
+
+            framebuffer_rgba8888_write_opaque(target_row + (size_t)target_x * 4, color);
         }
     }
 }
 
-static int renderer_positive_mod(int value, int divisor) {
-    int result = value % divisor;
-
-    if (result < 0) {
-        result += divisor;
-    }
-
-    return result;
+void renderer_draw_generated_sprite_scaled(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height
+) {
+    renderer_draw_generated_sprite_fit(
+            framebuffer,
+            sprite,
+            dst_x,
+            dst_y,
+            dst_width,
+            dst_height,
+            SPRITE_FIT_STRETCH
+    );
 }
 
 static int renderer_count_digits(int value) {
@@ -382,53 +765,233 @@ static void renderer_draw_number(
     }
 }
 
-static void renderer_draw_background(ANativeWindow_Buffer* buffer, const GameState* game) {
-    int scroll = (int)(game->worldScrollX / RENDERER_PARALLAX_DIVISOR);
-    int first_x = -renderer_positive_mod(scroll, RENDERER_BACKGROUND_MARKER_SPACING);
+static void renderer_draw_parallax_tile(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int x,
+        int y
+) {
+    renderer_draw_generated_sprite_scaled(
+            framebuffer,
+            sprite,
+            x,
+            y,
+            sprite->width,
+            sprite->height
+    );
+}
 
-    for (int x = first_x; x < buffer->width; x += RENDERER_BACKGROUND_MARKER_SPACING) {
-        int marker_index = renderer_positive_mod((x + scroll) / RENDERER_BACKGROUND_MARKER_SPACING, 3);
-        int y = 70 + marker_index * 45;
+static void renderer_draw_parallax_layer(
+        Framebuffer* framebuffer,
+        const ParallaxLayerConfig* layer,
+        int32_t world_scroll_x,
+        int32_t gameplay_ground_y
+) {
+    const GeneratedSprite* sprite;
+    int32_t layer_scroll;
+    int32_t screen_x;
+    int32_t layer_y;
+    int tile_w;
+    int tile_h;
+    int start_x;
+    int start_y;
 
-        renderer_draw_rect(
-                buffer,
-                x,
-                y,
-                RENDERER_BACKGROUND_MARKER_SIZE,
-                RENDERER_BACKGROUND_MARKER_SIZE,
-                48,
-                48,
-                48
+    if (framebuffer == 0
+            || layer == 0
+            || !layer->enabled
+            || layer->sprite_id == 0
+            || layer->scroll_den <= 0) {
+        return;
+    }
+
+    sprite = generated_sprite_get_by_id(layer->sprite_id);
+    if (sprite == 0 || sprite->pixels == 0 || sprite->width <= 0 || sprite->height <= 0) {
+        return;
+    }
+
+    layer_scroll = (int32_t)(((int64_t)world_scroll_x * (int64_t)layer->scroll_num)
+            / (int64_t)layer->scroll_den);
+    screen_x = (int32_t)layer->x_offset - layer_scroll;
+    tile_w = sprite->width;
+    tile_h = sprite->height;
+    layer_y = gameplay_ground_y - (int32_t)layer->y - tile_h;
+
+    if (!layer->repeat_x && !layer->repeat_y) {
+        renderer_draw_parallax_tile(framebuffer, sprite, screen_x, layer_y);
+        return;
+    }
+
+    start_x = screen_x;
+    if (layer->repeat_x) {
+        start_x = screen_x % tile_w;
+        if (start_x > 0) {
+            start_x -= tile_w;
+        }
+    }
+
+    start_y = layer_y;
+    if (layer->repeat_y) {
+        while (start_y > 0) {
+            start_y -= tile_h;
+        }
+    }
+
+    for (int y = start_y; y < layer_y + tile_h; y += tile_h) {
+        if (layer->repeat_x) {
+            for (int x = start_x; x < framebuffer->width; x += tile_w) {
+                renderer_draw_parallax_tile(framebuffer, sprite, x, y);
+            }
+        } else {
+            renderer_draw_parallax_tile(framebuffer, sprite, screen_x, y);
+        }
+
+        if (!layer->repeat_y) {
+            break;
+        }
+    }
+}
+
+void render_background(
+        Framebuffer* framebuffer,
+        const BackgroundConfig* background,
+        int32_t world_scroll_x,
+        int32_t gameplay_ground_y
+) {
+    int layer_count;
+
+    if (framebuffer == 0 || background == 0) {
+        return;
+    }
+
+    renderer_fill_vertical_gradient(
+            framebuffer,
+            background->sky.top_color,
+            background->sky.bottom_color
+    );
+
+    layer_count = background->layer_count;
+    if (layer_count < 0) {
+        layer_count = 0;
+    }
+    if (layer_count > LITTLE_ONE_MAX_PARALLAX_LAYERS) {
+        layer_count = LITTLE_ONE_MAX_PARALLAX_LAYERS;
+    }
+
+    for (int layer_index = 0; layer_index < layer_count; ++layer_index) {
+        renderer_draw_parallax_layer(
+                framebuffer,
+                background->layers + layer_index,
+                world_scroll_x,
+                gameplay_ground_y
         );
     }
 }
 
-static void renderer_draw_ground(ANativeWindow_Buffer* buffer, const GameState* game) {
-    int ground_y = game->screenHeight - (int)LITTLE_ONE_GROUND_BOTTOM_MARGIN_PX;
-    int scroll = (int)game->worldScrollX;
-    int first_x = -renderer_positive_mod(scroll, RENDERER_GROUND_MARKER_SPACING);
+static int32_t renderer_gameplay_ground_y(const GameState* game) {
+    return (int32_t)game->screenHeight - (int32_t)LITTLE_ONE_GROUND_BOTTOM_MARGIN_PX;
+}
 
-    renderer_draw_rect(buffer, 0, ground_y, buffer->width, RENDERER_GROUND_LINE_HEIGHT, 255, 255, 255);
+static void renderer_draw_ground_fallback_line(
+        Framebuffer* framebuffer,
+        int32_t gameplay_ground_y
+) {
+    renderer_draw_rect(
+            framebuffer,
+            0,
+            gameplay_ground_y,
+            framebuffer->width,
+            RENDERER_GROUND_LINE_HEIGHT,
+            255,
+            255,
+            255
+    );
+}
 
-    for (int x = first_x; x < buffer->width; x += RENDERER_GROUND_MARKER_SPACING) {
-        renderer_draw_rect(
-                buffer,
+void render_ground(
+        Framebuffer* framebuffer,
+        const GroundVisualConfig* ground,
+        int32_t world_scroll_x,
+        int32_t gameplay_ground_y
+) {
+    const GeneratedSprite* sprite;
+    int32_t screen_x;
+    int32_t start_x;
+    int32_t draw_y;
+    int tile_w;
+    int draw_h;
+
+    if (framebuffer == 0 || framebuffer->bits == 0) {
+        return;
+    }
+
+    if (ground == 0 || !ground->enabled || ground->sprite_id == 0) {
+        renderer_draw_ground_fallback_line(framebuffer, gameplay_ground_y);
+        return;
+    }
+
+    sprite = generated_sprite_get_by_id(ground->sprite_id);
+    if (sprite == 0 || sprite->pixels == 0 || sprite->width <= 0 || sprite->height <= 0) {
+        renderer_draw_ground_fallback_line(framebuffer, gameplay_ground_y);
+        return;
+    }
+
+    tile_w = sprite->width;
+    draw_h = ground->height > 0 ? ground->height : sprite->height;
+    draw_y = ground->y != 0 ? ground->y : gameplay_ground_y;
+    screen_x = (int32_t)ground->x_offset - world_scroll_x;
+
+    if (!ground->repeat_x) {
+        renderer_draw_generated_sprite_scaled(
+                framebuffer,
+                sprite,
+                screen_x,
+                draw_y,
+                tile_w,
+                draw_h
+        );
+        return;
+    }
+
+    start_x = screen_x % tile_w;
+    if (start_x > 0) {
+        start_x -= tile_w;
+    }
+
+    for (int32_t x = start_x; x < framebuffer->width; x += tile_w) {
+        renderer_draw_generated_sprite_scaled(
+                framebuffer,
+                sprite,
                 x,
-                ground_y - RENDERER_GROUND_MARKER_HEIGHT,
-                RENDERER_GROUND_MARKER_WIDTH,
-                RENDERER_GROUND_MARKER_HEIGHT,
-                255,
-                255,
-                255
+                draw_y,
+                tile_w,
+                draw_h
         );
     }
 }
+
+#if LITTLE_ONE_SHOW_WIREFRAMES
+static void renderer_draw_ground_debug_line(
+        Framebuffer* framebuffer,
+        int32_t gameplay_ground_y
+) {
+    renderer_draw_color_rect(
+            framebuffer,
+            0,
+            gameplay_ground_y,
+            framebuffer->width,
+            1,
+            RENDERER_GROUND_DEBUG_COLOR
+    );
+}
+#endif
 
 static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState* game) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         const Entity* entity = game->entities + entity_index;
         uint32_t color = 0xffffffff;
         SpriteId sprite_id = SPRITE_NONE;
+        int entity_width;
+        int entity_height;
         const GeneratedSprite* sprite;
 
         if (!entity->active) {
@@ -443,13 +1006,19 @@ static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState
             sprite_id = entity->obstacleConfig->visual.sprite_id;
         }
 
+        entity_width = entity_get_width(entity);
+        entity_height = entity_get_height(entity);
+
         sprite = generated_sprite_get(sprite_id);
         if (sprite != 0) {
-            renderer_draw_generated_sprite(
+            renderer_draw_generated_sprite_fit(
                     buffer,
                     sprite,
-                    (int)entity->x + sprite->pivot_x,
-                    (int)entity->y + sprite->pivot_y
+                    (int)entity->x,
+                    (int)entity->y,
+                    entity_width,
+                    entity_height,
+                    DEFAULT_SPRITE_FIT_MODE
             );
             continue;
         }
@@ -458,19 +1027,18 @@ static void renderer_draw_entities(ANativeWindow_Buffer* buffer, const GameState
                 buffer,
                 (int)entity->x,
                 (int)entity->y,
-                entity_get_width(entity),
-                entity_get_height(entity),
+                entity_width,
+                entity_height,
                 color
         );
     }
 }
 
 static void renderer_draw_player(ANativeWindow_Buffer* buffer, const GameState* game) {
+    const EntityVisualConfig* visual = game_player_visual_config();
     const GeneratedSprite* sprite = generated_sprite_get(SPRITE_PLAYER);
 
     if (sprite == 0) {
-        const EntityVisualConfig* visual = game_player_visual_config();
-
         renderer_draw_color_rect(
                 buffer,
                 (int)game->playerX,
@@ -482,13 +1050,73 @@ static void renderer_draw_player(ANativeWindow_Buffer* buffer, const GameState* 
         return;
     }
 
-    renderer_draw_generated_sprite(
+    renderer_draw_generated_sprite_fit(
             buffer,
             sprite,
-            (int)game->playerX + sprite->pivot_x,
-            (int)game->playerY + sprite->pivot_y
+            (int)game->playerX,
+            (int)game->playerY,
+            visual->width,
+            visual->height,
+            DEFAULT_SPRITE_FIT_MODE
     );
 }
+
+#if LITTLE_ONE_SHOW_WIREFRAMES
+static void renderer_draw_entity_wireframes(ANativeWindow_Buffer* buffer, const GameState* game) {
+    for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
+        const Entity* entity = game->entities + entity_index;
+        int entity_width;
+        int entity_height;
+
+        if (!entity->active) {
+            continue;
+        }
+
+        if (entity->type != ENTITY_ENEMY && entity->type != ENTITY_OBSTACLE) {
+            continue;
+        }
+
+        entity_width = entity_get_width(entity);
+        entity_height = entity_get_height(entity);
+
+        renderer_draw_size_wireframe_rect(
+                buffer,
+                (int)entity->x,
+                (int)entity->y,
+                entity_width,
+                entity_height
+        );
+        renderer_draw_hurt_zone_outline(
+                buffer,
+                (int)entity->x,
+                (int)entity->y,
+                entity_width,
+                entity_height,
+                entity_get_hurt_zone(entity)
+        );
+    }
+}
+
+static void renderer_draw_player_wireframe(ANativeWindow_Buffer* buffer, const GameState* game) {
+    const EntityVisualConfig* visual = game_player_visual_config();
+
+    renderer_draw_size_wireframe_rect(
+            buffer,
+            (int)game->playerX,
+            (int)game->playerY,
+            visual->width,
+            visual->height
+    );
+    renderer_draw_hurt_zone_outline(
+            buffer,
+            (int)game->playerX,
+            (int)game->playerY,
+            visual->width,
+            visual->height,
+            game_player_hurt_zone_config()
+    );
+}
+#endif
 
 static void renderer_draw_diagnostics(ANativeWindow_Buffer* buffer, const GameState* game) {
     int best_digit_count = renderer_count_digits(game->bestScore);
@@ -510,14 +1138,29 @@ static void renderer_draw_diagnostics(ANativeWindow_Buffer* buffer, const GameSt
 }
 
 void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
+    const BackgroundConfig* background;
+    int32_t gameplay_ground_y;
+
     if (buffer == 0 || buffer->bits == 0 || game == 0) {
         return;
     }
 
-    renderer_clear(buffer);
-    renderer_draw_background(buffer, game);
-    renderer_draw_ground(buffer, game);
+    background = background_config_get();
+    gameplay_ground_y = renderer_gameplay_ground_y(game);
+
+    render_background(buffer, background, (int32_t)game->worldScrollX, gameplay_ground_y);
+    render_ground(
+            buffer,
+            &background->ground_visual,
+            (int32_t)game->worldScrollX,
+            gameplay_ground_y
+    );
     renderer_draw_entities(buffer, game);
     renderer_draw_player(buffer, game);
+    #if LITTLE_ONE_SHOW_WIREFRAMES
+    renderer_draw_entity_wireframes(buffer, game);
+    renderer_draw_player_wireframe(buffer, game);
+    renderer_draw_ground_debug_line(buffer, gameplay_ground_y);
+    #endif
     renderer_draw_diagnostics(buffer, game);
 }

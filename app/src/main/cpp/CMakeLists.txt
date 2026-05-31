@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.22.1)
 project(littleone C)
 
 add_library(littleone SHARED
+    ../../../../src/config/background_config.c
     ../../../../src/config/enemy_config.c
     ../../../../src/config/obstacle_config.c
     ../../../../src/config/player_config.c
@@ -12,7 +13,11 @@ add_library(littleone SHARED
     ../../../../src/main.c
     ../../../../src/platform/platform_android.c
     ../../../../src/renderer/renderer.c
+    ../../../../src/sprites/definitions/bg_forest.sprite.c
+    ../../../../src/sprites/definitions/bg_mountains.sprite.c
     ../../../../src/sprites/definitions/boar.sprite.c
+    ../../../../src/sprites/definitions/fg_bushes.sprite.c
+    ../../../../src/sprites/definitions/ground_grass.sprite.c
     ../../../../src/sprites/definitions/ork.sprite.c
     ../../../../src/sprites/definitions/player.sprite.c
     ../../../../src/sprites/definitions/rat.sprite.c

@@ -28,5 +28,6 @@ void entity_spawn_obstacle(Entity* entity, const ObstacleConfig* config, float x
 void entity_update(Entity* entity, float world_speed, float dt);
 int entity_get_width(const Entity* entity);
 int entity_get_height(const Entity* entity);
+const HurtZone* entity_get_hurt_zone(const Entity* entity);
 
 #endif

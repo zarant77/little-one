@@ -17,13 +17,6 @@ static const float SPAWN_SECONDS_RANGE = 1.0f;
 static const float SPAWN_RIGHT_PADDING = 16.0f;
 static unsigned int game_random_state = 12345;
 
-typedef struct {
-    float x;
-    float y;
-    float width;
-    float height;
-} GameRect;
-
 static float game_player_width(void) {
     return (float)player_config_get()->visual.width;
 }
@@ -207,36 +200,22 @@ static void game_update_entities(GameState* game, float dt) {
     game->activeEntityCount = active_count;
 }
 
-static int game_rects_overlap(GameRect a, GameRect b) {
-    return a.x < b.x + b.width
-           && a.x + a.width > b.x
-           && a.y < b.y + b.height
-           && a.y + a.height > b.y;
-}
-
-static GameRect game_player_rect(const GameState* game) {
-    GameRect rect;
-    rect.x = game->playerX;
-    rect.y = game->playerY;
-    rect.width = game_player_width();
-    rect.height = game_player_height();
-
-    return rect;
-}
-
-static GameRect game_entity_rect(const Entity* entity) {
-    GameRect rect;
-    rect.x = entity->x;
-    rect.y = entity->y;
-    rect.width = (float)entity_get_width(entity);
-    rect.height = (float)entity_get_height(entity);
-
-    return rect;
+static int game_player_overlaps_entity_hurt_zone(const GameState* game, const Entity* entity) {
+    return hurt_zones_overlap(
+            (int32_t)game->playerX,
+            (int32_t)game->playerY,
+            player_config_get()->visual.width,
+            player_config_get()->visual.height,
+            &player_config_get()->hurt_zone,
+            (int32_t)entity->x,
+            (int32_t)entity->y,
+            entity_get_width(entity),
+            entity_get_height(entity),
+            entity_get_hurt_zone(entity)
+    );
 }
 
 static void game_handle_collisions(GameState* game, int player_was_smashing) {
-    GameRect player_rect = game_player_rect(game);
-
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         Entity* entity = game->entities + entity_index;
 
@@ -244,7 +223,7 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
             continue;
         }
 
-        if (!game_rects_overlap(player_rect, game_entity_rect(entity))) {
+        if (!game_player_overlaps_entity_hurt_zone(game, entity)) {
             continue;
         }
 
@@ -299,6 +278,10 @@ void game_init(GameState* game) {
 
 const EntityVisualConfig* game_player_visual_config(void) {
     return &player_config_get()->visual;
+}
+
+const HurtZone* game_player_hurt_zone_config(void) {
+    return &player_config_get()->hurt_zone;
 }
 
 void game_set_screen_size(GameState* game, float width, float height) {

@@ -30,6 +30,7 @@ typedef struct {
 
 void game_init(GameState* game);
 const EntityVisualConfig* game_player_visual_config(void);
+const HurtZone* game_player_hurt_zone_config(void);
 void game_set_screen_size(GameState* game, float width, float height);
 void game_update(GameState* game, const InputState* input, float dt);
 

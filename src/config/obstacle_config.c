@@ -4,23 +4,33 @@ static const ObstacleConfig OBSTACLE_CONFIGS[] = {
     // Stump
     {
         .id = "obstacle.stump", // Stable obstacle identifier
+        .hurt_zone = {
+            .x = 0,
+            .y = 0,
+            .radius = 60,
+        },
         .visual = {
-            .width = 80,                  // Render and collision width
-            .height = 180,                // Render and collision height
-            .color = 0xff0000ff,          // Fallback rectangle color
-            .sprite_id = SPRITE_STUMP,    // Generated sprite identifier
-            .animationId = "idle",        // Future default animation
+            .width = 150,              // Render width
+            .height = 150,             // Render height
+            .color = 0xff0000ff,       // Fallback rectangle color
+            .sprite_id = SPRITE_STUMP, // Generated sprite identifier
+            .animationId = "idle",     // Future default animation
         },
     },
     // Rock
     {
         .id = "obstacle.rock", // Stable obstacle identifier
+        .hurt_zone = {
+            .x = 0,
+            .y = 0,
+            .radius = 60,
+        },
         .visual = {
-            .width = 150,                // Render and collision width
-            .height = 150,               // Render and collision height
-            .color = 0xe500d2ff,         // Fallback rectangle color
-            .sprite_id = SPRITE_ROCK,    // Generated sprite identifier
-            .animationId = "idle",       // Future default animation
+            .width = 150,             // Render width
+            .height = 150,            // Render height
+            .color = 0xe500d2ff,      // Fallback rectangle color
+            .sprite_id = SPRITE_ROCK, // Generated sprite identifier
+            .animationId = "idle",    // Future default animation
         },
     },
 };

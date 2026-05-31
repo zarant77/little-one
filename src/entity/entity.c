@@ -85,3 +85,19 @@ int entity_get_height(const Entity* entity) {
 
     return 0;
 }
+
+const HurtZone* entity_get_hurt_zone(const Entity* entity) {
+    if (entity == 0 || !entity->active) {
+        return 0;
+    }
+
+    if (entity->type == ENTITY_ENEMY && entity->enemyConfig != 0) {
+        return &entity->enemyConfig->hurt_zone;
+    }
+
+    if (entity->type == ENTITY_OBSTACLE && entity->obstacleConfig != 0) {
+        return &entity->obstacleConfig->hurt_zone;
+    }
+
+    return 0;
+}
