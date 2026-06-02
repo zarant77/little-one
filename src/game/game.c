@@ -222,6 +222,33 @@ static int game_player_overlaps_entity_hurt_zone(const GameState* game, const En
     );
 }
 
+static int game_player_boundary_overlaps_enemy_hurt_zone(const GameState* game, const Entity* enemy) {
+    if (enemy == 0 || enemy->type != ENTITY_ENEMY) {
+        return 0;
+    }
+
+    return rect_overlaps_hurt_zone(
+            (int32_t)game->playerX,
+            (int32_t)game->playerY,
+            &player_config_get()->boundary,
+            (int32_t)enemy->x,
+            (int32_t)enemy->y,
+            entity_get_width(enemy),
+            entity_get_height(enemy),
+            entity_get_hurt_zone(enemy)
+    );
+}
+
+static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
+    if (entity->enemyConfig != 0) {
+        game->score += entity->enemyConfig->scoreValue;
+    }
+    entity_clear(entity);
+    #if LITTLE_ONE_DEBUG_SMASH
+    LOGI("Enemy killed by smash");
+    #endif
+}
+
 static void game_handle_collisions(GameState* game, int player_was_smashing) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         Entity* entity = game->entities + entity_index;
@@ -230,18 +257,14 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
             continue;
         }
 
-        if (!game_player_overlaps_entity_hurt_zone(game, entity)) {
+        if (entity->type == ENTITY_ENEMY
+                && player_was_smashing
+                && game_player_boundary_overlaps_enemy_hurt_zone(game, entity)) {
+            game_kill_enemy_by_smash(game, entity);
             continue;
         }
 
-        if (entity->type == ENTITY_ENEMY && player_was_smashing) {
-            if (entity->enemyConfig != 0) {
-                game->score += entity->enemyConfig->scoreValue;
-            }
-            entity_clear(entity);
-            #if LITTLE_ONE_DEBUG_SMASH
-            LOGI("Enemy killed by smash");
-            #endif
+        if (!game_player_overlaps_entity_hurt_zone(game, entity)) {
             continue;
         }
 

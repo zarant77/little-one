@@ -39,6 +39,25 @@ ensure_keystore() {
     -dname "CN=Android Debug,O=Android,C=US"
 }
 
+show_logo() {
+  cat <<'EOF'
+ _      _ _   _   _        ___
+| |    (_) | | | | |      / _ \
+| |     _| |_| |_| | ___ | | | |_ __   ___
+| |    | | __| __| |/ _ \| | | | '_ \ / _ \
+| |____| | |_| |_| |  __/| |_| | | | |  __/
+|______|_|\__|\__|_|\___| \___/|_| |_|\___|
+
+Tiny cat. Big world.
+EOF
+}
+
+pack_sprites() {
+  echo
+  echo "Packing sprite JSON files..."
+  python3 tools/pack_sprites.py
+}
+
 sign_apk() {
   "$APKSIGNER" sign \
     --ks "$KEYSTORE" \
@@ -56,9 +75,13 @@ build_apk() {
   ensure_tools
   ensure_keystore
 
+  pack_sprites
+
+  echo
   echo "SDK: $SDK"
   echo "Build Tools: $BUILD_TOOLS_DIR"
   echo "APK Signer: $APKSIGNER"
+  echo
 
   ./gradlew clean assembleRelease
 
@@ -84,11 +107,8 @@ launch_app() {
   adb shell monkey -p "$APP_ID" 1
 }
 
-uninstall_app() {
-  adb uninstall "$APP_ID" || true
-}
-
 show_logs() {
+  adb logcat -c
   adb logcat | grep LittleOne
 }
 
@@ -117,35 +137,34 @@ show_devices() {
 }
 
 while true; do
+  clear
+  show_logo
+
   echo
-  echo "=== Little One ==="
-  echo "1) Build"
-  echo "2) Install"
-  echo "3) Launch"
-  echo "4) Logs"
-  echo "5) Build + Install"
-  echo "6) Build + Install + Launch"
-  echo "7) Uninstall"
-  echo "8) Clean"
-  echo "9) APK size"
-  echo "10) Devices"
+  echo "1) Pack Sprites JSON -> C"
+  echo "2) Build"
+  echo "3) Build + Install + Launch"
+  echo "4) Clean"
+  echo "5) Logs"
+  echo "6) APK size"
+  echo "7) Devices"
   echo "0) Exit"
   echo
 
   read -rp "> " choice
 
   case "$choice" in
-    1) build_apk ;;
-    2) install_apk ;;
-    3) launch_app ;;
-    4) show_logs ;;
-    5) build_apk; install_apk ;;
-    6) build_apk; install_apk; launch_app ;;
-    7) uninstall_app ;;
-    8) clean_project ;;
-    9) show_apk_size ;;
-    10) show_devices ;;
+    1) pack_sprites ;;
+    2) build_apk ;;
+    3) build_apk; install_apk; launch_app ;;
+    4) clean_project ;;
+    5) show_logs ;;
+    6) show_apk_size ;;
+    7) show_devices ;;
     0) exit 0 ;;
     *) echo "Invalid option" ;;
   esac
+
+  echo
+  read -rp "Press Enter to continue..."
 done

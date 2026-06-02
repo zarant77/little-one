@@ -20,18 +20,8 @@ add_library(littleone SHARED
     ../../../../src/main.c
     ../../../../src/platform/platform_android.c
     ../../../../src/renderer/renderer.c
-    ../../../../src/sprites/definitions/bg_forest.sprite.c
-    ../../../../src/sprites/definitions/bg_mountains.sprite.c
-    ../../../../src/sprites/definitions/boar.sprite.c
-    ../../../../src/sprites/definitions/fg_bushes.sprite.c
-    ../../../../src/sprites/definitions/ground_grass.sprite.c
-    ../../../../src/sprites/definitions/ork.sprite.c
-    ../../../../src/sprites/definitions/player.sprite.c
-    ../../../../src/sprites/definitions/rat.sprite.c
-    ../../../../src/sprites/definitions/rock.sprite.c
-    ../../../../src/sprites/definitions/stump.sprite.c
+    ../../../../src/sprites/definitions/sprites_packed.c
     ../../../../src/sprites/generated_sprite.c
-    ../../../../src/sprites/sprite_registry.c
 )
 
 target_include_directories(littleone PRIVATE

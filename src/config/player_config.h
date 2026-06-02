@@ -9,6 +9,7 @@ typedef struct {
     float jumpVelocity;
     float smashVelocity;
     HurtZone hurt_zone;
+    CollisionBoundary boundary;
     EntityVisualConfig visual;
 } PlayerConfig;
 

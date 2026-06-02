@@ -12,6 +12,13 @@ typedef struct {
 } HurtZone;
 
 typedef struct {
+    int16_t x;
+    int16_t y;
+    int16_t width;
+    int16_t height;
+} CollisionBoundary;
+
+typedef struct {
     int width;
     int height;
     uint32_t color;
@@ -47,6 +54,18 @@ static inline int32_t hurt_zone_world_y(
     return center_y + (int32_t)zone->y;
 }
 
+static inline int32_t clamp_i32(int32_t value, int32_t min, int32_t max) {
+    if (value < min) {
+        return min;
+    }
+
+    if (value > max) {
+        return max;
+    }
+
+    return value;
+}
+
 static inline int hurt_zones_overlap(
         int32_t ax,
         int32_t ay,
@@ -80,6 +99,50 @@ static inline int hurt_zones_overlap(
     radius_sum = (int32_t)a->radius + (int32_t)b->radius;
 
     return dx * dx + dy * dy <= radius_sum * radius_sum;
+}
+
+static inline int rect_overlaps_hurt_zone(
+        int32_t rect_entity_x,
+        int32_t rect_entity_y,
+        const CollisionBoundary* rect,
+        int32_t circle_entity_x,
+        int32_t circle_entity_y,
+        int32_t circle_entity_width,
+        int32_t circle_entity_height,
+        const HurtZone* circle
+) {
+    int32_t rect_left;
+    int32_t rect_top;
+    int32_t rect_right;
+    int32_t rect_bottom;
+    int32_t circle_x;
+    int32_t circle_y;
+    int32_t closest_x;
+    int32_t closest_y;
+    int32_t dx;
+    int32_t dy;
+    int32_t radius;
+
+    if (rect == 0 || circle == 0 || rect->width < 0 || rect->height < 0 || circle->radius < 0) {
+        return 0;
+    }
+
+    rect_left = rect_entity_x + (int32_t)rect->x;
+    rect_top = rect_entity_y + (int32_t)rect->y;
+    rect_right = rect_left + (int32_t)rect->width;
+    rect_bottom = rect_top + (int32_t)rect->height;
+
+    circle_x = hurt_zone_world_x(circle_entity_x, circle_entity_width, circle);
+    circle_y = hurt_zone_world_y(circle_entity_y, circle_entity_height, circle);
+
+    closest_x = clamp_i32(circle_x, rect_left, rect_right);
+    closest_y = clamp_i32(circle_y, rect_top, rect_bottom);
+
+    dx = circle_x - closest_x;
+    dy = circle_y - closest_y;
+    radius = (int32_t)circle->radius;
+
+    return dx * dx + dy * dy <= radius * radius;
 }
 
 #endif

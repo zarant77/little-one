@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "id": "bg_mountains",
+  "width": 1020,
+  "height": 340,
+  "pivotX": 600,
+  "pivotY": 170,
+  "primitives": [
+    {
+      "kind": "triangle",
+      "x": 144,
+      "y": 154,
+      "w": 357,
+      "h": 256,
+      "rotation": 0,
+      "color": "7592a7ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 144,
+      "y": 157,
+      "w": 281,
+      "h": 203,
+      "rotation": 0,
+      "color": "8da9baff"
+    },
+    {
+      "kind": "triangle",
+      "x": 358,
+      "y": 139,
+      "w": 432,
+      "h": 278,
+      "rotation": 0,
+      "color": "66849bff"
+    },
+    {
+      "kind": "triangle",
+      "x": 358,
+      "y": 146,
+      "w": 326,
+      "h": 222,
+      "rotation": 0,
+      "color": "82a0b5ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 636,
+      "y": 162,
+      "w": 432,
+      "h": 237,
+      "rotation": 0,
+      "color": "5f7c94ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 636,
+      "y": 169,
+      "w": 331,
+      "h": 180,
+      "rotation": 0,
+      "color": "7897adff"
+    },
+    {
+      "kind": "triangle",
+      "x": 903,
+      "y": 144,
+      "w": 357,
+      "h": 259,
+      "rotation": 0,
+      "color": "6e8ba1ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 903,
+      "y": 151,
+      "w": 281,
+      "h": 203,
+      "rotation": 0,
+      "color": "88a5b7ff"
+    },
+    {
+      "kind": "rect",
+      "x": 601,
+      "y": 285,
+      "w": 1020,
+      "h": 101,
+      "rotation": 0,
+      "color": "5d7b94ff"
+    },
+    {
+      "kind": "rect",
+      "x": 601,
+      "y": 313,
+      "w": 1020,
+      "h": 60,
+      "rotation": 0,
+      "color": "4f708aff"
+    }
+  ]
+}

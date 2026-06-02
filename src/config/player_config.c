@@ -10,6 +10,12 @@ static const PlayerConfig PLAYER_CONFIG = {
         .y = 0,
         .radius = 50,
     },
+    .boundary = {
+        .x = 0,
+        .y = 0,
+        .width = 200,
+        .height = 130,
+    },
     .visual = {
         .width = 200,          // Render width
         .height = 130,         // Render height
