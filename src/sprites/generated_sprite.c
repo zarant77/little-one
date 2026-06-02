@@ -456,29 +456,79 @@ static void sprite_draw_rect(
     }
 }
 
-static void sprite_draw_circle(
+static void sprite_draw_ellipse(
     uint32_t *pixels,
     int sprite_width,
     int sprite_height,
     int center_x,
     int center_y,
-    int radius,
+    int width,
+    int height,
+    int rotation,
     uint32_t color)
 {
-    int min_x = center_x - radius;
-    int max_x = center_x + radius;
-    int min_y = center_y - radius;
-    int max_y = center_y + radius;
-    int radius_squared = radius * radius;
+    int radius_x;
+    int radius_y;
+    int cos_rotation;
+    int sin_rotation;
+    int extent_x;
+    int extent_y;
+    int left;
+    int top;
+    int right;
+    int bottom;
+    int64_t rx2;
+    int64_t ry2;
+    int64_t limit;
 
-    for (int y = min_y; y <= max_y; ++y)
+    if (width <= 0)
     {
-        for (int x = min_x; x <= max_x; ++x)
+        return;
+    }
+
+    if (height <= 0)
+    {
+        height = width;
+    }
+
+    radius_x = width / 2;
+    radius_y = height / 2;
+
+    if (radius_x <= 0 || radius_y <= 0)
+    {
+        return;
+    }
+
+    cos_rotation = sprite_cos_q16(rotation);
+    sin_rotation = sprite_sin_q16(rotation);
+
+    extent_x = (int)(((int64_t)sprite_abs_int(cos_rotation) * radius_x + (int64_t)sprite_abs_int(sin_rotation) * radius_y) / SPRITE_TRIG_SCALE) + 2;
+
+    extent_y = (int)(((int64_t)sprite_abs_int(sin_rotation) * radius_x + (int64_t)sprite_abs_int(cos_rotation) * radius_y) / SPRITE_TRIG_SCALE) + 2;
+
+    left = center_x - extent_x;
+    top = center_y - extent_y;
+    right = center_x + extent_x;
+    bottom = center_y + extent_y;
+
+    rx2 = (int64_t)radius_x * radius_x;
+    ry2 = (int64_t)radius_y * radius_y;
+    limit = rx2 * ry2;
+
+    for (int y = top; y <= bottom; ++y)
+    {
+        for (int x = left; x <= right; ++x)
         {
             int dx = x - center_x;
             int dy = y - center_y;
 
-            if (dx * dx + dy * dy <= radius_squared)
+            int64_t local_x = ((int64_t)dx * cos_rotation + (int64_t)dy * sin_rotation) / SPRITE_TRIG_SCALE;
+
+            int64_t local_y = (-(int64_t)dx * sin_rotation + (int64_t)dy * cos_rotation) / SPRITE_TRIG_SCALE;
+
+            int64_t value = local_x * local_x * ry2 + local_y * local_y * rx2;
+
+            if (value <= limit)
             {
                 sprite_put_pixel(pixels, sprite_width, sprite_height, x, y, color);
             }
@@ -644,13 +694,15 @@ static void sprite_generate(const PackedSpriteDefinition *definition, GeneratedS
         }
         else if (command->kind == PACKED_SPRITE_CMD_CIRCLE)
         {
-            sprite_draw_circle(
+            sprite_draw_ellipse(
                 sprite->pixels,
                 sprite->width,
                 sprite->height,
                 x,
                 y,
                 w,
+                h,
+                rotation,
                 color);
         }
         else if (command->kind == PACKED_SPRITE_CMD_TRIANGLE)
