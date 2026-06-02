@@ -13,6 +13,7 @@ add_library(littleone SHARED
     ../../../../src/config/obstacle_config.c
     ../../../../src/config/player_config.c
     ../../../../src/entity/entity.c
+    ../../../../src/entity/entity_animation.c
     ../../../../src/feedback/game_feedback.c
     ../../../../src/feedback/screen_shake.c
     ../../../../src/game/game.c
@@ -20,6 +21,8 @@ add_library(littleone SHARED
     ../../../../src/main.c
     ../../../../src/platform/platform_android.c
     ../../../../src/renderer/renderer.c
+    ../../../../src/sprites/animations/animation_evaluate.c
+    ../../../../src/sprites/animations/animations.c
     ../../../../src/sprites/definitions/sprites_packed.c
     ../../../../src/sprites/generated_sprite.c
 )

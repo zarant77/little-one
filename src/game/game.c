@@ -56,6 +56,35 @@ static int game_random_index(int count) {
     return index;
 }
 
+static EntityAnimSlot game_player_animation_slot(const GameState* game) {
+    if (game->gameOver) {
+        return ENTITY_ANIM_DEATH;
+    }
+
+    if (game->playerSmashing) {
+        return ENTITY_ANIM_SMASH;
+    }
+
+    if (!game->playerGrounded) {
+        return game->playerVelocityY < 0.0f ? ENTITY_ANIM_JUMP : ENTITY_ANIM_FALL;
+    }
+
+    if (game->playerVelocityX != 0.0f) {
+        return ENTITY_ANIM_WALK;
+    }
+
+    return ENTITY_ANIM_IDLE;
+}
+
+static void game_update_player_animation(GameState* game, int32_t elapsed_ms) {
+    entity_animation_set(
+            &game->playerAnimation,
+            entity_animation_player_config(),
+            game_player_animation_slot(game)
+    );
+    entity_animation_update(&game->playerAnimation, elapsed_ms);
+}
+
 static void game_clamp_player_x(GameState* game) {
     float max_x = (float)game->screenWidth - game_player_width();
 
@@ -269,6 +298,11 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
         }
 
         game->gameOver = 1;
+        entity_animation_set(
+                &game->playerAnimation,
+                entity_animation_player_config(),
+                ENTITY_ANIM_DEATH
+        );
         audio_play_sound("death");
         game_feedback_player_death(&game->screenShake);
         if (game->score > game->bestScore) {
@@ -294,6 +328,14 @@ void game_init(GameState* game) {
     game->playerGrounded = 0;
     game->playerSmashing = 0;
     game->playerCanSmash = 0;
+    game->playerAnimation.slot = ENTITY_ANIM_IDLE;
+    game->playerAnimation.clip = 0;
+    game->playerAnimation.time_ms = 0;
+    entity_animation_set(
+            &game->playerAnimation,
+            entity_animation_player_config(),
+            ENTITY_ANIM_IDLE
+    );
     game->screenWidth = 0;
     game->screenHeight = 0;
     game->worldScrollX = 0.0f;
@@ -386,6 +428,7 @@ void game_update(GameState* game, const InputState* input, float dt) {
     screen_shake_update(&game->screenShake, elapsed_ms);
 
     if (game->gameOver) {
+        game_update_player_animation(game, elapsed_ms);
         if (input != 0 && input->actionPressed) {
             int screen_width = game->screenWidth;
             int screen_height = game->screenHeight;
@@ -446,4 +489,5 @@ void game_update(GameState* game, const InputState* input, float dt) {
     game_update_spawn_timer(game, dt);
     game_update_entities(game, dt);
     game_handle_collisions(game, player_was_smashing);
+    game_update_player_animation(game, elapsed_ms);
 }

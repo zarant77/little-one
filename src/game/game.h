@@ -15,6 +15,7 @@ typedef struct {
     int playerGrounded;
     int playerSmashing;
     int playerCanSmash;
+    EntityAnimationState playerAnimation;
     int screenWidth;
     int screenHeight;
     float worldScrollX;

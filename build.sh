@@ -52,10 +52,11 @@ Tiny cat. Big world.
 EOF
 }
 
-pack_sprites() {
+pack_assets() {
   echo
-  echo "Packing sprite JSON files..."
+  echo "Packing assets JSON files..."
   python3 tools/pack_sprites.py
+  python3 tools/pack_animations.py
 }
 
 sign_apk() {
@@ -75,7 +76,7 @@ build_apk() {
   ensure_tools
   ensure_keystore
 
-  pack_sprites
+  pack_assets
 
   echo
   echo "SDK: $SDK"
@@ -141,7 +142,7 @@ while true; do
   show_logo
 
   echo
-  echo "1) Pack Sprites JSON -> C"
+  echo "1) Pack Assets JSON -> C"
   echo "2) Build"
   echo "3) Build + Install + Launch"
   echo "4) Clean"
@@ -154,7 +155,7 @@ while true; do
   read -rp "> " choice
 
   case "$choice" in
-    1) pack_sprites ;;
+    1) pack_assets ;;
     2) build_apk ;;
     3) build_apk; install_apk; launch_app ;;
     4) clean_project ;;

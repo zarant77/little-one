@@ -3,6 +3,7 @@
 
 #include "../config/enemy_config.h"
 #include "../config/obstacle_config.h"
+#include "entity_animation.h"
 
 typedef enum {
     ENTITY_NONE,
@@ -20,6 +21,7 @@ typedef struct {
 
     const EnemyConfig* enemyConfig;
     const ObstacleConfig* obstacleConfig;
+    EntityAnimationState animation;
 } Entity;
 
 void entity_clear(Entity* entity);

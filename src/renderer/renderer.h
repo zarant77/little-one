@@ -2,6 +2,7 @@
 #define LITTLE_ONE_RENDERER_H
 
 #include <android/native_window.h>
+#include <stdint.h>
 
 #include "../config/background_config.h"
 #include "../game/game.h"
@@ -25,6 +26,20 @@ void renderer_draw_generated_sprite_fit(
         SpriteFitMode fit_mode
 );
 
+void renderer_draw_generated_sprite_fit_ex(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height,
+        SpriteFitMode fit_mode,
+        int16_t scale_x,
+        int16_t scale_y,
+        int16_t rotation,
+        uint8_t alpha
+);
+
 void renderer_draw_generated_sprite_scaled(
         Framebuffer* framebuffer,
         const GeneratedSprite* sprite,
@@ -32,6 +47,24 @@ void renderer_draw_generated_sprite_scaled(
         int dst_y,
         int dst_width,
         int dst_height
+);
+
+void blit_sprite(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int32_t x,
+        int32_t y
+);
+
+void blit_sprite_ex(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int32_t x,
+        int32_t y,
+        int16_t scale_x,
+        int16_t scale_y,
+        int16_t rotation,
+        uint8_t alpha
 );
 
 void renderer_fill_vertical_gradient(

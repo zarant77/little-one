@@ -124,6 +124,20 @@ static uint32_t renderer_blend_rgba(uint32_t src_color, uint32_t dst_color) {
     return rgba_pack(out_r, out_g, out_b, 0xff);
 }
 
+static uint32_t renderer_multiply_alpha(uint32_t color, uint8_t alpha) {
+    uint8_t source_alpha;
+    uint8_t combined_alpha;
+
+    if (alpha == 255) {
+        return color;
+    }
+
+    source_alpha = rgba_a(color);
+    combined_alpha = (uint8_t)(((int)source_alpha * (int)alpha) / 255);
+
+    return (color & 0xffffff00) | (uint32_t)combined_alpha;
+}
+
 static int64_t renderer_div_ceil_i64(int64_t numerator, int64_t denominator) {
     return (numerator + denominator - 1) / denominator;
 }
@@ -409,14 +423,15 @@ static void renderer_draw_size_wireframe_rect(
 }
 #endif
 
-void renderer_draw_generated_sprite_fit(
+static void renderer_draw_generated_sprite_fit_alpha(
         Framebuffer* framebuffer,
         const GeneratedSprite* sprite,
         int dst_x,
         int dst_y,
         int dst_width,
         int dst_height,
-        SpriteFitMode fit_mode
+        SpriteFitMode fit_mode,
+        uint8_t alpha
 ) {
     int64_t dst_left;
     int64_t dst_top;
@@ -543,7 +558,7 @@ void renderer_draw_generated_sprite_fit(
             for (int target_x = clip_left; target_x < clip_right; ++target_x) {
                 int64_t dst_local_x = (int64_t)target_x - draw_left;
                 int source_x = (int)(dst_local_x * (int64_t)sprite->width / draw_width);
-                uint32_t source_color = source_row[source_x];
+                uint32_t source_color = renderer_multiply_alpha(source_row[source_x], alpha);
                 uint8_t source_alpha = rgba_a(source_color);
                 uint32_t color;
 
@@ -579,7 +594,7 @@ void renderer_draw_generated_sprite_fit(
         for (int target_x = clip_left; target_x < clip_right; ++target_x) {
             int64_t dst_local_x = (int64_t)target_x - draw_left;
             int source_x = (int)(dst_local_x * (int64_t)sprite->width / draw_width);
-            uint32_t source_color = source_row[source_x];
+            uint32_t source_color = renderer_multiply_alpha(source_row[source_x], alpha);
             uint8_t source_alpha = rgba_a(source_color);
             uint32_t color;
 
@@ -600,6 +615,117 @@ void renderer_draw_generated_sprite_fit(
             framebuffer_rgba8888_write_opaque(target_row + (size_t)target_x * 4, color);
         }
     }
+}
+
+void renderer_draw_generated_sprite_fit(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height,
+        SpriteFitMode fit_mode
+) {
+    renderer_draw_generated_sprite_fit_alpha(
+            framebuffer,
+            sprite,
+            dst_x,
+            dst_y,
+            dst_width,
+            dst_height,
+            fit_mode,
+            255
+    );
+}
+
+void renderer_draw_generated_sprite_fit_ex(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height,
+        SpriteFitMode fit_mode,
+        int16_t scale_x,
+        int16_t scale_y,
+        int16_t rotation,
+        uint8_t alpha
+) {
+    int pivot_x;
+    int pivot_y;
+    int scaled_width;
+    int scaled_height;
+    int scaled_pivot_x;
+    int scaled_pivot_y;
+
+    (void)rotation;
+
+    if (sprite == 0 || sprite->width <= 0 || sprite->height <= 0) {
+        return;
+    }
+
+    pivot_x = (int)(((int64_t)sprite->pivot_x * (int64_t)dst_width) / (int64_t)sprite->width);
+    pivot_y = (int)(((int64_t)sprite->pivot_y * (int64_t)dst_height) / (int64_t)sprite->height);
+    scaled_width = (int)(((int64_t)dst_width * (int64_t)scale_x) / 1000);
+    scaled_height = (int)(((int64_t)dst_height * (int64_t)scale_y) / 1000);
+    scaled_pivot_x = (int)(((int64_t)pivot_x * (int64_t)scale_x) / 1000);
+    scaled_pivot_y = (int)(((int64_t)pivot_y * (int64_t)scale_y) / 1000);
+
+    if (scaled_width < 0) {
+        scaled_width = -scaled_width;
+    }
+    if (scaled_height < 0) {
+        scaled_height = -scaled_height;
+    }
+
+    renderer_draw_generated_sprite_fit_alpha(
+            framebuffer,
+            sprite,
+            dst_x + pivot_x - scaled_pivot_x,
+            dst_y + pivot_y - scaled_pivot_y,
+            scaled_width,
+            scaled_height,
+            fit_mode,
+            alpha
+    );
+}
+
+void blit_sprite(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int32_t x,
+        int32_t y
+) {
+    blit_sprite_ex(framebuffer, sprite, x, y, 1000, 1000, 0, 255);
+}
+
+void blit_sprite_ex(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int32_t x,
+        int32_t y,
+        int16_t scale_x,
+        int16_t scale_y,
+        int16_t rotation,
+        uint8_t alpha
+) {
+    if (sprite == 0) {
+        return;
+    }
+
+    renderer_draw_generated_sprite_fit_ex(
+            framebuffer,
+            sprite,
+            (int)x,
+            (int)y,
+            sprite->width,
+            sprite->height,
+            SPRITE_FIT_STRETCH,
+            scale_x,
+            scale_y,
+            rotation,
+            alpha
+    );
 }
 
 void renderer_draw_generated_sprite_scaled(
@@ -1006,6 +1132,7 @@ static void renderer_draw_entities(
         int entity_width;
         int entity_height;
         const GeneratedSprite* sprite;
+        AnimationImpact impact;
 
         if (!entity->active) {
             continue;
@@ -1021,25 +1148,30 @@ static void renderer_draw_entities(
 
         entity_width = entity_get_width(entity);
         entity_height = entity_get_height(entity);
+        impact = entity_animation_get_impact(&entity->animation);
 
         sprite = generated_sprite_get(sprite_id);
         if (sprite != 0) {
-            renderer_draw_generated_sprite_fit(
+            renderer_draw_generated_sprite_fit_ex(
                     buffer,
                     sprite,
-                    (int)entity->x + shake_x,
-                    (int)entity->y + shake_y,
+                    (int)entity->x + shake_x + impact.offset_x,
+                    (int)entity->y + shake_y + impact.offset_y,
                     entity_width,
                     entity_height,
-                    DEFAULT_SPRITE_FIT_MODE
+                    DEFAULT_SPRITE_FIT_MODE,
+                    impact.scale_x,
+                    impact.scale_y,
+                    impact.rotation,
+                    impact.alpha
             );
             continue;
         }
 
         renderer_draw_color_rect(
                 buffer,
-                (int)entity->x + shake_x,
-                (int)entity->y + shake_y,
+                (int)entity->x + shake_x + impact.offset_x,
+                (int)entity->y + shake_y + impact.offset_y,
                 entity_width,
                 entity_height,
                 color
@@ -1055,12 +1187,13 @@ static void renderer_draw_player(
 ) {
     const EntityVisualConfig* visual = game_player_visual_config();
     const GeneratedSprite* sprite = generated_sprite_get(SPRITE_PLAYER);
+    AnimationImpact impact = entity_animation_get_impact(&game->playerAnimation);
 
     if (sprite == 0) {
         renderer_draw_color_rect(
                 buffer,
-                (int)game->playerX + shake_x,
-                (int)game->playerY + shake_y,
+                (int)game->playerX + shake_x + impact.offset_x,
+                (int)game->playerY + shake_y + impact.offset_y,
                 visual->width,
                 visual->height,
                 visual->color
@@ -1068,14 +1201,18 @@ static void renderer_draw_player(
         return;
     }
 
-    renderer_draw_generated_sprite_fit(
+    renderer_draw_generated_sprite_fit_ex(
             buffer,
             sprite,
-            (int)game->playerX + shake_x,
-            (int)game->playerY + shake_y,
+            (int)game->playerX + shake_x + impact.offset_x,
+            (int)game->playerY + shake_y + impact.offset_y,
             visual->width,
             visual->height,
-            DEFAULT_SPRITE_FIT_MODE
+            DEFAULT_SPRITE_FIT_MODE,
+            impact.scale_x,
+            impact.scale_y,
+            impact.rotation,
+            impact.alpha
     );
 }
 
