@@ -6,6 +6,7 @@
 #include "../config/background_config.h"
 #include "../game/game_settings.h"
 #include "../ui/hud.h"
+#include "../ui/menu.h"
 
 #define RENDERER_GROUND_LINE_HEIGHT 2
 #define RENDERER_DIGIT_WIDTH 12
@@ -1768,4 +1769,5 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     renderer_draw_ground_debug_line(buffer, gameplay_ground_y + shake_y);
     #endif
     hud_render(buffer, game);
+    menu_render(buffer, game);
 }

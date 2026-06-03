@@ -18,6 +18,7 @@
 #include "../renderer/renderer.h"
 #include "../sprites/generated_sprite.h"
 #include "../ui/hud.h"
+#include "../ui/menu.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
@@ -119,14 +120,16 @@ static void platform_handle_motion_event(
         float x = AMotionEvent_getX(event, action_index);
         float y = AMotionEvent_getY(event, action_index);
 
-        input_handle_touch(
-                &platform->input,
-                INPUT_TOUCH_DOWN,
-                pointer_id,
-                x,
-                y,
-                screen_width
-        );
+        if (!menu_handle_touch(&platform->game, INPUT_TOUCH_DOWN, pointer_id, (int)x, (int)y)) {
+            input_handle_touch(
+                    &platform->input,
+                    INPUT_TOUCH_DOWN,
+                    pointer_id,
+                    x,
+                    y,
+                    screen_width
+            );
+        }
         return;
     }
 
@@ -138,14 +141,16 @@ static void platform_handle_motion_event(
             float x = AMotionEvent_getX(event, pointer_index);
             float y = AMotionEvent_getY(event, pointer_index);
 
-            input_handle_touch(
-                    &platform->input,
-                    INPUT_TOUCH_MOVE,
-                    pointer_id,
-                    x,
-                    y,
-                    screen_width
-            );
+            if (!menu_handle_touch(&platform->game, INPUT_TOUCH_MOVE, pointer_id, (int)x, (int)y)) {
+                input_handle_touch(
+                        &platform->input,
+                        INPUT_TOUCH_MOVE,
+                        pointer_id,
+                        x,
+                        y,
+                        screen_width
+                );
+            }
         }
 
         return;
@@ -162,18 +167,21 @@ static void platform_handle_motion_event(
 
         int pointer_id = AMotionEvent_getPointerId(event, action_index);
 
-        input_handle_touch(
-                &platform->input,
-                INPUT_TOUCH_UP,
-                pointer_id,
-                0.0f,
-                0.0f,
-                screen_width
-        );
+        if (!menu_handle_touch(&platform->game, INPUT_TOUCH_UP, pointer_id, 0, 0)) {
+            input_handle_touch(
+                    &platform->input,
+                    INPUT_TOUCH_UP,
+                    pointer_id,
+                    0.0f,
+                    0.0f,
+                    screen_width
+            );
+        }
         return;
     }
 
     if (action_type == AMOTION_EVENT_ACTION_CANCEL) {
+        menu_handle_touch(&platform->game, INPUT_TOUCH_CANCEL, -1, 0, 0);
         input_handle_touch(
                 &platform->input,
                 INPUT_TOUCH_CANCEL,
@@ -193,6 +201,7 @@ static void platform_process_input(AndroidPlatform* platform, float screen_width
     queue = platform->input_queue;
 
     if (platform->input_cancel_requested) {
+        menu_handle_touch(&platform->game, INPUT_TOUCH_CANCEL, -1, 0, 0);
         input_handle_touch(&platform->input, INPUT_TOUCH_CANCEL, -1, 0.0f, 0.0f, screen_width);
         platform->input_cancel_requested = 0;
     }
@@ -297,6 +306,9 @@ static int platform_draw(AndroidPlatform* platform, float dt) {
     }
 
     game_set_screen_size(&platform->game, (float)buffer.width, (float)buffer.height);
+    if (platform->game.uiState != GAME_UI_PLAYING) {
+        input_init(&platform->input);
+    }
     game_update(&platform->game, &platform->input, dt);
     input_end_frame(&platform->input);
     renderer_draw_frame(&buffer, &platform->game);
@@ -544,6 +556,7 @@ void platform_android_on_create(
     platform->reset_frame_time = 1;
     generated_sprite_initialize_all();
     hud_initialize();
+    menu_initialize();
     sound_registry_initialize_all();
     music_registry_initialize_all();
     audio_init();

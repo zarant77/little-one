@@ -26,6 +26,8 @@ static int audio_music_cursor = 0;
 static const GeneratedSound* audio_sound = 0;
 static int audio_sound_cursor = 0;
 static int audio_next_mix_buffer = 0;
+static int audio_music_volume = 70;
+static int audio_sfx_volume = 80;
 
 enum {
     AUDIO_MIX_BUFFER_SAMPLES = 512,
@@ -67,6 +69,21 @@ static int16_t audio_clamp_sample(int value)
     return (int16_t)value;
 }
 
+static int audio_clamp_volume(int volume)
+{
+    if (volume < 0)
+    {
+        return 0;
+    }
+
+    if (volume > 100)
+    {
+        return 100;
+    }
+
+    return volume;
+}
+
 static void audio_fill_mix_buffer(int buffer_index)
 {
     int16_t* buffer;
@@ -85,7 +102,7 @@ static void audio_fill_mix_buffer(int buffer_index)
                 && audio_music->samples != 0
                 && audio_music->sample_count > 0)
         {
-            mixed += audio_music->samples[audio_music_cursor];
+            mixed += (audio_music->samples[audio_music_cursor] * audio_music_volume) / 100;
             audio_music_cursor += 1;
             if (audio_music_cursor >= audio_music->sample_count)
             {
@@ -97,7 +114,7 @@ static void audio_fill_mix_buffer(int buffer_index)
                 && audio_sound->samples != 0
                 && audio_sound->sample_count > 0)
         {
-            mixed += audio_sound->samples[audio_sound_cursor];
+            mixed += (audio_sound->samples[audio_sound_cursor] * audio_sfx_volume) / 100;
             audio_sound_cursor += 1;
             if (audio_sound_cursor >= audio_sound->sample_count)
             {
@@ -317,6 +334,16 @@ void audio_init(void)
     LOGI("Audio init success");
 }
 
+void audio_set_music_volume(int volume)
+{
+    audio_music_volume = audio_clamp_volume(volume);
+}
+
+void audio_set_sfx_volume(int volume)
+{
+    audio_sfx_volume = audio_clamp_volume(volume);
+}
+
 void audio_play_sound(const char* id)
 {
     const GeneratedSound* sound;
@@ -382,6 +409,16 @@ void audio_shutdown(void)
 {
     music_registry_shutdown_all();
     sound_registry_shutdown_all();
+}
+
+void audio_set_music_volume(int volume)
+{
+    (void)volume;
+}
+
+void audio_set_sfx_volume(int volume)
+{
+    (void)volume;
 }
 
 void audio_play_sound(const char* id)

@@ -369,12 +369,16 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
 
 void game_init(GameState* game) {
     int best_score;
+    GameSettings settings;
+    int settings_initialized;
 
     if (game == 0) {
         return;
     }
 
     best_score = game->bestScore;
+    settings = game->settings;
+    settings_initialized = game->settingsInitialized;
 
     game->playerX = 0.0f;
     game->playerY = 0.0f;
@@ -406,6 +410,15 @@ void game_init(GameState* game) {
     game->averageFrameMs = 0;
     game->activeEntityCount = 0;
     screen_shake_start(&game->screenShake, 0, 0, 1u);
+    game->uiState = GAME_UI_PLAYING;
+    if (!settings_initialized) {
+        game_settings_init(&settings);
+        settings_initialized = 1;
+    }
+    game->settings = settings;
+    game->settingsInitialized = settings_initialized;
+    audio_set_music_volume(game->settings.music_volume);
+    audio_set_sfx_volume(game->settings.sfx_volume);
 }
 
 const EntityVisualConfig* game_player_visual_config(void) {
@@ -475,6 +488,10 @@ void game_update(GameState* game, const InputState* input, float dt) {
     int32_t elapsed_ms;
 
     if (game == 0) {
+        return;
+    }
+
+    if (game->uiState != GAME_UI_PLAYING) {
         return;
     }
 

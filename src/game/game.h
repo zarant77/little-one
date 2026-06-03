@@ -4,8 +4,15 @@
 #include "../entity/entity.h"
 #include "../feedback/screen_shake.h"
 #include "../input/input.h"
+#include "../settings/game_settings.h"
 
 #define MAX_ENTITIES 16
+
+typedef enum {
+    GAME_UI_PLAYING = 0,
+    GAME_UI_PAUSED = 1,
+    GAME_UI_SETTINGS = 2
+} GameUiState;
 
 typedef struct {
     float playerX;
@@ -31,6 +38,9 @@ typedef struct {
     int averageFrameMs;
     int activeEntityCount;
     ScreenShake screenShake;
+    GameUiState uiState;
+    GameSettings settings;
+    int settingsInitialized;
 } GameState;
 
 void game_init(GameState* game);

@@ -72,7 +72,10 @@ add_library(littleone SHARED
     ../../../../src/sprites/animations/animations.c
     ../../../../src/sprites/definitions/sprites_packed.c
     ../../../../src/sprites/generated_sprite.c
+    ../../../../src/settings/game_settings.c
     ../../../../src/ui/hud.c
+    ../../../../src/ui/menu.c
+    ../../../../src/ui/ui_controls.c
 )
 
 add_dependencies(littleone pack_fonts pack_sprites)
