@@ -55,8 +55,11 @@ EOF
 pack_assets() {
   echo
   echo "Packing assets JSON files..."
-  python3 tools/pack_sprites.py
   python3 tools/pack_animations.py
+  python3 tools/pack_fonts.py
+  python3 tools/pack_music.py
+  python3 tools/pack_sfx.py
+  python3 tools/pack_sprites.py
 }
 
 sign_apk() {

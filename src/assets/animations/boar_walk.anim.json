@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "id": "boar_walk",
+  "durationMs": 500,
+  "loop": true,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 125,
+          "value": 2,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 250,
+          "value": 0,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 375,
+          "value": 2,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 500,
+          "value": 0,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 125,
+          "value": 1080,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 250,
+          "value": 970,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 375,
+          "value": 1080,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 500,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 125,
+          "value": 930,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 250,
+          "value": 1040,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 375,
+          "value": 930,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 500,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    }
+  ]
+}

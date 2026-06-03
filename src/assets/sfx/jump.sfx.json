@@ -1,0 +1,20 @@
+{
+  "type": "sfx",
+  "id": "jump",
+  "commands": [
+    {
+      "wave": "square",
+      "frequencyStart": 520,
+      "frequencyEnd": 880,
+      "durationMs": 90,
+      "volume": 62
+    },
+    {
+      "wave": "triangle",
+      "frequencyStart": 760,
+      "frequencyEnd": 980,
+      "durationMs": 45,
+      "volume": 42
+    }
+  ]
+}

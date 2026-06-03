@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "id": "land",
+  "durationMs": 190,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 45,
+          "value": 7,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 110,
+          "value": -3,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 190,
+          "value": 0,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 45,
+          "value": 1320,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 110,
+          "value": 900,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 190,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 45,
+          "value": 680,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 110,
+          "value": 1160,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 190,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    }
+  ]
+}

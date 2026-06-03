@@ -1,0 +1,27 @@
+{
+  "type": "sfx",
+  "id": "boar_death",
+  "commands": [
+    {
+      "wave": "triangle",
+      "frequencyStart": 260,
+      "frequencyEnd": 95,
+      "durationMs": 210,
+      "volume": 82
+    },
+    {
+      "wave": "square",
+      "frequencyStart": 140,
+      "frequencyEnd": 60,
+      "durationMs": 170,
+      "volume": 70
+    },
+    {
+      "wave": "noise",
+      "frequencyStart": 110,
+      "frequencyEnd": 35,
+      "durationMs": 130,
+      "volume": 54
+    }
+  ]
+}

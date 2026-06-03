@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "id": "idle",
+  "durationMs": 720,
+  "loop": true,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 360,
+          "value": -3,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 720,
+          "value": 0,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 360,
+          "value": 1015,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 720,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 360,
+          "value": 985,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 720,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    }
+  ]
+}

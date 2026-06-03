@@ -49,6 +49,15 @@ void renderer_draw_generated_sprite_scaled(
         int dst_height
 );
 
+void renderer_draw_color_rect(
+        Framebuffer* framebuffer,
+        int x,
+        int y,
+        int width,
+        int height,
+        uint32_t color
+);
+
 void blit_sprite(
         Framebuffer* framebuffer,
         const GeneratedSprite* sprite,

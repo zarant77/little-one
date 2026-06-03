@@ -1,0 +1,20 @@
+{
+  "type": "sfx",
+  "id": "damage",
+  "commands": [
+    {
+      "wave": "square",
+      "frequencyStart": 920,
+      "frequencyEnd": 540,
+      "durationMs": 55,
+      "volume": 74
+    },
+    {
+      "wave": "noise",
+      "frequencyStart": 300,
+      "frequencyEnd": 120,
+      "durationMs": 45,
+      "volume": 48
+    }
+  ]
+}

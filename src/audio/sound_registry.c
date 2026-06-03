@@ -12,57 +12,7 @@
 
 #include "sound_generator.h"
 
-static const SoundCommand JUMP_SOUND_COMMANDS[] = {
-    {SOUND_WAVE_SQUARE, 420, 760, 90, 32},
-    {SOUND_WAVE_TRIANGLE, 760, 520, 45, 22},
-};
-
-static const SoundCommand SMASH_SOUND_COMMANDS[] = {
-    {SOUND_WAVE_NOISE, 180, 70, 130, 55},
-    {SOUND_WAVE_SQUARE, 90, 55, 80, 30},
-};
-
-static const SoundCommand HIT_SOUND_COMMANDS[] = {
-    {SOUND_WAVE_NOISE, 900, 260, 45, 45},
-    {SOUND_WAVE_SQUARE, 240, 160, 50, 28},
-};
-
-static const SoundCommand DEATH_SOUND_COMMANDS[] = {
-    {SOUND_WAVE_SQUARE, 360, 120, 180, 38},
-    {SOUND_WAVE_TRIANGLE, 120, 55, 220, 30},
-};
-
-const SoundDefinition JUMP_SOUND = {
-    "jump",
-    JUMP_SOUND_COMMANDS,
-    (int16_t)(sizeof(JUMP_SOUND_COMMANDS) / sizeof(JUMP_SOUND_COMMANDS[0]))};
-
-const SoundDefinition SMASH_SOUND = {
-    "smash",
-    SMASH_SOUND_COMMANDS,
-    (int16_t)(sizeof(SMASH_SOUND_COMMANDS) / sizeof(SMASH_SOUND_COMMANDS[0]))};
-
-const SoundDefinition HIT_SOUND = {
-    "hit",
-    HIT_SOUND_COMMANDS,
-    (int16_t)(sizeof(HIT_SOUND_COMMANDS) / sizeof(HIT_SOUND_COMMANDS[0]))};
-
-const SoundDefinition DEATH_SOUND = {
-    "death",
-    DEATH_SOUND_COMMANDS,
-    (int16_t)(sizeof(DEATH_SOUND_COMMANDS) / sizeof(DEATH_SOUND_COMMANDS[0]))};
-
-const SoundDefinition *SOUND_DEFINITIONS[] = {
-    &JUMP_SOUND,
-    &SMASH_SOUND,
-    &HIT_SOUND,
-    &DEATH_SOUND,
-};
-
-const size_t SOUND_COUNT =
-    sizeof(SOUND_DEFINITIONS) / sizeof(SOUND_DEFINITIONS[0]);
-
-static GeneratedSound GENERATED_SOUNDS[SOUND_ID_COUNT];
+static GeneratedSound GENERATED_SOUND_CACHE[SOUND_ID_COUNT];
 static int sound_registry_initialized = 0;
 
 static int sound_id_equals(const char *left, const char *right)
@@ -93,16 +43,10 @@ void sound_registry_initialize_all(void)
         return;
     }
 
-    for (size_t sound_index = 0; sound_index < SOUND_COUNT && sound_index < SOUND_ID_COUNT; ++sound_index)
+    for (size_t sound_index = 0; sound_index < PACKED_SOUND_COUNT && sound_index < SOUND_ID_COUNT; ++sound_index)
     {
-        const SoundDefinition *definition = SOUND_DEFINITIONS[sound_index];
-        GeneratedSound *sound = GENERATED_SOUNDS + sound_index;
-
-        if (definition == 0)
-        {
-            LOGE("Generated sound %zu invalid: definition is null", sound_index);
-            continue;
-        }
+        const SoundDefinition *definition = PACKED_SOUND_DEFINITIONS + sound_index;
+        GeneratedSound *sound = GENERATED_SOUND_CACHE + sound_index;
 
         LOGI(
             "Generated sound %zu: id=%s command_count=%d",
@@ -126,7 +70,7 @@ void sound_registry_shutdown_all(void)
 {
     for (size_t sound_index = 0; sound_index < SOUND_ID_COUNT; ++sound_index)
     {
-        sound_generator_release(GENERATED_SOUNDS + sound_index);
+        sound_generator_release(GENERATED_SOUND_CACHE + sound_index);
     }
 
     sound_registry_initialized = 0;
@@ -141,7 +85,7 @@ const GeneratedSound *sound_registry_get(SoundId sound_id)
         return 0;
     }
 
-    sound = GENERATED_SOUNDS + sound_id;
+    sound = GENERATED_SOUND_CACHE + sound_id;
     if (sound->samples == 0)
     {
         return 0;
@@ -152,11 +96,11 @@ const GeneratedSound *sound_registry_get(SoundId sound_id)
 
 const GeneratedSound *sound_registry_get_by_id(const char *sound_id)
 {
-    for (size_t sound_index = 0; sound_index < SOUND_COUNT && sound_index < SOUND_ID_COUNT; ++sound_index)
+    for (size_t sound_index = 0; sound_index < PACKED_SOUND_COUNT && sound_index < SOUND_ID_COUNT; ++sound_index)
     {
-        if (sound_id_equals(GENERATED_SOUNDS[sound_index].id, sound_id))
+        if (sound_id_equals(GENERATED_SOUND_CACHE[sound_index].id, sound_id))
         {
-            return GENERATED_SOUNDS + sound_index;
+            return GENERATED_SOUND_CACHE + sound_index;
         }
     }
 

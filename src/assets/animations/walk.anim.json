@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "id": "walk",
+  "durationMs": 480,
+  "loop": true,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 120,
+          "value": 2,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 240,
+          "value": -2,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 360,
+          "value": 2,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 480,
+          "value": 0,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 120,
+          "value": 920,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 240,
+          "value": 1120,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 360,
+          "value": 920,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 480,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 120,
+          "value": 1100,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 240,
+          "value": 900,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 360,
+          "value": 1100,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 480,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    }
+  ]
+}

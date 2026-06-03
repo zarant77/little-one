@@ -6,14 +6,6 @@
 #include "generated_sound.h"
 #include "sound_definition.h"
 
-extern const SoundDefinition JUMP_SOUND;
-extern const SoundDefinition SMASH_SOUND;
-extern const SoundDefinition HIT_SOUND;
-extern const SoundDefinition DEATH_SOUND;
-
-extern const SoundDefinition* SOUND_DEFINITIONS[];
-extern const size_t SOUND_COUNT;
-
 void sound_registry_initialize_all(void);
 void sound_registry_shutdown_all(void);
 

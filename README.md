@@ -112,15 +112,9 @@ src/
 
 Little One uses procedural assets instead of traditional PNG, WAV or OGG files.
 
-Documentation:
-
-- [SPRITE_FORMAT.md](./SPRITE_FORMAT.md) — procedural graphics format
-- [AUDIO_FORMAT.md](./AUDIO_FORMAT.md) — procedural audio format
-
 Tools:
 
-- [Cat Paint](https://paint.catemup.com) → sprite editor
-- [Cat Meow](https://meow.catemup.com) → sound and music editor
+- [Cat Meow Studio](https://cms.catemup.com)
 
 ## License
 

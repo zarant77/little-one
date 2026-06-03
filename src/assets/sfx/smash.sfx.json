@@ -1,0 +1,20 @@
+{
+  "type": "sfx",
+  "id": "smash",
+  "commands": [
+    {
+      "wave": "square",
+      "frequencyStart": 180,
+      "frequencyEnd": 70,
+      "durationMs": 120,
+      "volume": 86
+    },
+    {
+      "wave": "noise",
+      "frequencyStart": 120,
+      "frequencyEnd": 40,
+      "durationMs": 90,
+      "volume": 72
+    }
+  ]
+}

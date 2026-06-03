@@ -5,7 +5,25 @@ import re
 from pathlib import Path
 from typing import Any
 
-DEFINITIONS_DIR = Path("src/sprites/definitions")
+def find_project_root() -> Path:
+    script_path = Path(__file__).resolve()
+    candidates = [
+        Path.cwd().resolve(),
+        script_path.parent,
+        *script_path.parents,
+    ]
+
+    for candidate in candidates:
+        if (candidate / "src").is_dir():
+            return candidate
+
+    return script_path.parents[1]
+
+
+PROJECT_ROOT = find_project_root()
+ASSETS_DIR = PROJECT_ROOT / "src" / "assets"
+SPRITE_ASSETS_DIR = ASSETS_DIR / "sprites"
+DEFINITIONS_DIR = PROJECT_ROOT / "src" / "sprites" / "definitions"
 
 SPRITE_MAX_VALUE = 1024
 COMMAND_MAX_VALUE = 1023
@@ -292,21 +310,49 @@ def load_valid_sprites(files: list[Path]) -> tuple[list[dict[str, Any]], int]:
             sprites.append(sprite)
         except Exception as error:
             skipped += 1
-            warn(f"Skipping {file_path.name}: {error}")
+            try:
+                display_path = file_path.relative_to(PROJECT_ROOT)
+            except ValueError:
+                display_path = file_path
+
+            warn(f"Skipping {display_path}: {error}")
 
     return sprites, skipped
 
 
+def find_sprite_files() -> list[Path]:
+    return sorted(
+        file_path
+        for file_path in SPRITE_ASSETS_DIR.rglob("*.json")
+        if file_path.is_file()
+    )
+
+
+def validate_unique_sprite_ids(sprites: list[dict[str, Any]]) -> None:
+    seen: set[str] = set()
+
+    for sprite in sprites:
+        sprite_id = str(sprite["id"])
+
+        if sprite_id in seen:
+            fail(f"Duplicate sprite id: {sprite_id}")
+
+        seen.add(sprite_id)
+
+
 def main() -> None:
-    files = sorted(DEFINITIONS_DIR.glob("*.sprite.json"))
+    files = find_sprite_files()
 
     if not files:
-        fail(f"No *.sprite.json files found in {DEFINITIONS_DIR}")
+        fail(f"No sprite JSON files found in {SPRITE_ASSETS_DIR}")
 
     sprites, skipped = load_valid_sprites(files)
 
     if not sprites:
         fail("No valid sprites found")
+
+    validate_unique_sprite_ids(sprites)
+    DEFINITIONS_DIR.mkdir(parents=True, exist_ok=True)
 
     palette: list[str] = []
     palette_index: dict[str, int] = {}
@@ -343,6 +389,7 @@ def main() -> None:
     print(f"Packed sprites: {len(sprites)}")
     print(f"Skipped sprites: {skipped}")
     print(f"Palette colors: {len(palette)}")
+    print(f"Input: {SPRITE_ASSETS_DIR}")
     print(f"Output: {DEFINITIONS_DIR}")
 
 

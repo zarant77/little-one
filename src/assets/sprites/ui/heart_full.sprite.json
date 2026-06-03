@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "id": "heart_full",
+  "width": 56,
+  "height": 56,
+  "pivotX": 28,
+  "pivotY": 28,
+  "primitives": [
+    {
+      "kind": "circle",
+      "x": 16,
+      "y": 18,
+      "w": 32,
+      "h": 32,
+      "rotation": 0,
+      "color": "000000ff"
+    },
+    {
+      "kind": "circle",
+      "x": 40,
+      "y": 18,
+      "w": 32,
+      "h": 32,
+      "rotation": 0,
+      "color": "000000ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 28,
+      "y": 39,
+      "w": 56,
+      "h": 32,
+      "rotation": 180,
+      "color": "000000ff"
+    },
+    {
+      "kind": "circle",
+      "x": 16,
+      "y": 18,
+      "w": 27,
+      "h": 27,
+      "rotation": 0,
+      "color": "f50000ff"
+    },
+    {
+      "kind": "circle",
+      "x": 40,
+      "y": 18,
+      "w": 27,
+      "h": 27,
+      "rotation": 0,
+      "color": "f50000ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 28,
+      "y": 36,
+      "w": 52,
+      "h": 30,
+      "rotation": 180,
+      "color": "f50000ff"
+    }
+  ]
+}

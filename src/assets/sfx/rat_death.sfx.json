@@ -1,0 +1,27 @@
+{
+  "type": "sfx",
+  "id": "rat_death",
+  "commands": [
+    {
+      "wave": "square",
+      "frequencyStart": 1180,
+      "frequencyEnd": 760,
+      "durationMs": 45,
+      "volume": 70
+    },
+    {
+      "wave": "square",
+      "frequencyStart": 880,
+      "frequencyEnd": 1320,
+      "durationMs": 35,
+      "volume": 58
+    },
+    {
+      "wave": "noise",
+      "frequencyStart": 420,
+      "frequencyEnd": 160,
+      "durationMs": 35,
+      "volume": 32
+    }
+  ]
+}

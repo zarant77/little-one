@@ -1,0 +1,27 @@
+{
+  "type": "sfx",
+  "id": "death",
+  "commands": [
+    {
+      "wave": "triangle",
+      "frequencyStart": 520,
+      "frequencyEnd": 180,
+      "durationMs": 180,
+      "volume": 76
+    },
+    {
+      "wave": "square",
+      "frequencyStart": 220,
+      "frequencyEnd": 80,
+      "durationMs": 120,
+      "volume": 54
+    },
+    {
+      "wave": "noise",
+      "frequencyStart": 90,
+      "frequencyEnd": 30,
+      "durationMs": 90,
+      "volume": 40
+    }
+  ]
+}

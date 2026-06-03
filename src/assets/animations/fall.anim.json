@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "id": "fall",
+  "durationMs": 180,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 180,
+          "value": 2,
+          "easing": "ease_out"
+        }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 180,
+          "value": 1080,
+          "easing": "ease_out"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 180,
+          "value": 920,
+          "easing": "ease_out"
+        }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 180,
+          "value": 100,
+          "easing": "ease_out"
+        }
+      ]
+    }
+  ]
+}

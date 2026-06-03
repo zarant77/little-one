@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "id": "hud_bg",
+  "width": 440,
+  "height": 176,
+  "pivotX": 220,
+  "pivotY": 88,
+  "primitives": [
+    {
+      "kind": "circle",
+      "x": 26,
+      "y": 26,
+      "w": 53,
+      "h": 0,
+      "rotation": 0,
+      "color": "2f37f9ff"
+    },
+    {
+      "kind": "circle",
+      "x": 26,
+      "y": 150,
+      "w": 53,
+      "h": 0,
+      "rotation": 0,
+      "color": "2f37f9ff"
+    },
+    {
+      "kind": "circle",
+      "x": 414,
+      "y": 26,
+      "w": 53,
+      "h": 0,
+      "rotation": 0,
+      "color": "2f37f9ff"
+    },
+    {
+      "kind": "circle",
+      "x": 414,
+      "y": 150,
+      "w": 53,
+      "h": 0,
+      "rotation": 0,
+      "color": "2f37f9ff"
+    },
+    {
+      "kind": "rect",
+      "x": 219,
+      "y": 87,
+      "w": 381,
+      "h": 178,
+      "rotation": 0,
+      "color": "2f37f9ff"
+    },
+    {
+      "kind": "rect",
+      "x": 426,
+      "y": 88,
+      "w": 33,
+      "h": 122,
+      "rotation": 0,
+      "color": "2f37f9ff"
+    },
+    {
+      "kind": "rect",
+      "x": 17,
+      "y": 91,
+      "w": 39,
+      "h": 122,
+      "rotation": 0,
+      "color": "2f37f9ff"
+    },
+    {
+      "kind": "circle",
+      "x": 35,
+      "y": 34,
+      "w": 44,
+      "h": 0,
+      "rotation": 0,
+      "color": "00f3b3ff"
+    },
+    {
+      "kind": "circle",
+      "x": 35,
+      "y": 142,
+      "w": 44,
+      "h": 0,
+      "rotation": 0,
+      "color": "00f3b3ff"
+    },
+    {
+      "kind": "circle",
+      "x": 406,
+      "y": 34,
+      "w": 44,
+      "h": 0,
+      "rotation": 0,
+      "color": "00f3b3ff"
+    },
+    {
+      "kind": "circle",
+      "x": 406,
+      "y": 142,
+      "w": 44,
+      "h": 0,
+      "rotation": 0,
+      "color": "00f3b3ff"
+    },
+    {
+      "kind": "rect",
+      "x": 222,
+      "y": 88,
+      "w": 370,
+      "h": 152,
+      "rotation": 0,
+      "color": "00f3b3ff"
+    },
+    {
+      "kind": "rect",
+      "x": 37,
+      "y": 88,
+      "w": 48,
+      "h": 113,
+      "rotation": 0,
+      "color": "00f3b3ff"
+    },
+    {
+      "kind": "rect",
+      "x": 413,
+      "y": 88,
+      "w": 30,
+      "h": 103,
+      "rotation": 0,
+      "color": "00f3b3ff"
+    }
+  ]
+}

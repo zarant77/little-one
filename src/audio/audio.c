@@ -159,6 +159,8 @@ void audio_shutdown(void)
     audio_destroy_object(&audio_player_object);
     audio_destroy_object(&audio_output_mix_object);
     audio_destroy_object(&audio_engine_object);
+    music_registry_shutdown_all();
+    sound_registry_shutdown_all();
     audio_initialized = 0;
 }
 
@@ -177,6 +179,9 @@ void audio_init(void)
     {
         return;
     }
+
+    sound_registry_initialize_all();
+    music_registry_initialize_all();
 
     result = slCreateEngine(&audio_engine_object, 0, 0, 0, 0, 0);
     if (!audio_check_result(result, "create engine"))
@@ -369,10 +374,14 @@ void audio_stop_music(void)
 
 void audio_init(void)
 {
+    sound_registry_initialize_all();
+    music_registry_initialize_all();
 }
 
 void audio_shutdown(void)
 {
+    music_registry_shutdown_all();
+    sound_registry_shutdown_all();
 }
 
 void audio_play_sound(const char* id)

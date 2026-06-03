@@ -1,7 +1,7 @@
 #include "player_config.h"
 
 static const PlayerConfig PLAYER_CONFIG = {
-    .hp = 1,                  // Hit points
+    .hp = 3,                  // Hit points
     .moveSpeed = 600.0f,      // Horizontal movement speed
     .jumpVelocity = -1800.0f, // Initial jump velocity
     .smashVelocity = 4000.0f, // Downward smash velocity

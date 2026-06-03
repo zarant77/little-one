@@ -5,6 +5,7 @@
 
 #include "../config/background_config.h"
 #include "../game/game_settings.h"
+#include "../ui/hud.h"
 
 #define RENDERER_GROUND_LINE_HEIGHT 2
 #define RENDERER_DIGIT_WIDTH 12
@@ -15,6 +16,10 @@
 #define RENDERER_SIZE_WIREFRAME_COLOR 0xffff00ff
 #define RENDERER_HURT_ZONE_WIREFRAME_COLOR 0xff0000ff
 #define RENDERER_GROUND_DEBUG_COLOR 0x00ffffff
+#define RENDERER_TRIG_SCALE 65536
+#define RENDERER_PI_MILLIRADIANS 3141
+#define RENDERER_TWO_PI_MILLIRADIANS 6283
+#define RENDERER_HALF_PI_MILLIRADIANS 1571
 
 /* Canonical Little One colors are 0xRRGGBBAA:
  * 0xff0000ff red, 0x00ff00ff green, 0x0000ffff blue,
@@ -136,6 +141,95 @@ static uint32_t renderer_multiply_alpha(uint32_t color, uint8_t alpha) {
     combined_alpha = (uint8_t)(((int)source_alpha * (int)alpha) / 255);
 
     return (color & 0xffffff00) | (uint32_t)combined_alpha;
+}
+
+static int renderer_normalize_rotation(int rotation) {
+    while (rotation > RENDERER_PI_MILLIRADIANS) {
+        rotation -= RENDERER_TWO_PI_MILLIRADIANS;
+    }
+
+    while (rotation < -RENDERER_PI_MILLIRADIANS) {
+        rotation += RENDERER_TWO_PI_MILLIRADIANS;
+    }
+
+    return rotation;
+}
+
+static int renderer_sin_q16(int rotation) {
+    int normalized = renderer_normalize_rotation(rotation);
+    int64_t x;
+    int64_t x2;
+    int64_t result;
+
+    if (normalized > RENDERER_HALF_PI_MILLIRADIANS) {
+        normalized = RENDERER_PI_MILLIRADIANS - normalized;
+    } else if (normalized < -RENDERER_HALF_PI_MILLIRADIANS) {
+        normalized = -RENDERER_PI_MILLIRADIANS - normalized;
+    }
+
+    x = ((int64_t)normalized * RENDERER_TRIG_SCALE) / 1000;
+    x2 = (x * x) / RENDERER_TRIG_SCALE;
+    result = x;
+    result -= (((x * x2) / RENDERER_TRIG_SCALE) / 6);
+    result += (((((x * x2) / RENDERER_TRIG_SCALE) * x2) / RENDERER_TRIG_SCALE) / 120);
+    result -= (((((((x * x2) / RENDERER_TRIG_SCALE) * x2) / RENDERER_TRIG_SCALE) * x2) / RENDERER_TRIG_SCALE) / 5040);
+
+    if (result > RENDERER_TRIG_SCALE) {
+        return RENDERER_TRIG_SCALE;
+    }
+    if (result < -RENDERER_TRIG_SCALE) {
+        return -RENDERER_TRIG_SCALE;
+    }
+
+    return (int)result;
+}
+
+static int renderer_cos_q16(int rotation) {
+    return renderer_sin_q16(rotation + RENDERER_HALF_PI_MILLIRADIANS);
+}
+
+static void renderer_write_sprite_pixel(
+        Framebuffer* framebuffer,
+        int target_x,
+        int target_y,
+        uint32_t source_color,
+        uint8_t alpha
+) {
+    uint32_t color;
+
+    source_color = renderer_multiply_alpha(source_color, alpha);
+    if (rgba_a(source_color) == 0) {
+        return;
+    }
+
+    if (framebuffer->format == WINDOW_FORMAT_RGB_565) {
+        uint16_t* framebuffer_pixels = (uint16_t*)framebuffer->bits;
+        uint16_t* target_pixel = framebuffer_pixels + target_y * framebuffer->stride + target_x;
+
+        if (rgba_a(source_color) == 255) {
+            color = source_color;
+        } else {
+            color = renderer_blend_rgba(source_color, rgb565_to_rgba(*target_pixel));
+        }
+
+        *target_pixel = rgba_to_rgb565(color);
+        return;
+    }
+
+    {
+        uint8_t* framebuffer_pixels = (uint8_t*)framebuffer->bits;
+        uint8_t* target_pixel =
+                framebuffer_pixels + (size_t)target_y * (size_t)framebuffer->stride * 4
+                + (size_t)target_x * 4;
+
+        if (rgba_a(source_color) == 255) {
+            color = source_color;
+        } else {
+            color = renderer_blend_rgba(source_color, framebuffer_rgba8888_read(target_pixel));
+        }
+
+        framebuffer_rgba8888_write_opaque(target_pixel, color);
+    }
 }
 
 static int64_t renderer_div_ceil_i64(int64_t numerator, int64_t denominator) {
@@ -269,7 +363,7 @@ static void renderer_draw_rect(
     }
 }
 
-static void renderer_draw_color_rect(
+void renderer_draw_color_rect(
         ANativeWindow_Buffer* buffer,
         int x,
         int y,
@@ -638,17 +732,275 @@ void renderer_draw_generated_sprite_fit(
     );
 }
 
-void renderer_draw_generated_sprite_fit_ex(
-        Framebuffer* framebuffer,
+typedef struct {
+    int x;
+    int y;
+    int width;
+    int height;
+} RendererSpriteRect;
+
+static RendererSpriteRect renderer_sprite_fit_rect(
         const GeneratedSprite* sprite,
         int dst_x,
         int dst_y,
         int dst_width,
         int dst_height,
-        SpriteFitMode fit_mode,
+        SpriteFitMode fit_mode
+) {
+    RendererSpriteRect rect;
+
+    rect.x = dst_x;
+    rect.y = dst_y;
+    rect.width = dst_width;
+    rect.height = dst_height;
+
+    if (sprite == 0
+            || sprite->width <= 0
+            || sprite->height <= 0
+            || dst_width <= 0
+            || dst_height <= 0) {
+        rect.width = 0;
+        rect.height = 0;
+        return rect;
+    }
+
+    if (fit_mode == SPRITE_FIT_CONTAIN || fit_mode == SPRITE_FIT_COVER) {
+        int64_t source_scaled_to_dst = (int64_t)sprite->width * (int64_t)dst_height;
+        int64_t dst_scaled_to_source = (int64_t)dst_width * (int64_t)sprite->height;
+        int64_t draw_width;
+        int64_t draw_height;
+
+        if (fit_mode == SPRITE_FIT_CONTAIN) {
+            if (source_scaled_to_dst > dst_scaled_to_source) {
+                draw_width = (int64_t)dst_width;
+                draw_height = ((int64_t)dst_width * (int64_t)sprite->height)
+                        / (int64_t)sprite->width;
+            } else {
+                draw_width = ((int64_t)dst_height * (int64_t)sprite->width)
+                        / (int64_t)sprite->height;
+                draw_height = (int64_t)dst_height;
+            }
+        } else {
+            if (source_scaled_to_dst > dst_scaled_to_source) {
+                draw_width = renderer_div_ceil_i64(
+                        (int64_t)dst_height * (int64_t)sprite->width,
+                        (int64_t)sprite->height
+                );
+                draw_height = (int64_t)dst_height;
+            } else {
+                draw_width = (int64_t)dst_width;
+                draw_height = renderer_div_ceil_i64(
+                        (int64_t)dst_width * (int64_t)sprite->height,
+                        (int64_t)sprite->width
+                );
+            }
+        }
+
+        if (draw_width <= 0) {
+            draw_width = 1;
+        }
+        if (draw_height <= 0) {
+            draw_height = 1;
+        }
+
+        rect.width = (int)draw_width;
+        rect.height = (int)draw_height;
+        rect.x = dst_x + (dst_width - rect.width) / 2;
+        rect.y = dst_y + (dst_height - rect.height) / 2;
+    }
+
+    return rect;
+}
+
+static void renderer_transform_corner(
+        int64_t local_x,
+        int64_t local_y,
+        int draw_width,
+        int draw_height,
+        const GeneratedSprite* sprite,
+        int16_t scale_x,
+        int16_t scale_y,
+        int cos_rotation,
+        int sin_rotation,
+        int64_t *out_x,
+        int64_t *out_y
+) {
+    int64_t scaled_x = (local_x * (int64_t)draw_width * (int64_t)scale_x)
+            / ((int64_t)sprite->width * 1000);
+    int64_t scaled_y = (local_y * (int64_t)draw_height * (int64_t)scale_y)
+            / ((int64_t)sprite->height * 1000);
+
+    *out_x = (scaled_x * cos_rotation - scaled_y * sin_rotation) / RENDERER_TRIG_SCALE;
+    *out_y = (scaled_x * sin_rotation + scaled_y * cos_rotation) / RENDERER_TRIG_SCALE;
+}
+
+static void renderer_draw_generated_sprite_transformed(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int draw_x,
+        int draw_y,
+        int draw_width,
+        int draw_height,
         int16_t scale_x,
         int16_t scale_y,
         int16_t rotation,
+        uint8_t alpha
+) {
+    int cos_rotation;
+    int sin_rotation;
+    int64_t pivot_x;
+    int64_t pivot_y;
+    int64_t corners_x[4];
+    int64_t corners_y[4];
+    int64_t min_x;
+    int64_t min_y;
+    int64_t max_x;
+    int64_t max_y;
+    int clip_left;
+    int clip_top;
+    int clip_right;
+    int clip_bottom;
+
+    if (framebuffer == 0
+            || framebuffer->bits == 0
+            || sprite == 0
+            || sprite->pixels == 0
+            || sprite->width <= 0
+            || sprite->height <= 0
+            || draw_width <= 0
+            || draw_height <= 0
+            || scale_x == 0
+            || scale_y == 0
+            || alpha == 0) {
+        return;
+    }
+
+    cos_rotation = renderer_cos_q16(rotation);
+    sin_rotation = renderer_sin_q16(rotation);
+    pivot_x = (int64_t)draw_x
+            + ((int64_t)sprite->pivot_x * (int64_t)draw_width) / (int64_t)sprite->width;
+    pivot_y = (int64_t)draw_y
+            + ((int64_t)sprite->pivot_y * (int64_t)draw_height) / (int64_t)sprite->height;
+
+    renderer_transform_corner(
+            -sprite->pivot_x,
+            -sprite->pivot_y,
+            draw_width,
+            draw_height,
+            sprite,
+            scale_x,
+            scale_y,
+            cos_rotation,
+            sin_rotation,
+            corners_x,
+            corners_y
+    );
+    renderer_transform_corner(
+            (int64_t)sprite->width - sprite->pivot_x,
+            -sprite->pivot_y,
+            draw_width,
+            draw_height,
+            sprite,
+            scale_x,
+            scale_y,
+            cos_rotation,
+            sin_rotation,
+            corners_x + 1,
+            corners_y + 1
+    );
+    renderer_transform_corner(
+            -sprite->pivot_x,
+            (int64_t)sprite->height - sprite->pivot_y,
+            draw_width,
+            draw_height,
+            sprite,
+            scale_x,
+            scale_y,
+            cos_rotation,
+            sin_rotation,
+            corners_x + 2,
+            corners_y + 2
+    );
+    renderer_transform_corner(
+            (int64_t)sprite->width - sprite->pivot_x,
+            (int64_t)sprite->height - sprite->pivot_y,
+            draw_width,
+            draw_height,
+            sprite,
+            scale_x,
+            scale_y,
+            cos_rotation,
+            sin_rotation,
+            corners_x + 3,
+            corners_y + 3
+    );
+
+    min_x = corners_x[0];
+    max_x = corners_x[0];
+    min_y = corners_y[0];
+    max_y = corners_y[0];
+    for (int corner_index = 1; corner_index < 4; ++corner_index) {
+        if (corners_x[corner_index] < min_x) {
+            min_x = corners_x[corner_index];
+        }
+        if (corners_x[corner_index] > max_x) {
+            max_x = corners_x[corner_index];
+        }
+        if (corners_y[corner_index] < min_y) {
+            min_y = corners_y[corner_index];
+        }
+        if (corners_y[corner_index] > max_y) {
+            max_y = corners_y[corner_index];
+        }
+    }
+
+    clip_left = (int)renderer_max_i64(0, pivot_x + min_x - 2);
+    clip_top = (int)renderer_max_i64(0, pivot_y + min_y - 2);
+    clip_right = (int)renderer_min_i64((int64_t)framebuffer->width, pivot_x + max_x + 2);
+    clip_bottom = (int)renderer_min_i64((int64_t)framebuffer->height, pivot_y + max_y + 2);
+
+    if (clip_left >= clip_right || clip_top >= clip_bottom) {
+        return;
+    }
+
+    for (int target_y = clip_top; target_y < clip_bottom; ++target_y) {
+        for (int target_x = clip_left; target_x < clip_right; ++target_x) {
+            int64_t dx = (int64_t)target_x - pivot_x;
+            int64_t dy = (int64_t)target_y - pivot_y;
+            int64_t unrotated_x = (dx * cos_rotation + dy * sin_rotation)
+                    / RENDERER_TRIG_SCALE;
+            int64_t unrotated_y = (-dx * sin_rotation + dy * cos_rotation)
+                    / RENDERER_TRIG_SCALE;
+            int64_t source_local_x =
+                    (unrotated_x * 1000 * (int64_t)sprite->width)
+                    / ((int64_t)scale_x * (int64_t)draw_width);
+            int64_t source_local_y =
+                    (unrotated_y * 1000 * (int64_t)sprite->height)
+                    / ((int64_t)scale_y * (int64_t)draw_height);
+            int source_x = (int)(source_local_x + sprite->pivot_x);
+            int source_y = (int)(source_local_y + sprite->pivot_y);
+
+            if (source_x < 0 || source_y < 0 || source_x >= sprite->width || source_y >= sprite->height) {
+                continue;
+            }
+
+            renderer_write_sprite_pixel(
+                    framebuffer,
+                    target_x,
+                    target_y,
+                    sprite->pixels[(size_t)source_y * (size_t)sprite->width + (size_t)source_x],
+                    alpha
+            );
+        }
+    }
+}
+
+static void renderer_draw_generated_sprite_scale_only(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        const RendererSpriteRect* rect,
+        int16_t scale_x,
+        int16_t scale_y,
         uint8_t alpha
 ) {
     int pivot_x;
@@ -658,16 +1010,14 @@ void renderer_draw_generated_sprite_fit_ex(
     int scaled_pivot_x;
     int scaled_pivot_y;
 
-    (void)rotation;
-
-    if (sprite == 0 || sprite->width <= 0 || sprite->height <= 0) {
+    if (rect == 0 || rect->width <= 0 || rect->height <= 0) {
         return;
     }
 
-    pivot_x = (int)(((int64_t)sprite->pivot_x * (int64_t)dst_width) / (int64_t)sprite->width);
-    pivot_y = (int)(((int64_t)sprite->pivot_y * (int64_t)dst_height) / (int64_t)sprite->height);
-    scaled_width = (int)(((int64_t)dst_width * (int64_t)scale_x) / 1000);
-    scaled_height = (int)(((int64_t)dst_height * (int64_t)scale_y) / 1000);
+    pivot_x = (int)(((int64_t)sprite->pivot_x * (int64_t)rect->width) / (int64_t)sprite->width);
+    pivot_y = (int)(((int64_t)sprite->pivot_y * (int64_t)rect->height) / (int64_t)sprite->height);
+    scaled_width = (int)(((int64_t)rect->width * (int64_t)scale_x) / 1000);
+    scaled_height = (int)(((int64_t)rect->height * (int64_t)scale_y) / 1000);
     scaled_pivot_x = (int)(((int64_t)pivot_x * (int64_t)scale_x) / 1000);
     scaled_pivot_y = (int)(((int64_t)pivot_y * (int64_t)scale_y) / 1000);
 
@@ -681,11 +1031,88 @@ void renderer_draw_generated_sprite_fit_ex(
     renderer_draw_generated_sprite_fit_alpha(
             framebuffer,
             sprite,
-            dst_x + pivot_x - scaled_pivot_x,
-            dst_y + pivot_y - scaled_pivot_y,
+            rect->x + pivot_x - scaled_pivot_x,
+            rect->y + pivot_y - scaled_pivot_y,
             scaled_width,
             scaled_height,
-            fit_mode,
+            SPRITE_FIT_STRETCH,
+            alpha
+    );
+}
+
+void renderer_draw_generated_sprite_fit_ex(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height,
+        SpriteFitMode fit_mode,
+        int16_t scale_x,
+        int16_t scale_y,
+        int16_t rotation,
+        uint8_t alpha
+) {
+    RendererSpriteRect rect;
+
+    if (framebuffer == 0
+            || framebuffer->bits == 0
+            || sprite == 0
+            || sprite->width <= 0
+            || sprite->height <= 0
+            || dst_width <= 0
+            || dst_height <= 0
+            || scale_x == 0
+            || scale_y == 0
+            || alpha == 0) {
+        return;
+    }
+
+    if (scale_x == 1000 && scale_y == 1000 && rotation == 0) {
+        renderer_draw_generated_sprite_fit_alpha(
+                framebuffer,
+                sprite,
+                dst_x,
+                dst_y,
+                dst_width,
+                dst_height,
+                fit_mode,
+                alpha
+        );
+        return;
+    }
+
+    rect = renderer_sprite_fit_rect(
+            sprite,
+            dst_x,
+            dst_y,
+            dst_width,
+            dst_height,
+            fit_mode
+    );
+
+    if (rotation == 0) {
+        renderer_draw_generated_sprite_scale_only(
+                framebuffer,
+                sprite,
+                &rect,
+                scale_x,
+                scale_y,
+                alpha
+        );
+        return;
+    }
+
+    renderer_draw_generated_sprite_transformed(
+            framebuffer,
+            sprite,
+            rect.x,
+            rect.y,
+            rect.width,
+            rect.height,
+            scale_x,
+            scale_y,
+            rotation,
             alpha
     );
 }
@@ -1340,5 +1767,5 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     renderer_draw_player_wireframe(buffer, game, shake_x, shake_y);
     renderer_draw_ground_debug_line(buffer, gameplay_ground_y + shake_y);
     #endif
-    renderer_draw_diagnostics(buffer, game);
+    hud_render(buffer, game);
 }

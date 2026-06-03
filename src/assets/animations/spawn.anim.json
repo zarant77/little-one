@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "id": "spawn",
+  "durationMs": 260,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 90,
+          "value": 1220,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 180,
+          "value": 940,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 260,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 90,
+          "value": 820,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 180,
+          "value": 1080,
+          "easing": "ease_in_out"
+        },
+        {
+          "timeMs": 260,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "alpha",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 50,
+          "value": 255,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 260,
+          "value": 255,
+          "easing": "linear"
+        }
+      ]
+    }
+  ]
+}

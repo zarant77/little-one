@@ -17,6 +17,7 @@
 #include "../input/input.h"
 #include "../renderer/renderer.h"
 #include "../sprites/generated_sprite.h"
+#include "../ui/hud.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
@@ -542,10 +543,11 @@ void platform_android_on_create(
     platform->null_window_logged = 0;
     platform->reset_frame_time = 1;
     generated_sprite_initialize_all();
+    hud_initialize();
     sound_registry_initialize_all();
     music_registry_initialize_all();
     audio_init();
-    audio_play_music("main_theme");
+    audio_play_music("music");
     game_init(&platform->game);
     input_init(&platform->input);
 

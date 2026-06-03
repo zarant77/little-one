@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "id": "star",
+  "width": 56,
+  "height": 56,
+  "pivotX": 28,
+  "pivotY": 28,
+  "primitives": [
+    {
+      "kind": "triangle",
+      "x": 28,
+      "y": 12,
+      "w": 13,
+      "h": 22,
+      "rotation": 0,
+      "color": "000000ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 28,
+      "y": 13,
+      "w": 11,
+      "h": 21,
+      "rotation": 0,
+      "color": "ffff00ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 46,
+      "y": 25,
+      "w": 13,
+      "h": 22,
+      "rotation": 72.01857030303594,
+      "color": "000000ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 45,
+      "y": 25,
+      "w": 11,
+      "h": 21,
+      "rotation": 72.01857030303594,
+      "color": "ffff00ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 10,
+      "y": 25,
+      "w": 13,
+      "h": 22,
+      "rotation": -72.01857030303594,
+      "color": "000000ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 11,
+      "y": 25,
+      "w": 11,
+      "h": 21,
+      "rotation": -72.01857030303594,
+      "color": "ffff00ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 17,
+      "y": 46,
+      "w": 13,
+      "h": 22,
+      "rotation": -143.58362148011395,
+      "color": "000000ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 17,
+      "y": 45,
+      "w": 11,
+      "h": 21,
+      "rotation": -143.58362148011395,
+      "color": "ffff00ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 39,
+      "y": 46,
+      "w": 13,
+      "h": 22,
+      "rotation": -215.14867265719192,
+      "color": "000000ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 38,
+      "y": 46,
+      "w": 11,
+      "h": 21,
+      "rotation": -215.14867265719192,
+      "color": "ffff00ff"
+    },
+    {
+      "kind": "circle",
+      "x": 28,
+      "y": 30,
+      "w": 21,
+      "h": 21,
+      "rotation": 0,
+      "color": "ffff00ff"
+    }
+  ]
+}

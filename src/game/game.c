@@ -17,6 +17,7 @@ static const float WORLD_SCROLL_WRAP = 10000.0f;
 static const float SPAWN_MIN_SECONDS = 1.5f;
 static const float SPAWN_SECONDS_RANGE = 1.0f;
 static const float SPAWN_RIGHT_PADDING = 16.0f;
+static const int PLAYER_HIT_INVULNERABLE_MS = 900;
 static unsigned int game_random_state = 12345;
 
 static float game_player_width(void) {
@@ -59,6 +60,10 @@ static int game_random_index(int count) {
 static EntityAnimSlot game_player_animation_slot(const GameState* game) {
     if (game->gameOver) {
         return ENTITY_ANIM_DEATH;
+    }
+
+    if (game->playerInvulnerableMs > 0) {
+        return ENTITY_ANIM_DAMAGE;
     }
 
     if (game->playerSmashing) {
@@ -125,7 +130,7 @@ static void game_clamp_player_to_ground(GameState* game) {
         game->playerCanSmash = 0;
         if (!was_grounded) {
             if (was_smashing) {
-                audio_play_sound("hit");
+                audio_play_sound("smash");
                 game_feedback_smash_land(&game->screenShake);
             }
             #if LITTLE_ONE_DEBUG_SMASH
@@ -268,14 +273,74 @@ static int game_player_boundary_overlaps_enemy_hurt_zone(const GameState* game, 
     );
 }
 
+static const char* game_enemy_death_sound_id(const Entity* entity) {
+    const char* id;
+
+    if (entity == 0 || entity->enemyConfig == 0 || entity->enemyConfig->id == 0) {
+        return "death";
+    }
+
+    id = entity->enemyConfig->id;
+    if (id[0] == 'e' && id[1] == 'n' && id[2] == 'e' && id[3] == 'm' && id[4] == 'y' && id[5] == '.') {
+        id += 6;
+
+        if (id[0] == 'o' && id[1] == 'r' && id[2] == 'k' && id[3] == 0) {
+            return "ork_death";
+        }
+        if (id[0] == 'b' && id[1] == 'o' && id[2] == 'a' && id[3] == 'r' && id[4] == 0) {
+            return "boar_death";
+        }
+        if (id[0] == 'r' && id[1] == 'a' && id[2] == 't' && id[3] == 0) {
+            return "rat_death";
+        }
+    }
+
+    return "death";
+}
+
 static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
     if (entity->enemyConfig != 0) {
         game->score += entity->enemyConfig->scoreValue;
     }
+    audio_play_sound(game_enemy_death_sound_id(entity));
     entity_clear(entity);
     #if LITTLE_ONE_DEBUG_SMASH
     LOGI("Enemy killed by smash");
     #endif
+}
+
+static void game_handle_player_death(GameState* game) {
+    game->gameOver = 1;
+    entity_animation_set(
+            &game->playerAnimation,
+            entity_animation_player_config(),
+            ENTITY_ANIM_DEATH
+    );
+    audio_play_sound("death");
+    game_feedback_player_death(&game->screenShake);
+    if (game->score > game->bestScore) {
+        game->bestScore = game->score;
+    }
+}
+
+static void game_damage_player(GameState* game) {
+    if (game->playerInvulnerableMs > 0 || game->playerHp <= 0) {
+        return;
+    }
+
+    game->playerHp -= 1;
+    if (game->playerHp <= 0) {
+        game_handle_player_death(game);
+        return;
+    }
+
+    game->playerInvulnerableMs = PLAYER_HIT_INVULNERABLE_MS;
+    entity_animation_set(
+            &game->playerAnimation,
+            entity_animation_player_config(),
+            ENTITY_ANIM_DAMAGE
+    );
+    audio_play_sound("damage");
 }
 
 static void game_handle_collisions(GameState* game, int player_was_smashing) {
@@ -297,17 +362,7 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
             continue;
         }
 
-        game->gameOver = 1;
-        entity_animation_set(
-                &game->playerAnimation,
-                entity_animation_player_config(),
-                ENTITY_ANIM_DEATH
-        );
-        audio_play_sound("death");
-        game_feedback_player_death(&game->screenShake);
-        if (game->score > game->bestScore) {
-            game->bestScore = game->score;
-        }
+        game_damage_player(game);
         return;
     }
 }
@@ -328,6 +383,8 @@ void game_init(GameState* game) {
     game->playerGrounded = 0;
     game->playerSmashing = 0;
     game->playerCanSmash = 0;
+    game->playerHp = player_config_get()->hp;
+    game->playerInvulnerableMs = 0;
     game->playerAnimation.slot = ENTITY_ANIM_IDLE;
     game->playerAnimation.clip = 0;
     game->playerAnimation.time_ms = 0;
@@ -426,6 +483,12 @@ void game_update(GameState* game, const InputState* input, float dt) {
         elapsed_ms = 0;
     }
     screen_shake_update(&game->screenShake, elapsed_ms);
+    if (game->playerInvulnerableMs > 0) {
+        game->playerInvulnerableMs -= elapsed_ms;
+        if (game->playerInvulnerableMs < 0) {
+            game->playerInvulnerableMs = 0;
+        }
+    }
 
     if (game->gameOver) {
         game_update_player_animation(game, elapsed_ms);
@@ -470,6 +533,7 @@ void game_update(GameState* game, const InputState* input, float dt) {
             game->playerVelocityY = player_config_get()->smashVelocity;
             game->playerSmashing = 1;
             game->playerCanSmash = 0;
+            audio_play_sound("smash");
             #if LITTLE_ONE_DEBUG_SMASH
             LOGI("Smash start");
             #endif

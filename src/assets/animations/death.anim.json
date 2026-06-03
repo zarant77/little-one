@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "id": "death",
+  "durationMs": 520,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 80,
+          "value": -6,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 180,
+          "value": 12,
+          "easing": "ease_in"
+        },
+        {
+          "timeMs": 520,
+          "value": 16,
+          "easing": "ease_out"
+        }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 80,
+          "value": 850,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 180,
+          "value": 1450,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 520,
+          "value": 1500,
+          "easing": "ease_out"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 80,
+          "value": 1180,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 180,
+          "value": 360,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 520,
+          "value": 220,
+          "easing": "ease_out"
+        }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 180,
+          "value": 180,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 520,
+          "value": 180,
+          "easing": "linear"
+        }
+      ]
+    },
+    {
+      "property": "alpha",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 255,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 320,
+          "value": 255,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 520,
+          "value": 0,
+          "easing": "ease_out"
+        }
+      ]
+    }
+  ]
+}

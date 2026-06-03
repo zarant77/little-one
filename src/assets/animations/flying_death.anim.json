@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "id": "flying_death",
+  "durationMs": 520,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 180,
+          "value": 12,
+          "easing": "ease_in"
+        },
+        {
+          "timeMs": 520,
+          "value": 34,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 180,
+          "value": 900,
+          "easing": "ease_in"
+        },
+        {
+          "timeMs": 520,
+          "value": 2200,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 520,
+          "value": 700,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 520,
+          "value": 700,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "alpha",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 255,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 360,
+          "value": 255,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 520,
+          "value": 0,
+          "easing": "ease_out"
+        }
+      ]
+    }
+  ]
+}

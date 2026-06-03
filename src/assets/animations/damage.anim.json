@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "id": "damage",
+  "durationMs": 230,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 30,
+          "value": -5,
+          "easing": "step"
+        },
+        {
+          "timeMs": 60,
+          "value": 5,
+          "easing": "step"
+        },
+        {
+          "timeMs": 90,
+          "value": -4,
+          "easing": "step"
+        },
+        {
+          "timeMs": 125,
+          "value": 3,
+          "easing": "step"
+        },
+        {
+          "timeMs": 170,
+          "value": -2,
+          "easing": "step"
+        },
+        {
+          "timeMs": 230,
+          "value": 0,
+          "easing": "ease_out"
+        }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 55,
+          "value": 1180,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 230,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 55,
+          "value": 820,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 230,
+          "value": 1000,
+          "easing": "ease_in"
+        }
+      ]
+    }
+  ]
+}

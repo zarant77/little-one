@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_INPUT_DIR = Path("src/sprites/animations")
-DEFAULT_OUTPUT_FILE = DEFAULT_INPUT_DIR / "animations.c"
+DEFAULT_INPUT_DIR = Path("src/assets/animations")
+DEFAULT_OUTPUT_FILE = Path("src/sprites/animations/animations.c")
 
 PROPERTY_MAP = {
     "offset_x": "ANIM_PROP_OFFSET_X",

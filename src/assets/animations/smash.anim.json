@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "id": "smash",
+  "durationMs": 180,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 50,
+          "value": 4,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 180,
+          "value": 8,
+          "easing": "linear"
+        }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 50,
+          "value": 1240,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 180,
+          "value": 1140,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 1000,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 50,
+          "value": 780,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 180,
+          "value": 860,
+          "easing": "ease_in"
+        }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        {
+          "timeMs": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "timeMs": 50,
+          "value": 420,
+          "easing": "ease_out"
+        },
+        {
+          "timeMs": 180,
+          "value": 420,
+          "easing": "linear"
+        }
+      ]
+    }
+  ]
+}
