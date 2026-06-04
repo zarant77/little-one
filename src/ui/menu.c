@@ -326,10 +326,11 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
     {
         if (action_type == INPUT_TOUCH_DOWN)
         {
-            game_restart_run(game);
+            game_try_restart_after_game_over(game);
+            return 1;
         }
 
-        return 1;
+        return 0;
     }
 
     if (action_type == INPUT_TOUCH_CANCEL)

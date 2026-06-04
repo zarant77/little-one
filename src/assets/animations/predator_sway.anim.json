@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "id": "predator_sway",
+  "durationMs": 1040,
+  "loop": true,
+  "tracks": [
+    {
+      "property": "offset_x",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 180, "value": -5, "easing": "ease_out" },
+        { "timeMs": 360, "value": -7, "easing": "ease_in_out" },
+        { "timeMs": 520, "value": 0, "easing": "ease_in_out" },
+        { "timeMs": 700, "value": 6, "easing": "ease_out" },
+        { "timeMs": 880, "value": 8, "easing": "ease_in_out" },
+        { "timeMs": 1040, "value": 0, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "offset_y",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 180, "value": 1, "easing": "ease_out" },
+        { "timeMs": 360, "value": 2, "easing": "ease_in_out" },
+        { "timeMs": 520, "value": 0, "easing": "ease_in_out" },
+        { "timeMs": 700, "value": 1, "easing": "ease_out" },
+        { "timeMs": 880, "value": 2, "easing": "ease_in_out" },
+        { "timeMs": 1040, "value": 0, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 180, "value": -34, "easing": "ease_out" },
+        { "timeMs": 360, "value": -46, "easing": "ease_in_out" },
+        { "timeMs": 520, "value": 0, "easing": "ease_in_out" },
+        { "timeMs": 700, "value": 36, "easing": "ease_out" },
+        { "timeMs": 880, "value": 48, "easing": "ease_in_out" },
+        { "timeMs": 1040, "value": 0, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 180, "value": 1030, "easing": "ease_out" },
+        { "timeMs": 360, "value": 1050, "easing": "ease_in_out" },
+        { "timeMs": 520, "value": 1000, "easing": "ease_in_out" },
+        { "timeMs": 700, "value": 970, "easing": "ease_out" },
+        { "timeMs": 880, "value": 950, "easing": "ease_in_out" },
+        { "timeMs": 1040, "value": 1000, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 180, "value": 990, "easing": "ease_out" },
+        { "timeMs": 360, "value": 980, "easing": "ease_in_out" },
+        { "timeMs": 520, "value": 1000, "easing": "ease_in_out" },
+        { "timeMs": 700, "value": 1010, "easing": "ease_out" },
+        { "timeMs": 880, "value": 1020, "easing": "ease_in_out" },
+        { "timeMs": 1040, "value": 1000, "easing": "ease_in" }
+      ]
+    }
+  ]
+}

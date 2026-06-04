@@ -9,6 +9,7 @@
 #include "../config/obstacle_config.h"
 #include "../config/player_config.h"
 #include "../feedback/game_feedback.h"
+#include "../sprites/animations/animation_evaluate.h"
 #include "game_effects.h"
 #include "game_settings.h"
 
@@ -20,6 +21,8 @@ static const float SPAWN_MIN_SECONDS = 1.5f;
 static const float SPAWN_SECONDS_RANGE = 1.0f;
 static const float SPAWN_RIGHT_PADDING = 16.0f;
 static const int PLAYER_HIT_INVULNERABLE_MS = 900;
+static const int GAME_OVER_MIN_VISIBLE_MS = 1000;
+static const int SMASH_HITSTOP_MS = 70;
 static unsigned int game_random_state = 12345;
 
 static void game_set_music(const char* music_id) {
@@ -92,6 +95,11 @@ static EntityAnimSlot game_player_animation_slot(const GameState* game) {
 }
 
 static void game_update_player_animation(GameState* game, int32_t elapsed_ms) {
+    if (game->gameOver) {
+        entity_animation_update(&game->playerAnimation, elapsed_ms);
+        return;
+    }
+
     entity_animation_set(
             &game->playerAnimation,
             entity_animation_player_config(),
@@ -176,6 +184,7 @@ static void game_clear_foreground_decorations(GameState* game) {
         decoration->x = 0.0f;
         decoration->y = 0.0f;
         decoration->scale = 1.0f;
+        decoration->alpha = 1.0f;
         decoration->sprite = 0;
         decoration->width = 0;
         decoration->height = 0;
@@ -278,6 +287,15 @@ static void game_update_entities(GameState* game, float dt) {
         }
 
         entity_update(entity, game->worldSpeed, dt);
+        if (!entity->active) {
+            continue;
+        }
+
+        if (entity->dead) {
+            active_count += 1;
+            continue;
+        }
+
         if (entity->x + (float)entity_get_width(entity) < 0.0f) {
             entity_clear(entity);
         } else {
@@ -286,6 +304,16 @@ static void game_update_entities(GameState* game, float dt) {
     }
 
     game->activeEntityCount = active_count;
+}
+
+static void game_update_dead_entities(GameState* game, float dt) {
+    for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
+        Entity* entity = game->entities + entity_index;
+
+        if (entity->active && entity->dead) {
+            entity_update(entity, 0.0f, dt);
+        }
+    }
 }
 
 static ForegroundDecoration* game_find_free_foreground_decoration(GameState* game) {
@@ -434,6 +462,7 @@ static const ForegroundDecorationConfig* game_spawn_foreground_decoration(GameSt
     decoration->active = 1;
     decoration->x = (float)game->screenWidth + FOREGROUND_SPAWN_RIGHT_PADDING;
     decoration->scale = scale;
+    decoration->alpha = 1.0f;
     decoration->sprite = sprite;
     decoration->width = (int)((float)config->width * scale);
     decoration->height = (int)((float)config->height * scale);
@@ -451,6 +480,66 @@ static const ForegroundDecorationConfig* game_spawn_foreground_decoration(GameSt
     return config;
 }
 
+#if FOREGROUND_FADE_ENABLED
+static float game_foreground_decoration_alpha(
+        const GameState* game,
+        const ForegroundDecoration* decoration
+) {
+    float min_alpha = FOREGROUND_FADE_MIN_ALPHA;
+    float player_left = game->playerX;
+    float player_top = game->playerY;
+    float player_right = player_left + game_player_width();
+    float player_bottom = player_top + game_player_height();
+    float decoration_left = decoration->x;
+    float decoration_top = decoration->y;
+    float decoration_right = decoration_left + (float)decoration->width;
+    float decoration_bottom = decoration_top + (float)decoration->height;
+    float distance_x = 0.0f;
+    float distance_y = 0.0f;
+    float distance;
+    float t;
+
+    if (min_alpha < 0.0f) {
+        min_alpha = 0.0f;
+    } else if (min_alpha > 1.0f) {
+        min_alpha = 1.0f;
+    }
+
+    if (decoration_right < player_left) {
+        distance_x = player_left - decoration_right;
+    } else if (player_right < decoration_left) {
+        distance_x = decoration_left - player_right;
+    }
+
+    if (decoration_bottom < player_top) {
+        distance_y = player_top - decoration_bottom;
+    } else if (player_bottom < decoration_top) {
+        distance_y = decoration_top - player_bottom;
+    }
+
+    distance = distance_x > distance_y ? distance_x : distance_y;
+    if (distance <= 0.0f) {
+        return min_alpha;
+    }
+
+    #if FOREGROUND_FADE_USE_SMOOTH_DISTANCE
+    if (FOREGROUND_FADE_DISTANCE <= 0.0f) {
+        return 1.0f;
+    }
+
+    if (distance >= FOREGROUND_FADE_DISTANCE) {
+        return 1.0f;
+    }
+
+    t = distance / FOREGROUND_FADE_DISTANCE;
+    return min_alpha + (1.0f - min_alpha) * t;
+    #else
+    (void)t;
+    return 1.0f;
+    #endif
+}
+#endif
+
 static void game_update_foreground_decorations(GameState* game, float dt) {
     float scroll_distance = game->worldSpeed * FOREGROUND_SCROLL_MULTIPLIER * dt;
 
@@ -467,7 +556,15 @@ static void game_update_foreground_decorations(GameState* game, float dt) {
         if (decoration->x + (float)decoration->width < 0.0f) {
             decoration->active = 0;
             decoration->sprite = 0;
+            decoration->alpha = 1.0f;
+            continue;
         }
+
+        #if FOREGROUND_FADE_ENABLED
+        decoration->alpha = game_foreground_decoration_alpha(game, decoration);
+        #else
+        decoration->alpha = 1.0f;
+        #endif
     }
 
     game->foregroundSpawnGap -= scroll_distance;
@@ -541,7 +638,10 @@ static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
         game->score += entity->enemyConfig->scoreValue;
     }
     audio_play_sound(game_enemy_death_sound_id(entity));
-    entity_clear(entity);
+    entity_kill(entity);
+    if (game->hitstopMs < SMASH_HITSTOP_MS) {
+        game->hitstopMs = SMASH_HITSTOP_MS;
+    }
     #if LITTLE_ONE_DEBUG_SMASH
     LOGI("Enemy killed by smash");
     #endif
@@ -553,11 +653,25 @@ static void game_enter_game_over(GameState* game) {
     }
 
     game->gameOver = 1;
+    game->gameOverElapsedMs = 0;
+    game->gameOverInputArmed = 0;
+    game->playerVelocityX = 0.0f;
+    game->playerVelocityY = 0.0f;
+    game->playerSmashing = 0;
+    game->playerCanSmash = 0;
     entity_animation_set(
             &game->playerAnimation,
             entity_animation_player_config(),
             ENTITY_ANIM_DEATH
     );
+    if (player_config_get()->visual.deathAnimationId != 0) {
+        const AnimationClip* death_clip =
+                animation_find_clip(player_config_get()->visual.deathAnimationId);
+
+        if (death_clip != 0) {
+            game->playerAnimation.clip = death_clip;
+        }
+    }
     audio_play_sound("death");
     game_feedback_player_death(&game->screenShake);
     if (game->score > game->bestScore) {
@@ -594,7 +708,7 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         Entity* entity = game->entities + entity_index;
 
-        if (!entity->active) {
+        if (!entity->active || entity->dead) {
             continue;
         }
 
@@ -636,6 +750,7 @@ void game_init(GameState* game) {
     game->playerCanSmash = 0;
     game->playerHp = player_config_get()->hp;
     game->playerInvulnerableMs = 0;
+    game->hitstopMs = 0;
     game->playerAnimation.slot = ENTITY_ANIM_IDLE;
     game->playerAnimation.clip = 0;
     game->playerAnimation.time_ms = 0;
@@ -655,6 +770,8 @@ void game_init(GameState* game) {
             + game_random_01()
             * (FOREGROUND_INITIAL_SPAWN_GAP_MAX - FOREGROUND_INITIAL_SPAWN_GAP_MIN);
     game->gameOver = 0;
+    game->gameOverElapsedMs = 0;
+    game->gameOverInputArmed = 0;
     game->score = 0;
     game->bestScore = best_score;
     game->runTimeMs = 0;
@@ -691,6 +808,18 @@ void game_restart_run(GameState* game) {
     #if LITTLE_ONE_DEBUG_GAME_STATE
     LOGI("Game run restarted");
     #endif
+}
+
+int game_try_restart_after_game_over(GameState* game) {
+    if (game == 0
+            || !game->gameOver
+            || game->gameOverElapsedMs < GAME_OVER_MIN_VISIBLE_MS
+            || !game->gameOverInputArmed) {
+        return 0;
+    }
+
+    game_restart_run(game);
+    return 1;
 }
 
 const EntityVisualConfig* game_player_visual_config(void) {
@@ -752,8 +881,10 @@ void game_set_screen_size(GameState* game, float width, float height) {
         }
     }
 
-    game_clamp_player_x(game);
-    game_clamp_player_to_ground(game);
+    if (!game->gameOver) {
+        game_clamp_player_x(game);
+        game_clamp_player_to_ground(game);
+    }
 }
 
 void game_update(GameState* game, const InputState* input, float dt) {
@@ -782,11 +913,30 @@ void game_update(GameState* game, const InputState* input, float dt) {
     }
 
     if (game->gameOver) {
+        game->gameOverElapsedMs += elapsed_ms;
         game_update_player_animation(game, elapsed_ms);
-        if (input != 0 && input->actionPressed) {
-            game_restart_run(game);
+        game_update_dead_entities(game, dt);
+
+        if (input == 0 || !input->actionHeld) {
+            game->gameOverInputArmed = 1;
         }
 
+        if (game->gameOverElapsedMs >= GAME_OVER_MIN_VISIBLE_MS
+                && game->gameOverInputArmed
+                && input != 0
+                && input->actionPressed) {
+            game_try_restart_after_game_over(game);
+        }
+
+        return;
+    }
+
+    if (game->hitstopMs > 0) {
+        game->hitstopMs -= elapsed_ms;
+        if (game->hitstopMs < 0) {
+            game->hitstopMs = 0;
+        }
+        game->playerVelocityX = 0.0f;
         return;
     }
 

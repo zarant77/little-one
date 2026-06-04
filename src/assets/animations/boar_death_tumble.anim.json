@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "id": "boar_death_tumble",
+  "durationMs": 1050,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_x",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 1050, "value": -360, "easing": "ease_out" }
+      ]
+    },
+    {
+      "property": "offset_y",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 240, "value": -30, "easing": "ease_out" },
+        { "timeMs": 1050, "value": 180, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 1050, "value": -1650, "easing": "ease_out" }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 1050, "value": 780, "easing": "ease_in" }
+      ]
+    }
+  ]
+}

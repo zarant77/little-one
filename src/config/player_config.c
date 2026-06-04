@@ -8,7 +8,7 @@ static const PlayerConfig PLAYER_CONFIG = {
     .hurt_zone = {
         .x = 0,
         .y = 0,
-        .radius = 50,
+        .radius = 70,
     },
     .boundary = {
         .x = 0,
@@ -22,6 +22,7 @@ static const PlayerConfig PLAYER_CONFIG = {
         .color = 0xffffffff,   // Fallback rectangle color
         .sprite_id = SPRITE_PLAYER, // Generated sprite identifier
         .animationId = "idle", // Future default animation
+        .deathAnimationId = "player_death_fall",
     },
 };
 

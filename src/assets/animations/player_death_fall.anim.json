@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "id": "player_death_fall",
+  "durationMs": 1000,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 140, "value": -45, "easing": "ease_out" },
+        { "timeMs": 1000, "value": 900, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 1000, "value": 1500, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 140, "value": 920, "easing": "ease_out" },
+        { "timeMs": 1000, "value": 1000, "easing": "ease_in" }
+      ]
+    }
+  ]
+}

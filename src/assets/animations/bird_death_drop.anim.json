@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "id": "bird_death_drop",
+  "durationMs": 800,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_x",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 800, "value": 90, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "offset_y",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 160, "value": 12, "easing": "ease_out" },
+        { "timeMs": 800, "value": 650, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 220, "value": 320, "easing": "ease_out" },
+        { "timeMs": 800, "value": 700, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 800, "value": 700, "easing": "ease_in" }
+      ]
+    }
+  ]
+}

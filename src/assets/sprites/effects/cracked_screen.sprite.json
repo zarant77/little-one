@@ -1,0 +1,502 @@
+{
+  "version": 1,
+  "id": "cracked_screen",
+  "width": 900,
+  "height": 520,
+  "pivotX": 450,
+  "pivotY": 260,
+  "primitives": [
+    {
+      "kind": "circle",
+      "x": 450,
+      "y": 250,
+      "w": 34,
+      "h": 34,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "circle",
+      "x": 450,
+      "y": 250,
+      "w": 62,
+      "h": 62,
+      "rotation": 0,
+      "color": "00000022"
+    },
+    {
+      "kind": "circle",
+      "x": 450,
+      "y": 250,
+      "w": 92,
+      "h": 92,
+      "rotation": 0,
+      "color": "00000044"
+    },
+
+    {
+      "kind": "triangle",
+      "x": 450,
+      "y": 206,
+      "w": 44,
+      "h": 84,
+      "rotation": 0,
+      "color": "00000044"
+    },
+    {
+      "kind": "triangle",
+      "x": 488,
+      "y": 224,
+      "w": 42,
+      "h": 78,
+      "rotation": 48,
+      "color": "00000022"
+    },
+    {
+      "kind": "triangle",
+      "x": 492,
+      "y": 278,
+      "w": 44,
+      "h": 82,
+      "rotation": 118,
+      "color": "00000044"
+    },
+    {
+      "kind": "triangle",
+      "x": 450,
+      "y": 296,
+      "w": 42,
+      "h": 78,
+      "rotation": 180,
+      "color": "00000022"
+    },
+    {
+      "kind": "triangle",
+      "x": 408,
+      "y": 278,
+      "w": 44,
+      "h": 82,
+      "rotation": 242,
+      "color": "00000044"
+    },
+    {
+      "kind": "triangle",
+      "x": 412,
+      "y": 224,
+      "w": 42,
+      "h": 78,
+      "rotation": 312,
+      "color": "00000022"
+    },
+
+    {
+      "kind": "triangle",
+      "x": 450,
+      "y": 182,
+      "w": 18,
+      "h": 40,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "triangle",
+      "x": 506,
+      "y": 220,
+      "w": 16,
+      "h": 34,
+      "rotation": 48,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "triangle",
+      "x": 506,
+      "y": 282,
+      "w": 16,
+      "h": 34,
+      "rotation": 132,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "triangle",
+      "x": 450,
+      "y": 320,
+      "w": 18,
+      "h": 40,
+      "rotation": 180,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "triangle",
+      "x": 394,
+      "y": 282,
+      "w": 16,
+      "h": 34,
+      "rotation": 228,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "triangle",
+      "x": 394,
+      "y": 220,
+      "w": 16,
+      "h": 34,
+      "rotation": 312,
+      "color": "ffffffff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 450,
+      "y": 170,
+      "w": 6,
+      "h": 170,
+      "rotation": 0,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 450,
+      "y": 352,
+      "w": 6,
+      "h": 204,
+      "rotation": 0,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 360,
+      "y": 215,
+      "w": 6,
+      "h": 205,
+      "rotation": -63,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 548,
+      "y": 218,
+      "w": 6,
+      "h": 212,
+      "rotation": 60,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 330,
+      "y": 325,
+      "w": 6,
+      "h": 230,
+      "rotation": 48,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 570,
+      "y": 326,
+      "w": 6,
+      "h": 228,
+      "rotation": -48,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 450,
+      "y": 250,
+      "w": 320,
+      "h": 4,
+      "rotation": 12,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 450,
+      "y": 250,
+      "w": 280,
+      "h": 4,
+      "rotation": -18,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 452,
+      "y": 130,
+      "w": 4,
+      "h": 56,
+      "rotation": -12,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 432,
+      "y": 108,
+      "w": 4,
+      "h": 42,
+      "rotation": -32,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 474,
+      "y": 106,
+      "w": 4,
+      "h": 44,
+      "rotation": 26,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 620,
+      "y": 170,
+      "w": 4,
+      "h": 82,
+      "rotation": 28,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 664,
+      "y": 146,
+      "w": 4,
+      "h": 58,
+      "rotation": 46,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 590,
+      "y": 222,
+      "w": 4,
+      "h": 50,
+      "rotation": -18,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 655,
+      "y": 394,
+      "w": 4,
+      "h": 86,
+      "rotation": -52,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 706,
+      "y": 422,
+      "w": 4,
+      "h": 62,
+      "rotation": -70,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 586,
+      "y": 352,
+      "w": 4,
+      "h": 48,
+      "rotation": 18,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 450,
+      "y": 410,
+      "w": 4,
+      "h": 84,
+      "rotation": 8,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 428,
+      "y": 442,
+      "w": 4,
+      "h": 58,
+      "rotation": -18,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 474,
+      "y": 448,
+      "w": 4,
+      "h": 56,
+      "rotation": 24,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 250,
+      "y": 398,
+      "w": 4,
+      "h": 84,
+      "rotation": 64,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 206,
+      "y": 430,
+      "w": 4,
+      "h": 64,
+      "rotation": 82,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 314,
+      "y": 350,
+      "w": 4,
+      "h": 46,
+      "rotation": -22,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 272,
+      "y": 166,
+      "w": 4,
+      "h": 82,
+      "rotation": -36,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 220,
+      "y": 146,
+      "w": 4,
+      "h": 58,
+      "rotation": -56,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 312,
+      "y": 214,
+      "w": 4,
+      "h": 44,
+      "rotation": 18,
+      "color": "050505ff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 450,
+      "y": 170,
+      "w": 3,
+      "h": 150,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "rect",
+      "x": 360,
+      "y": 215,
+      "w": 3,
+      "h": 182,
+      "rotation": -63,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "rect",
+      "x": 548,
+      "y": 218,
+      "w": 3,
+      "h": 188,
+      "rotation": 60,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "rect",
+      "x": 330,
+      "y": 325,
+      "w": 3,
+      "h": 170,
+      "rotation": 48,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "rect",
+      "x": 570,
+      "y": 326,
+      "w": 3,
+      "h": 168,
+      "rotation": -48,
+      "color": "ffffffff"
+    },
+
+    {
+      "kind": "rect",
+      "x": 452,
+      "y": 128,
+      "w": 3,
+      "h": 42,
+      "rotation": -12,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "rect",
+      "x": 620,
+      "y": 170,
+      "w": 3,
+      "h": 44,
+      "rotation": 28,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "rect",
+      "x": 655,
+      "y": 394,
+      "w": 3,
+      "h": 46,
+      "rotation": -52,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "rect",
+      "x": 252,
+      "y": 398,
+      "w": 3,
+      "h": 44,
+      "rotation": 64,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "rect",
+      "x": 272,
+      "y": 166,
+      "w": 3,
+      "h": 42,
+      "rotation": -36,
+      "color": "ffffffff"
+    },
+
+    {
+      "kind": "triangle",
+      "x": 450,
+      "y": 250,
+      "w": 14,
+      "h": 14,
+      "rotation": 0,
+      "color": "050505ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 450,
+      "y": 250,
+      "w": 10,
+      "h": 10,
+      "rotation": 180,
+      "color": "ffffffff"
+    }
+  ]
+}

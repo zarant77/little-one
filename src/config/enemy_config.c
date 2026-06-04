@@ -20,6 +20,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .color = 0xc06e00ff,      // Fallback rectangle color
             .sprite_id = SPRITE_BOAR, // Generated sprite identifier
             .animationId = "walk",    // Future default animation
+            .deathAnimationId = "boar_death_tumble",
         },
     },
     // Ork
@@ -41,6 +42,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .color = 0x00aa00ff,     // Fallback rectangle color
             .sprite_id = SPRITE_ORK, // Generated sprite identifier
             .animationId = "walk",   // Future default animation
+            .deathAnimationId = "ork_death_knockback",
         },
     },
     // Rat
@@ -62,6 +64,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .color = 0x666666ff,     // Fallback rectangle color
             .sprite_id = SPRITE_RAT, // Generated sprite identifier
             .animationId = "walk",   // Future default animation
+            .deathAnimationId = "rat_death_flip",
         },
     },
     // Bird
@@ -83,6 +86,29 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .color = 0x3f7fd6ff,      // Fallback rectangle color
             .sprite_id = SPRITE_BIRD, // Generated sprite identifier
             .animationId = "fly",     // Future default animation
+            .deathAnimationId = "bird_death_camera_hit",
+        },
+    },
+    // Bat
+    {
+        .id = "enemy.bat",    // Stable enemy identifier
+        .hp = 1,              // Hit points
+        .scoreValue = 1,      // Score awarded on kill
+        .moveSpeed = 900.0f,  // Horizontal movement speed
+        .spawnYmin = -450.0f, // Minimum spawn Y offset from ground
+        .spawnYmax = -320.0f, // Maximum spawn Y offset from ground
+        .hurt_zone = {
+            .x = 0,
+            .y = 0,
+            .radius = 48,
+        },
+        .visual = {
+            .width = 200,                       // Render width
+            .height = 75,                       // Render height
+            .color = 0x3f7fd6ff,                // Fallback rectangle color
+            .sprite_id = SPRITE_BAT,            // Generated sprite identifier
+            .animationId = "bat_flight_twitch", // Future default animation
+            .deathAnimationId = "bat_death_spin_drop",
         },
     },
 };

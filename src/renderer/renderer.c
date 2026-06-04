@@ -6,6 +6,7 @@
 #include "../config/background_config.h"
 #include "../game/game_effects.h"
 #include "../game/game_settings.h"
+#include "../sprites/animations/animation_evaluate.h"
 #include "../ui/hud.h"
 #include "../ui/menu.h"
 
@@ -22,6 +23,8 @@
 #define RENDERER_PI_MILLIRADIANS 3141
 #define RENDERER_TWO_PI_MILLIRADIANS 6283
 #define RENDERER_HALF_PI_MILLIRADIANS 1571
+#define BIRD_CAMERA_HIT_IMPACT_MS 520
+#define BIRD_CAMERA_HIT_CRACK_DURATION_MS 500
 
 /* Canonical Little One colors are 0xRRGGBBAA:
  * 0xff0000ff red, 0x00ff00ff green, 0x0000ffff blue,
@@ -1552,7 +1555,8 @@ static void renderer_draw_entities(
         ANativeWindow_Buffer* buffer,
         const GameState* game,
         int32_t shake_x,
-        int32_t shake_y
+        int32_t shake_y,
+        int draw_dead
 ) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         const Entity* entity = game->entities + entity_index;
@@ -1563,7 +1567,7 @@ static void renderer_draw_entities(
         const GeneratedSprite* sprite;
         AnimationImpact impact;
 
-        if (!entity->active) {
+        if (!entity->active || entity->dead != draw_dead) {
             continue;
         }
 
@@ -1645,6 +1649,85 @@ static void renderer_draw_player(
     );
 }
 
+static void renderer_draw_bird_camera_hit_crack(
+        ANativeWindow_Buffer* buffer,
+        const GameState* game,
+        int32_t shake_x,
+        int32_t shake_y
+) {
+    const GeneratedSprite* crack_sprite;
+    int draw_width;
+    int draw_height;
+    int draw_x;
+    int draw_y;
+    int impact_x;
+    int impact_y;
+
+    for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
+        const Entity* entity = game->entities + entity_index;
+
+        if (!entity->active
+                || !entity->dead
+                || entity->enemyConfig == 0
+                || entity->enemyConfig->visual.sprite_id != SPRITE_BIRD
+                || entity->animation.time_ms < BIRD_CAMERA_HIT_IMPACT_MS
+                || entity->animation.time_ms >= BIRD_CAMERA_HIT_IMPACT_MS
+                        + BIRD_CAMERA_HIT_CRACK_DURATION_MS) {
+            continue;
+        }
+
+        crack_sprite = generated_sprite_get_by_id("cracked_screen");
+        if (crack_sprite == 0) {
+            return;
+        }
+
+        {
+            AnimationImpact impact = animation_evaluate(
+                    entity->animation.clip,
+                    BIRD_CAMERA_HIT_IMPACT_MS
+            );
+            impact_x = (int)entity->x
+                    + shake_x
+                    + impact.offset_x
+                    + entity_get_width(entity) / 2;
+            impact_y = (int)entity->y
+                    + shake_y
+                    + impact.offset_y
+                    + entity_get_height(entity) / 2;
+        }
+
+        draw_width = buffer->width * 4 / 5;
+        draw_height = draw_width * crack_sprite->height / crack_sprite->width;
+        if (draw_height > buffer->height * 4 / 5) {
+            draw_height = buffer->height * 4 / 5;
+            draw_width = draw_height * crack_sprite->width / crack_sprite->height;
+        }
+
+        draw_x = impact_x - draw_width / 2;
+        draw_y = impact_y - draw_height / 2;
+        if (draw_x < 0) {
+            draw_x = 0;
+        } else if (draw_x + draw_width > buffer->width) {
+            draw_x = buffer->width - draw_width;
+        }
+        if (draw_y < 0) {
+            draw_y = 0;
+        } else if (draw_y + draw_height > buffer->height) {
+            draw_y = buffer->height - draw_height;
+        }
+        renderer_draw_generated_sprite_fit(
+                buffer,
+                crack_sprite,
+                draw_x,
+                draw_y,
+                draw_width,
+                draw_height,
+                SPRITE_FIT_CONTAIN
+        );
+        return;
+    }
+}
+
 static void renderer_draw_foreground_decorations(
         ANativeWindow_Buffer* buffer,
         const GameState* game,
@@ -1656,6 +1739,9 @@ static void renderer_draw_foreground_decorations(
             ++decoration_index) {
         const ForegroundDecoration* decoration =
                 game->foregroundDecorations + decoration_index;
+        float alpha;
+        float min_alpha = FOREGROUND_FADE_MIN_ALPHA;
+        uint8_t alpha_u8;
 
         if (!decoration->active
                 || decoration->sprite == 0
@@ -1665,13 +1751,46 @@ static void renderer_draw_foreground_decorations(
             continue;
         }
 
-        renderer_draw_generated_sprite_scaled(
+        alpha = decoration->alpha;
+        if (min_alpha < 0.0f) {
+            min_alpha = 0.0f;
+        } else if (min_alpha > 1.0f) {
+            min_alpha = 1.0f;
+        }
+
+        if (alpha != alpha) {
+            alpha = 1.0f;
+        } else if (alpha < min_alpha) {
+            alpha = min_alpha;
+        } else if (alpha > 1.0f) {
+            alpha = 1.0f;
+        }
+
+        if (alpha >= 1.0f) {
+            renderer_draw_generated_sprite_scaled(
+                    buffer,
+                    decoration->sprite,
+                    (int)decoration->x + shake_x,
+                    (int)decoration->y + shake_y,
+                    decoration->width,
+                    decoration->height
+            );
+            continue;
+        }
+
+        alpha_u8 = (uint8_t)(alpha * 255.0f);
+        renderer_draw_generated_sprite_fit_ex(
                 buffer,
                 decoration->sprite,
                 (int)decoration->x + shake_x,
                 (int)decoration->y + shake_y,
                 decoration->width,
-                decoration->height
+                decoration->height,
+                SPRITE_FIT_STRETCH,
+                1000,
+                1000,
+                0,
+                alpha_u8
         );
     }
 }
@@ -1793,8 +1912,10 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
             shake_x,
             shake_y
     );
-    renderer_draw_entities(buffer, game, shake_x, shake_y);
-    renderer_draw_player(buffer, game, shake_x, shake_y);
+    renderer_draw_entities(buffer, game, shake_x, shake_y, 0);
+    if (!game->gameOver) {
+        renderer_draw_player(buffer, game, shake_x, shake_y);
+    }
     game_effects_render(buffer, shake_x, shake_y);
     renderer_draw_foreground_decorations(buffer, game, shake_x, shake_y);
     #if LITTLE_ONE_SHOW_WIREFRAMES
@@ -1802,6 +1923,11 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     renderer_draw_player_wireframe(buffer, game, shake_x, shake_y);
     renderer_draw_ground_debug_line(buffer, gameplay_ground_y + shake_y);
     #endif
+    renderer_draw_entities(buffer, game, shake_x, shake_y, 1);
+    if (game->gameOver) {
+        renderer_draw_player(buffer, game, shake_x, shake_y);
+    }
+    renderer_draw_bird_camera_hit_crack(buffer, game, shake_x, shake_y);
     hud_render(buffer, game);
     menu_render(buffer, game);
 }

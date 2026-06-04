@@ -33,6 +33,22 @@ static const ObstacleConfig OBSTACLE_CONFIGS[] = {
             .animationId = "predator_snap_idle", // Future default animation
         },
     },
+    // Cactus
+    {
+        .id = "obstacle.cactus", // Stable obstacle identifier
+        .hurt_zone = {
+            .x = 0,
+            .y = -40,
+            .radius = 60,
+        },
+        .visual = {
+            .width = 160,                   // Render width
+            .height = 300,                  // Render height
+            .color = 0xe500d2ff,            // Fallback rectangle color
+            .sprite_id = SPRITE_CACTUS,     // Generated sprite identifier
+            .animationId = "predator_sway", // Future default animation
+        },
+    },
 };
 
 static const int OBSTACLE_CONFIG_COUNT = sizeof(OBSTACLE_CONFIGS) / sizeof(OBSTACLE_CONFIGS[0]);

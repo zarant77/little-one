@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "id": "bat_flight_twitch",
+  "durationMs": 280,
+  "loop": true,
+  "tracks": [
+    {
+      "property": "offset_y",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 40, "value": -7, "easing": "ease_out" },
+        { "timeMs": 80, "value": 4, "easing": "ease_in" },
+        { "timeMs": 120, "value": -3, "easing": "ease_out" },
+        { "timeMs": 170, "value": -8, "easing": "ease_out" },
+        { "timeMs": 220, "value": 5, "easing": "ease_in" },
+        { "timeMs": 280, "value": 0, "easing": "ease_in_out" }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 40, "value": -12, "easing": "ease_out" },
+        { "timeMs": 80, "value": 10, "easing": "ease_in" },
+        { "timeMs": 120, "value": -5, "easing": "ease_out" },
+        { "timeMs": 170, "value": -14, "easing": "ease_out" },
+        { "timeMs": 220, "value": 9, "easing": "ease_in" },
+        { "timeMs": 280, "value": 0, "easing": "ease_in_out" }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 40, "value": 1080, "easing": "ease_out" },
+        { "timeMs": 80, "value": 930, "easing": "ease_in" },
+        { "timeMs": 120, "value": 1040, "easing": "ease_out" },
+        { "timeMs": 170, "value": 1100, "easing": "ease_out" },
+        { "timeMs": 220, "value": 940, "easing": "ease_in" },
+        { "timeMs": 280, "value": 1000, "easing": "ease_in_out" }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 40, "value": 910, "easing": "ease_out" },
+        { "timeMs": 80, "value": 1100, "easing": "ease_in" },
+        { "timeMs": 120, "value": 960, "easing": "ease_out" },
+        { "timeMs": 170, "value": 900, "easing": "ease_out" },
+        { "timeMs": 220, "value": 1080, "easing": "ease_in" },
+        { "timeMs": 280, "value": 1000, "easing": "ease_in_out" }
+      ]
+    }
+  ]
+}

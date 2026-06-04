@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "id": "ork_death_knockback",
+  "durationMs": 950,
+  "loop": false,
+  "tracks": [
+    {
+      "property": "offset_x",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 180, "value": 80, "easing": "ease_out" },
+        { "timeMs": 950, "value": 180, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "offset_y",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 180, "value": -35, "easing": "ease_out" },
+        { "timeMs": 950, "value": 190, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 950, "value": 1250, "easing": "ease_out" }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 950, "value": 720, "easing": "ease_in" }
+      ]
+    }
+  ]
+}

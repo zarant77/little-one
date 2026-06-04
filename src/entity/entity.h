@@ -18,6 +18,7 @@ typedef struct {
     float y;
 
     int active;
+    int dead;
 
     const EnemyConfig* enemyConfig;
     const ObstacleConfig* obstacleConfig;
@@ -27,6 +28,7 @@ typedef struct {
 void entity_clear(Entity* entity);
 void entity_spawn_enemy(Entity* entity, const EnemyConfig* config, float x, float y);
 void entity_spawn_obstacle(Entity* entity, const ObstacleConfig* config, float x, float y);
+void entity_kill(Entity* entity);
 void entity_update(Entity* entity, float world_speed, float dt);
 int entity_get_width(const Entity* entity);
 int entity_get_height(const Entity* entity);

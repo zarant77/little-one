@@ -13,7 +13,7 @@
       "w": 112,
       "h": 550,
       "rotation": 0,
-      "color": "2a170dff"
+      "color": "2a140bff"
     },
     {
       "kind": "rect",
@@ -31,7 +31,7 @@
       "w": 12,
       "h": 250,
       "rotation": -4,
-      "color": "7f5232ff"
+      "color": "7b4d2dff"
     },
     {
       "kind": "rect",
@@ -40,7 +40,7 @@
       "w": 12,
       "h": 240,
       "rotation": 5,
-      "color": "7f5232ff"
+      "color": "7b4d2dff"
     },
     {
       "kind": "circle",
@@ -130,7 +130,7 @@
       "w": 158,
       "h": 138,
       "rotation": 15,
-      "color": "46a74cff"
+      "color": "49aa50ff"
     },
     {
       "kind": "circle",
@@ -184,7 +184,7 @@
       "w": 12,
       "h": 240,
       "rotation": 5,
-      "color": "7f5232ff"
+      "color": "7b4d2dff"
     }
   ]
 }

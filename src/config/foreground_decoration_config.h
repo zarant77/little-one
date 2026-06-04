@@ -8,9 +8,14 @@
 #define FOREGROUND_DEFAULT_MIN_GAP 180.0f
 #define FOREGROUND_DEFAULT_MAX_GAP 420.0f
 #define FOREGROUND_SPAWN_RIGHT_PADDING 16.0f
+#define FOREGROUND_FADE_ENABLED 1
+#define FOREGROUND_FADE_MIN_ALPHA 0.6f
+#define FOREGROUND_FADE_DISTANCE 100.0f
+#define FOREGROUND_FADE_USE_SMOOTH_DISTANCE 1
 
-typedef struct {
-    const char* sprite_id;
+typedef struct
+{
+    const char *sprite_id;
     int width;
     int height;
     /* Distance from the gameplay ground line to the decoration bottom edge. */
@@ -25,6 +30,6 @@ typedef struct {
     float spawn_weight;
 } ForegroundDecorationConfig;
 
-const ForegroundDecorationConfig* foreground_decoration_config_get_all(int* count);
+const ForegroundDecorationConfig *foreground_decoration_config_get_all(int *count);
 
 #endif

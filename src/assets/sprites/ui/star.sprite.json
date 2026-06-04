@@ -112,7 +112,7 @@
       "w": 4,
       "h": 41,
       "rotation": 23.527063947420984,
-      "color": "fbfeffff"
+      "color": "ffffffff"
     },
     {
       "kind": "rect",
@@ -121,7 +121,7 @@
       "w": 4,
       "h": 38,
       "rotation": -23.527063947420984,
-      "color": "fbfeffff"
+      "color": "ffffffff"
     },
     {
       "kind": "triangle",
@@ -130,7 +130,7 @@
       "w": 7,
       "h": 40,
       "rotation": -92.6025622024998,
-      "color": "fbfeffff"
+      "color": "ffffffff"
     },
     {
       "kind": "triangle",
@@ -139,7 +139,7 @@
       "w": 7,
       "h": 40,
       "rotation": 92.6025622024998,
-      "color": "fbfeffff"
+      "color": "ffffffff"
     },
     {
       "kind": "triangle",
@@ -157,7 +157,7 @@
       "w": 4,
       "h": 37,
       "rotation": 16.94511929224298,
-      "color": "fbfeffff"
+      "color": "ffffffff"
     },
     {
       "kind": "triangle",

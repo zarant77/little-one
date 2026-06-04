@@ -157,7 +157,7 @@
       "w": 108,
       "h": 78,
       "rotation": 9.396179923394723,
-      "color": "40424bff"
+      "color": "3c3f48ff"
     },
     {
       "kind": "circle",
@@ -166,7 +166,7 @@
       "w": 98,
       "h": 77,
       "rotation": 0,
-      "color": "555964ff"
+      "color": "55555aff"
     },
     {
       "kind": "triangle",
@@ -238,7 +238,7 @@
       "w": 8,
       "h": 15,
       "rotation": 0,
-      "color": "11141aff"
+      "color": "111111ff"
     },
     {
       "kind": "circle",
@@ -274,7 +274,7 @@
       "w": 8,
       "h": 15,
       "rotation": 0,
-      "color": "11141aff"
+      "color": "111111ff"
     },
     {
       "kind": "circle",

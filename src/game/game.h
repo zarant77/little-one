@@ -15,6 +15,7 @@ typedef struct {
     float x;
     float y;
     float scale;
+    float alpha;
     const GeneratedSprite* sprite;
     int width;
     int height;
@@ -36,6 +37,7 @@ typedef struct {
     int playerCanSmash;
     int playerHp;
     int playerInvulnerableMs;
+    int hitstopMs;
     EntityAnimationState playerAnimation;
     int screenWidth;
     int screenHeight;
@@ -46,6 +48,8 @@ typedef struct {
     ForegroundDecoration foregroundDecorations[FOREGROUND_MAX_INSTANCES];
     float foregroundSpawnGap;
     int gameOver;
+    int gameOverElapsedMs;
+    int gameOverInputArmed;
     int score;
     int bestScore;
     int runTimeMs;
@@ -60,6 +64,7 @@ typedef struct {
 
 void game_init(GameState* game);
 void game_restart_run(GameState* game);
+int game_try_restart_after_game_over(GameState* game);
 const EntityVisualConfig* game_player_visual_config(void);
 const HurtZone* game_player_hurt_zone_config(void);
 void game_set_screen_size(GameState* game, float width, float height);

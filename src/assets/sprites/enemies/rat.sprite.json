@@ -40,7 +40,7 @@
       "w": 566,
       "h": 396,
       "rotation": 0,
-      "color": "66666bff"
+      "color": "626773ff"
     },
     {
       "kind": "circle",
@@ -49,7 +49,7 @@
       "w": 300,
       "h": 300,
       "rotation": 0,
-      "color": "69696eff"
+      "color": "626773ff"
     },
     {
       "kind": "circle",
@@ -67,7 +67,7 @@
       "w": 396,
       "h": 164,
       "rotation": 0,
-      "color": "9f9fa4ff"
+      "color": "a4a5a6ff"
     },
     {
       "kind": "circle",
@@ -103,7 +103,7 @@
       "w": 116,
       "h": 116,
       "rotation": 0,
-      "color": "6b6b70ff"
+      "color": "626773ff"
     },
     {
       "kind": "circle",
@@ -112,7 +112,7 @@
       "w": 84,
       "h": 84,
       "rotation": 0,
-      "color": "ff7f7aff"
+      "color": "ff7774ff"
     },
     {
       "kind": "circle",
@@ -139,7 +139,7 @@
       "w": 132,
       "h": 132,
       "rotation": 0,
-      "color": "707075ff"
+      "color": "6f6f75ff"
     },
     {
       "kind": "circle",
@@ -148,7 +148,7 @@
       "w": 102,
       "h": 102,
       "rotation": 0,
-      "color": "ff837fff"
+      "color": "ff857dff"
     },
     {
       "kind": "circle",
@@ -157,7 +157,7 @@
       "w": 48,
       "h": 48,
       "rotation": 0,
-      "color": "ff9e96ff"
+      "color": "ff9a91ff"
     },
     {
       "kind": "circle",
@@ -310,7 +310,7 @@
       "w": 32,
       "h": 32,
       "rotation": 0,
-      "color": "4e4e53ff"
+      "color": "4d505aff"
     },
     {
       "kind": "circle",
@@ -319,7 +319,7 @@
       "w": 26,
       "h": 26,
       "rotation": 0,
-      "color": "4e4e53ff"
+      "color": "4d505aff"
     },
     {
       "kind": "circle",
@@ -328,7 +328,7 @@
       "w": 28,
       "h": 28,
       "rotation": 0,
-      "color": "4e4e53ff"
+      "color": "4d505aff"
     },
     {
       "kind": "rect",
@@ -346,7 +346,7 @@
       "w": 100,
       "h": 30,
       "rotation": 10,
-      "color": "ff7d78ff"
+      "color": "ff7774ff"
     },
     {
       "kind": "circle",
