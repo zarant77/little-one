@@ -8,6 +8,7 @@
 #include "../config/obstacle_config.h"
 #include "../config/player_config.h"
 #include "../feedback/game_feedback.h"
+#include "game_effects.h"
 #include "game_settings.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
@@ -19,6 +20,14 @@ static const float SPAWN_SECONDS_RANGE = 1.0f;
 static const float SPAWN_RIGHT_PADDING = 16.0f;
 static const int PLAYER_HIT_INVULNERABLE_MS = 900;
 static unsigned int game_random_state = 12345;
+
+static void game_set_music(const char* music_id) {
+    audio_play_music(music_id);
+
+    #if LITTLE_ONE_DEBUG_GAME_STATE
+    LOGI("Game music requested: %s", music_id);
+    #endif
+}
 
 static float game_player_width(void) {
     return (float)player_config_get()->visual.width;
@@ -130,8 +139,16 @@ static void game_clamp_player_to_ground(GameState* game) {
         game->playerCanSmash = 0;
         if (!was_grounded) {
             if (was_smashing) {
+                int impact_x = (int)game->playerX + (int)game_player_width() / 2;
+                int impact_y = (int)ground_y;
+                uint32_t effect_seed = game_random_state
+                        ^ (uint32_t)impact_x
+                        ^ ((uint32_t)impact_y << 16)
+                        ^ (uint32_t)game->runTimeMs;
+
                 audio_play_sound("smash");
                 game_feedback_smash_land(&game->screenShake);
+                game_effects_spawn_smash_impact(impact_x, impact_y, effect_seed);
             }
             #if LITTLE_ONE_DEBUG_SMASH
             LOGI("Landing");
@@ -309,7 +326,11 @@ static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
     #endif
 }
 
-static void game_handle_player_death(GameState* game) {
+static void game_enter_game_over(GameState* game) {
+    if (game->gameOver) {
+        return;
+    }
+
     game->gameOver = 1;
     entity_animation_set(
             &game->playerAnimation,
@@ -321,6 +342,11 @@ static void game_handle_player_death(GameState* game) {
     if (game->score > game->bestScore) {
         game->bestScore = game->score;
     }
+    game_set_music("game_over");
+
+    #if LITTLE_ONE_DEBUG_GAME_STATE
+    LOGI("Game state switched to game over");
+    #endif
 }
 
 static void game_damage_player(GameState* game) {
@@ -330,7 +356,7 @@ static void game_damage_player(GameState* game) {
 
     game->playerHp -= 1;
     if (game->playerHp <= 0) {
-        game_handle_player_death(game);
+        game_enter_game_over(game);
         return;
     }
 
@@ -406,10 +432,12 @@ void game_init(GameState* game) {
     game->gameOver = 0;
     game->score = 0;
     game->bestScore = best_score;
+    game->runTimeMs = 0;
     game->fps = 0;
     game->averageFrameMs = 0;
     game->activeEntityCount = 0;
     screen_shake_start(&game->screenShake, 0, 0, 1u);
+    game_effects_init();
     game->uiState = GAME_UI_PLAYING;
     if (!settings_initialized) {
         game_settings_init(&settings);
@@ -419,6 +447,25 @@ void game_init(GameState* game) {
     game->settingsInitialized = settings_initialized;
     audio_set_music_volume(game->settings.music_volume);
     audio_set_sfx_volume(game->settings.sfx_volume);
+    game_set_music("main_theme");
+}
+
+void game_restart_run(GameState* game) {
+    int screen_width;
+    int screen_height;
+
+    if (game == 0) {
+        return;
+    }
+
+    screen_width = game->screenWidth;
+    screen_height = game->screenHeight;
+    game_init(game);
+    game_set_screen_size(game, (float)screen_width, (float)screen_height);
+
+    #if LITTLE_ONE_DEBUG_GAME_STATE
+    LOGI("Game run restarted");
+    #endif
 }
 
 const EntityVisualConfig* game_player_visual_config(void) {
@@ -500,6 +547,7 @@ void game_update(GameState* game, const InputState* input, float dt) {
         elapsed_ms = 0;
     }
     screen_shake_update(&game->screenShake, elapsed_ms);
+    game_effects_update(elapsed_ms);
     if (game->playerInvulnerableMs > 0) {
         game->playerInvulnerableMs -= elapsed_ms;
         if (game->playerInvulnerableMs < 0) {
@@ -510,15 +558,13 @@ void game_update(GameState* game, const InputState* input, float dt) {
     if (game->gameOver) {
         game_update_player_animation(game, elapsed_ms);
         if (input != 0 && input->actionPressed) {
-            int screen_width = game->screenWidth;
-            int screen_height = game->screenHeight;
-
-            game_init(game);
-            game_set_screen_size(game, (float)screen_width, (float)screen_height);
+            game_restart_run(game);
         }
 
         return;
     }
+
+    game->runTimeMs += elapsed_ms;
 
     game->worldScrollX += game->worldSpeed * dt;
     while (game->worldScrollX >= WORLD_SCROLL_WRAP) {

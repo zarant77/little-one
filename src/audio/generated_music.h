@@ -8,7 +8,8 @@
 
 typedef enum {
     MUSIC_NONE = -1,
-    MUSIC_MAIN_THEME = 0,
+    MUSIC_GAME_OVER = 0,
+    MUSIC_MAIN_THEME,
     MUSIC_ID_COUNT
 } MusicId;
 

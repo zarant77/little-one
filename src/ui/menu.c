@@ -1,7 +1,9 @@
 #include "menu.h"
 
+#include <stdio.h>
+
 #include "../audio/audio.h"
-#include "../font/font_renderer.h"
+#include "../fonts/font_renderer.h"
 #include "../input/input.h"
 #include "../settings/game_settings.h"
 #include "ui_controls.h"
@@ -9,8 +11,8 @@
 #define MENU_FONT_ID "vector_16_basic"
 #define MENU_DIM_COLOR 0x00000088
 #define MENU_TEXT_COLOR 0xffffffff
-#define MENU_PAUSE_BUTTON_SIZE 88
-#define MENU_PAUSE_BUTTON_MARGIN 28
+#define MENU_PAUSE_BUTTON_SIZE 120
+#define MENU_PAUSE_BUTTON_MARGIN 50
 #define MENU_PANEL_MAX_WIDTH 620
 #define MENU_PANEL_PADDING 44
 #define MENU_PANEL_GAP 28
@@ -18,6 +20,7 @@
 #define MENU_BUTTON_HEIGHT 92
 #define MENU_SETTINGS_PANEL_HEIGHT 620
 #define MENU_PAUSE_PANEL_HEIGHT 410
+#define MENU_GAME_OVER_PANEL_HEIGHT 500
 #define MENU_SLIDER_HEIGHT 94
 #define MENU_NO_POINTER -1
 
@@ -29,6 +32,7 @@ typedef enum {
 
 typedef struct {
     const PackedFont* font;
+    const GeneratedSprite* pause_button;
     int initialized;
 } MenuResources;
 
@@ -75,7 +79,7 @@ static const MenuResources* menu_resources_get(void)
         menu_initialize();
     }
 
-    if (MENU_RESOURCES.font == 0)
+    if (MENU_RESOURCES.font == 0 || MENU_RESOURCES.pause_button == 0)
     {
         return 0;
     }
@@ -151,21 +155,57 @@ static void menu_draw_title(
     ui_draw_label(framebuffer, font, x, y, MENU_TITLE_SCALE, MENU_TEXT_COLOR, title);
 }
 
-static void menu_draw_pause_icon(Framebuffer* framebuffer, UiRect rect)
+static void menu_draw_centered_label(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        UiRect panel,
+        int y,
+        int scale,
+        const char* label
+)
 {
-    int bar_width = rect.width / 6;
-    int bar_height = rect.height / 2;
-    int bar_y = rect.y + (rect.height - bar_height) / 2;
-    int left_x = rect.x + rect.width / 2 - bar_width - 8;
-    int right_x = rect.x + rect.width / 2 + 8;
+    int text_width = menu_text_width(font, scale, label);
+    int x = panel.x + (panel.width - text_width) / 2;
 
-    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, 0x3d405bcc);
-    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, 3, 0xf2cc8fff);
-    renderer_draw_color_rect(framebuffer, rect.x, rect.y + rect.height - 3, rect.width, 3, 0xf2cc8fff);
-    renderer_draw_color_rect(framebuffer, rect.x, rect.y, 3, rect.height, 0xf2cc8fff);
-    renderer_draw_color_rect(framebuffer, rect.x + rect.width - 3, rect.y, 3, rect.height, 0xf2cc8fff);
-    renderer_draw_color_rect(framebuffer, left_x, bar_y, bar_width, bar_height, 0xffffffff);
-    renderer_draw_color_rect(framebuffer, right_x, bar_y, bar_width, bar_height, 0xffffffff);
+    ui_draw_label(framebuffer, font, x, y, scale, MENU_TEXT_COLOR, label);
+}
+
+static void menu_render_game_over(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        const GameState* game
+)
+{
+    MenuLayout layout = menu_layout_get(game, MENU_GAME_OVER_PANEL_HEIGHT);
+    char score_text[32];
+    char time_text[32];
+
+    snprintf(score_text, sizeof(score_text), "SCORE %d", game->score);
+    snprintf(time_text, sizeof(time_text), "TIME %dS", game->runTimeMs / 1000);
+
+    renderer_draw_color_rect(framebuffer, 0, 0, framebuffer->width, framebuffer->height, MENU_DIM_COLOR);
+    ui_draw_panel(framebuffer, layout.panel);
+    menu_draw_title(framebuffer, font, layout.panel, "GAME OVER");
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 170, 2, score_text);
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 240, 2, time_text);
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 350, 2, "TAP TO RETRY");
+}
+
+static void menu_draw_pause_button(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        UiRect rect
+)
+{
+    renderer_draw_generated_sprite_fit(
+            framebuffer,
+            sprite,
+            rect.x,
+            rect.y,
+            rect.width,
+            rect.height,
+            SPRITE_FIT_STRETCH
+    );
 }
 
 static void menu_set_state(GameState* game, GameUiState state)
@@ -201,7 +241,13 @@ static void menu_update_slider(GameState* game, MenuDragTarget target, UiRect re
 void menu_initialize(void)
 {
     MENU_RESOURCES.font = font_registry_find(MENU_FONT_ID);
+    MENU_RESOURCES.pause_button = generated_sprite_get_by_id("btn_pause");
     MENU_RESOURCES.initialized = 1;
+}
+
+void menu_pause(GameState* game)
+{
+    menu_set_state(game, GAME_UI_PAUSED);
 }
 
 void menu_render(Framebuffer* framebuffer, const GameState* game)
@@ -220,9 +266,15 @@ void menu_render(Framebuffer* framebuffer, const GameState* game)
         return;
     }
 
+    if (game->gameOver)
+    {
+        menu_render_game_over(framebuffer, resources->font, game);
+        return;
+    }
+
     if (game->uiState == GAME_UI_PLAYING)
     {
-        menu_draw_pause_icon(framebuffer, menu_pause_button_rect(game));
+        menu_draw_pause_button(framebuffer, resources->pause_button, menu_pause_button_rect(game));
         return;
     }
 
@@ -270,6 +322,16 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         return 0;
     }
 
+    if (game->gameOver)
+    {
+        if (action_type == INPUT_TOUCH_DOWN)
+        {
+            game_restart_run(game);
+        }
+
+        return 1;
+    }
+
     if (action_type == INPUT_TOUCH_CANCEL)
     {
         menu_pointer_id = MENU_NO_POINTER;
@@ -282,7 +344,7 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         UiRect pause_button = menu_pause_button_rect(game);
         if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&pause_button, x, y))
         {
-            menu_set_state(game, GAME_UI_PAUSED);
+            menu_pause(game);
             return 1;
         }
 
@@ -323,7 +385,7 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         layout = menu_layout_get(game, MENU_SETTINGS_PANEL_HEIGHT);
         if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&layout.back_button, x, y))
         {
-            menu_set_state(game, GAME_UI_PAUSED);
+            menu_pause(game);
             return 1;
         }
 

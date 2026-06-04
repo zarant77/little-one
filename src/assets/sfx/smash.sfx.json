@@ -13,8 +13,8 @@
       "wave": "noise",
       "frequencyStart": 120,
       "frequencyEnd": 40,
-      "durationMs": 90,
-      "volume": 72
+      "durationMs": 50,
+      "volume": 10
     }
   ]
 }

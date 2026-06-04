@@ -30,6 +30,7 @@ typedef struct AndroidPlatform {
     AInputQueue* attached_input_queue;
     pthread_mutex_t input_queue_mutex;
     int input_cancel_requested;
+    int pause_requested;
     pthread_t thread;
     volatile int loop_running;
     GameState game;
@@ -193,12 +194,31 @@ static void platform_handle_motion_event(
     }
 }
 
+static int platform_handle_key_event(AndroidPlatform* platform, AInputEvent* event) {
+    if (AKeyEvent_getKeyCode(event) != AKEYCODE_BACK) {
+        return 0;
+    }
+
+    if (AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
+        menu_pause(&platform->game);
+        input_init(&platform->input);
+    }
+
+    return 1;
+}
+
 static void platform_process_input(AndroidPlatform* platform, float screen_width) {
     AInputQueue* queue;
     AInputEvent* event = NULL;
 
     pthread_mutex_lock(&platform->input_queue_mutex);
     queue = platform->input_queue;
+
+    if (platform->pause_requested) {
+        menu_pause(&platform->game);
+        input_init(&platform->input);
+        platform->pause_requested = 0;
+    }
 
     if (platform->input_cancel_requested) {
         menu_handle_touch(&platform->game, INPUT_TOUCH_CANCEL, -1, 0, 0);
@@ -240,6 +260,8 @@ static void platform_process_input(AndroidPlatform* platform, float screen_width
         if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
             platform_handle_motion_event(platform, event, screen_width);
             handled = 1;
+        } else if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_KEY) {
+            handled = platform_handle_key_event(platform, event);
         }
 
         AInputQueue_finishEvent(queue, event, handled);
@@ -504,6 +526,34 @@ static void platform_on_native_window_destroyed(
     pthread_mutex_unlock(&platform->window_mutex);
 }
 
+static void platform_on_pause(ANativeActivity* activity) {
+    AndroidPlatform* platform = platform_from_activity(activity);
+    if (platform == NULL) {
+        return;
+    }
+
+    LOGI("Native activity paused");
+    audio_pause();
+
+    pthread_mutex_lock(&platform->input_queue_mutex);
+    platform->pause_requested = 1;
+    pthread_mutex_unlock(&platform->input_queue_mutex);
+}
+
+static void platform_on_resume(ANativeActivity* activity) {
+    AndroidPlatform* platform = platform_from_activity(activity);
+    if (platform == NULL) {
+        return;
+    }
+
+    LOGI("Native activity resumed");
+    audio_resume();
+
+    pthread_mutex_lock(&platform->window_mutex);
+    platform->reset_frame_time = 1;
+    pthread_mutex_unlock(&platform->window_mutex);
+}
+
 static void platform_on_destroy(ANativeActivity* activity) {
     AndroidPlatform* platform = platform_from_activity(activity);
     if (platform == NULL) {
@@ -560,7 +610,6 @@ void platform_android_on_create(
     sound_registry_initialize_all();
     music_registry_initialize_all();
     audio_init();
-    audio_play_music("music");
     game_init(&platform->game);
     input_init(&platform->input);
 
@@ -568,6 +617,8 @@ void platform_android_on_create(
     activity->callbacks->onInputQueueDestroyed = platform_on_input_queue_destroyed;
     activity->callbacks->onNativeWindowCreated = platform_on_native_window_created;
     activity->callbacks->onNativeWindowDestroyed = platform_on_native_window_destroyed;
+    activity->callbacks->onPause = platform_on_pause;
+    activity->callbacks->onResume = platform_on_resume;
     activity->callbacks->onDestroy = platform_on_destroy;
 
     LOGI("Little One native activity created");

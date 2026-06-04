@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "../font/font_renderer.h"
+#include "../fonts/font_renderer.h"
 #include "../renderer/renderer.h"
 
 typedef struct {

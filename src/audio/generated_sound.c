@@ -32,8 +32,8 @@ static const SoundCommand SMASH_SOUND_COMMANDS[] = {
         .wave = SOUND_WAVE_NOISE,
         .frequency_start = 120,
         .frequency_end = 40,
-        .duration_ms = 90,
-        .volume = 72,
+        .duration_ms = 50,
+        .volume = 10,
     },
 };
 
@@ -70,13 +70,6 @@ static const SoundCommand DEATH_SOUND_COMMANDS[] = {
         .frequency_end = 80,
         .duration_ms = 120,
         .volume = 54,
-    },
-    {
-        .wave = SOUND_WAVE_NOISE,
-        .frequency_start = 90,
-        .frequency_end = 30,
-        .duration_ms = 90,
-        .volume = 40,
     },
 };
 
@@ -120,13 +113,6 @@ static const SoundCommand BOAR_DEATH_SOUND_COMMANDS[] = {
         .frequency_end = 60,
         .duration_ms = 170,
         .volume = 70,
-    },
-    {
-        .wave = SOUND_WAVE_NOISE,
-        .frequency_start = 110,
-        .frequency_end = 35,
-        .duration_ms = 130,
-        .volume = 54,
     },
 };
 

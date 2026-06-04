@@ -10,8 +10,8 @@ static const ObstacleConfig OBSTACLE_CONFIGS[] = {
             .radius = 60,
         },
         .visual = {
-            .width = 150,              // Render width
-            .height = 150,             // Render height
+            .width = 200,              // Render width
+            .height = 200,             // Render height
             .color = 0xff0000ff,       // Fallback rectangle color
             .sprite_id = SPRITE_STUMP, // Generated sprite identifier
             .animationId = "idle",     // Future default animation
@@ -26,8 +26,8 @@ static const ObstacleConfig OBSTACLE_CONFIGS[] = {
             .radius = 60,
         },
         .visual = {
-            .width = 150,             // Render width
-            .height = 150,            // Render height
+            .width = 200,             // Render width
+            .height = 200,            // Render height
             .color = 0xe500d2ff,      // Fallback rectangle color
             .sprite_id = SPRITE_ROCK, // Generated sprite identifier
             .animationId = "idle",    // Future default animation

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "../fonts/fonts_packed.h"
+#include "fonts_packed.h"
 #include "../renderer/renderer.h"
 
 const PackedFont* font_registry_find(const char* id);

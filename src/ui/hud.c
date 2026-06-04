@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "../config/player_config.h"
-#include "../font/font_renderer.h"
+#include "../fonts/font_renderer.h"
 #include "../sprites/generated_sprite.h"
 
 #define HUD_FONT_ID "vector_16_basic"
@@ -41,13 +41,13 @@ static const HudLayout HUD_LAYOUT = {
     .heart_size = 56,
     .star_size = 56,
 
-    .margin_x = 24,
-    .margin_y = 24,
+    .margin_x = 30,
+    .margin_y = 30,
 
-    .padding_x = 20,
+    .padding_x = 30,
     .padding_y = 20,
 
-    .cat_content_gap = 20,
+    .cat_content_gap = 50,
     .heart_gap = 8,
     .row_gap = 12,
     .star_score_gap = 12,

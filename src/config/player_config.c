@@ -13,12 +13,12 @@ static const PlayerConfig PLAYER_CONFIG = {
     .boundary = {
         .x = 0,
         .y = 0,
-        .width = 200,
-        .height = 130,
+        .width = 250,
+        .height = 160,
     },
     .visual = {
-        .width = 200,          // Render width
-        .height = 130,         // Render height
+        .width = 250,          // Render width
+        .height = 160,         // Render height
         .color = 0xffffffff,   // Fallback rectangle color
         .sprite_id = SPRITE_PLAYER, // Generated sprite identifier
         .animationId = "idle", // Future default animation

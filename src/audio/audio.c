@@ -334,6 +334,22 @@ void audio_init(void)
     LOGI("Audio init success");
 }
 
+void audio_pause(void)
+{
+    if (audio_player != 0)
+    {
+        (*audio_player)->SetPlayState(audio_player, SL_PLAYSTATE_PAUSED);
+    }
+}
+
+void audio_resume(void)
+{
+    if (audio_player != 0)
+    {
+        (*audio_player)->SetPlayState(audio_player, SL_PLAYSTATE_PLAYING);
+    }
+}
+
 void audio_set_music_volume(int volume)
 {
     audio_music_volume = audio_clamp_volume(volume);
@@ -383,6 +399,11 @@ void audio_play_music(const char* id)
         return;
     }
 
+    if (audio_music == music)
+    {
+        return;
+    }
+
     audio_music = music;
     audio_music_cursor = 0;
     LOGI("Music playback start: %s", music->id);
@@ -409,6 +430,14 @@ void audio_shutdown(void)
 {
     music_registry_shutdown_all();
     sound_registry_shutdown_all();
+}
+
+void audio_pause(void)
+{
+}
+
+void audio_resume(void)
+{
 }
 
 void audio_set_music_volume(int volume)

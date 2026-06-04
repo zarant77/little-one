@@ -15,13 +15,6 @@
       "frequencyEnd": 80,
       "durationMs": 120,
       "volume": 54
-    },
-    {
-      "wave": "noise",
-      "frequencyStart": 90,
-      "frequencyEnd": 30,
-      "durationMs": 90,
-      "volume": 40
     }
   ]
 }

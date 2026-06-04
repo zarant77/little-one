@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "../config/background_config.h"
+#include "../game/game_effects.h"
 #include "../game/game_settings.h"
 #include "../ui/hud.h"
 #include "../ui/menu.h"
@@ -1763,6 +1764,7 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     );
     renderer_draw_entities(buffer, game, shake_x, shake_y);
     renderer_draw_player(buffer, game, shake_x, shake_y);
+    game_effects_render(buffer, shake_x, shake_y);
     #if LITTLE_ONE_SHOW_WIREFRAMES
     renderer_draw_entity_wireframes(buffer, game, shake_x, shake_y);
     renderer_draw_player_wireframe(buffer, game, shake_x, shake_y);

@@ -15,8 +15,8 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .radius = 54,
         },
         .visual = {
-            .width = 160,             // Render width
-            .height = 160,            // Render height
+            .width = 200,             // Render width
+            .height = 200,            // Render height
             .color = 0xc06e00ff,      // Fallback rectangle color
             .sprite_id = SPRITE_BOAR, // Generated sprite identifier
             .animationId = "walk",    // Future default animation
@@ -36,8 +36,8 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .radius = 68,
         },
         .visual = {
-            .width = 200,            // Render width
-            .height = 200,           // Render height
+            .width = 250,            // Render width
+            .height = 250,           // Render height
             .color = 0x00aa00ff,     // Fallback rectangle color
             .sprite_id = SPRITE_ORK, // Generated sprite identifier
             .animationId = "walk",   // Future default animation
@@ -57,8 +57,8 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .radius = 26,
         },
         .visual = {
-            .width = 128,            // Render width
-            .height = 64,            // Render height
+            .width = 200,            // Render width
+            .height = 100,            // Render height
             .color = 0x666666ff,     // Fallback rectangle color
             .sprite_id = SPRITE_RAT, // Generated sprite identifier
             .animationId = "walk",   // Future default animation

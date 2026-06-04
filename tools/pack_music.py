@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -187,13 +188,22 @@ def parse_music_file(path: Path) -> MusicPattern:
         validate_u8(volume, f"{label}.volume")
 
         if duration_ticks == 0:
-            raise ValueError(f"{label}: durationTicks must be greater than 0")
+            print(f"Warning: {label}: skipped zero-length note")
+            continue
 
         if start_tick >= length_ticks:
-            raise ValueError(f"{label}: startTick must be inside song length")
+            print(f"Warning: {label}: skipped note starting outside song length")
+            continue
 
-        if start_tick + duration_ticks > length_ticks:
-            raise ValueError(f"{label}: note exceeds song length")
+        note_end_tick = start_tick + duration_ticks
+        if note_end_tick > length_ticks:
+            fixed_duration_ticks = length_ticks - start_tick
+            print(
+                f"Warning: {label}: trimmed note duration "
+                f"from {duration_ticks} to {fixed_duration_ticks} "
+                f"to fit lengthTicks={length_ticks}"
+            )
+            duration_ticks = fixed_duration_ticks
 
         notes.append(
             MusicNote(
@@ -359,7 +369,12 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-    convert_all(args.input_dir, args.output)
+
+    try:
+        convert_all(args.input_dir, args.output)
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        print(f"Error: {error}", file=sys.stderr)
+        raise SystemExit(1) from None
 
 
 if __name__ == "__main__":

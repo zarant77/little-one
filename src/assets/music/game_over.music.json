@@ -1,0 +1,886 @@
+{
+  "type": "music",
+  "id": "game_over",
+  "bpm": 92,
+  "ticksPerBeat": 4,
+  "lengthTicks": 128,
+  "instruments": [
+    {
+      "id": "lead",
+      "wave": "triangle",
+      "volume": 68,
+      "attackMs": 18,
+      "decayMs": 180
+    },
+    {
+      "id": "bass",
+      "wave": "sine",
+      "volume": 64,
+      "attackMs": 8,
+      "decayMs": 220
+    },
+    {
+      "id": "pulse",
+      "wave": "square",
+      "volume": 24,
+      "attackMs": 10,
+      "decayMs": 90
+    },
+    {
+      "id": "echo",
+      "wave": "triangle",
+      "volume": 34,
+      "attackMs": 24,
+      "decayMs": 260
+    }
+  ],
+  "notes": [
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 0,
+      "durationTicks": 4,
+      "volume": 64
+    },
+    {
+      "instrument": 1,
+      "note": 45,
+      "startTick": 0,
+      "durationTicks": 8,
+      "volume": 58
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 0,
+      "durationTicks": 1,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 64,
+      "startTick": 3,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 71,
+      "startTick": 4,
+      "durationTicks": 2,
+      "volume": 48
+    },
+    {
+      "instrument": 0,
+      "note": 69,
+      "startTick": 6,
+      "durationTicks": 6,
+      "volume": 58
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 6,
+      "durationTicks": 1,
+      "volume": 20
+    },
+    {
+      "instrument": 1,
+      "note": 57,
+      "startTick": 8,
+      "durationTicks": 4,
+      "volume": 38
+    },
+    {
+      "instrument": 3,
+      "note": 60,
+      "startTick": 8,
+      "durationTicks": 4,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 64,
+      "startTick": 10,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 12,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 1,
+      "note": 52,
+      "startTick": 12,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 12,
+      "durationTicks": 1,
+      "volume": 22
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 14,
+      "durationTicks": 1,
+      "volume": 17
+    },
+    {
+      "instrument": 3,
+      "note": 64,
+      "startTick": 14,
+      "durationTicks": 2,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 69,
+      "startTick": 16,
+      "durationTicks": 4,
+      "volume": 56
+    },
+    {
+      "instrument": 1,
+      "note": 41,
+      "startTick": 16,
+      "durationTicks": 8,
+      "volume": 58
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 16,
+      "durationTicks": 1,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 19,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 20,
+      "durationTicks": 3,
+      "volume": 44
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 22,
+      "durationTicks": 1,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 65,
+      "startTick": 24,
+      "durationTicks": 6,
+      "volume": 58
+    },
+    {
+      "instrument": 1,
+      "note": 53,
+      "startTick": 24,
+      "durationTicks": 4,
+      "volume": 38
+    },
+    {
+      "instrument": 3,
+      "note": 57,
+      "startTick": 24,
+      "durationTicks": 4,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 26,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 1,
+      "note": 48,
+      "startTick": 28,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 28,
+      "durationTicks": 1,
+      "volume": 22
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 30,
+      "durationTicks": 2,
+      "volume": 40
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 30,
+      "durationTicks": 1,
+      "volume": 17
+    },
+    {
+      "instrument": 3,
+      "note": 60,
+      "startTick": 30,
+      "durationTicks": 2,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 65,
+      "startTick": 32,
+      "durationTicks": 4,
+      "volume": 54
+    },
+    {
+      "instrument": 1,
+      "note": 38,
+      "startTick": 32,
+      "durationTicks": 8,
+      "volume": 58
+    },
+    {
+      "instrument": 2,
+      "note": 50,
+      "startTick": 32,
+      "durationTicks": 1,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 35,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 36,
+      "durationTicks": 3,
+      "volume": 44
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 38,
+      "durationTicks": 1,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 62,
+      "startTick": 40,
+      "durationTicks": 5,
+      "volume": 52
+    },
+    {
+      "instrument": 1,
+      "note": 50,
+      "startTick": 40,
+      "durationTicks": 4,
+      "volume": 38
+    },
+    {
+      "instrument": 3,
+      "note": 53,
+      "startTick": 40,
+      "durationTicks": 4,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 42,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 1,
+      "note": 45,
+      "startTick": 44,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 50,
+      "startTick": 44,
+      "durationTicks": 1,
+      "volume": 22
+    },
+    {
+      "instrument": 0,
+      "note": 60,
+      "startTick": 46,
+      "durationTicks": 2,
+      "volume": 40
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 46,
+      "durationTicks": 1,
+      "volume": 17
+    },
+    {
+      "instrument": 3,
+      "note": 57,
+      "startTick": 46,
+      "durationTicks": 2,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 48,
+      "durationTicks": 4,
+      "volume": 60
+    },
+    {
+      "instrument": 1,
+      "note": 40,
+      "startTick": 48,
+      "durationTicks": 8,
+      "volume": 58
+    },
+    {
+      "instrument": 2,
+      "note": 52,
+      "startTick": 48,
+      "durationTicks": 1,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 59,
+      "startTick": 51,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 52,
+      "durationTicks": 3,
+      "volume": 48
+    },
+    {
+      "instrument": 2,
+      "note": 56,
+      "startTick": 54,
+      "durationTicks": 1,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 71,
+      "startTick": 56,
+      "durationTicks": 5,
+      "volume": 62
+    },
+    {
+      "instrument": 1,
+      "note": 52,
+      "startTick": 56,
+      "durationTicks": 4,
+      "volume": 38
+    },
+    {
+      "instrument": 3,
+      "note": 56,
+      "startTick": 56,
+      "durationTicks": 4,
+      "volume": 28
+    },
+    {
+      "instrument": 2,
+      "note": 59,
+      "startTick": 58,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 1,
+      "note": 47,
+      "startTick": 60,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 52,
+      "startTick": 60,
+      "durationTicks": 1,
+      "volume": 22
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 62,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 2,
+      "note": 56,
+      "startTick": 62,
+      "durationTicks": 1,
+      "volume": 17
+    },
+    {
+      "instrument": 3,
+      "note": 59,
+      "startTick": 62,
+      "durationTicks": 2,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 64,
+      "durationTicks": 4,
+      "volume": 66
+    },
+    {
+      "instrument": 1,
+      "note": 45,
+      "startTick": 64,
+      "durationTicks": 8,
+      "volume": 58
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 64,
+      "durationTicks": 1,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 64,
+      "startTick": 67,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 74,
+      "startTick": 68,
+      "durationTicks": 3,
+      "volume": 50
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 70,
+      "durationTicks": 1,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 72,
+      "durationTicks": 5,
+      "volume": 58
+    },
+    {
+      "instrument": 1,
+      "note": 57,
+      "startTick": 72,
+      "durationTicks": 4,
+      "volume": 38
+    },
+    {
+      "instrument": 3,
+      "note": 64,
+      "startTick": 72,
+      "durationTicks": 4,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 64,
+      "startTick": 74,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 1,
+      "note": 52,
+      "startTick": 76,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 76,
+      "durationTicks": 1,
+      "volume": 22
+    },
+    {
+      "instrument": 0,
+      "note": 71,
+      "startTick": 78,
+      "durationTicks": 2,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 78,
+      "durationTicks": 1,
+      "volume": 17
+    },
+    {
+      "instrument": 3,
+      "note": 67,
+      "startTick": 78,
+      "durationTicks": 2,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 80,
+      "durationTicks": 4,
+      "volume": 54
+    },
+    {
+      "instrument": 1,
+      "note": 41,
+      "startTick": 80,
+      "durationTicks": 8,
+      "volume": 58
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 80,
+      "durationTicks": 1,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 83,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 69,
+      "startTick": 84,
+      "durationTicks": 3,
+      "volume": 46
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 86,
+      "durationTicks": 1,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 88,
+      "durationTicks": 6,
+      "volume": 56
+    },
+    {
+      "instrument": 1,
+      "note": 53,
+      "startTick": 88,
+      "durationTicks": 4,
+      "volume": 38
+    },
+    {
+      "instrument": 3,
+      "note": 60,
+      "startTick": 88,
+      "durationTicks": 4,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 90,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 1,
+      "note": 48,
+      "startTick": 92,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 92,
+      "durationTicks": 1,
+      "volume": 22
+    },
+    {
+      "instrument": 0,
+      "note": 65,
+      "startTick": 94,
+      "durationTicks": 2,
+      "volume": 38
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 94,
+      "durationTicks": 1,
+      "volume": 17
+    },
+    {
+      "instrument": 3,
+      "note": 64,
+      "startTick": 94,
+      "durationTicks": 2,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 65,
+      "startTick": 96,
+      "durationTicks": 4,
+      "volume": 50
+    },
+    {
+      "instrument": 1,
+      "note": 38,
+      "startTick": 96,
+      "durationTicks": 8,
+      "volume": 58
+    },
+    {
+      "instrument": 2,
+      "note": 50,
+      "startTick": 96,
+      "durationTicks": 1,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 99,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 100,
+      "durationTicks": 3,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 102,
+      "durationTicks": 1,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 62,
+      "startTick": 104,
+      "durationTicks": 5,
+      "volume": 50
+    },
+    {
+      "instrument": 1,
+      "note": 50,
+      "startTick": 104,
+      "durationTicks": 4,
+      "volume": 38
+    },
+    {
+      "instrument": 3,
+      "note": 57,
+      "startTick": 104,
+      "durationTicks": 4,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 106,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 1,
+      "note": 45,
+      "startTick": 108,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 50,
+      "startTick": 108,
+      "durationTicks": 1,
+      "volume": 22
+    },
+    {
+      "instrument": 0,
+      "note": 59,
+      "startTick": 110,
+      "durationTicks": 2,
+      "volume": 38
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 110,
+      "durationTicks": 1,
+      "volume": 17
+    },
+    {
+      "instrument": 3,
+      "note": 60,
+      "startTick": 110,
+      "durationTicks": 2,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 112,
+      "durationTicks": 3,
+      "volume": 54
+    },
+    {
+      "instrument": 1,
+      "note": 40,
+      "startTick": 112,
+      "durationTicks": 8,
+      "volume": 58
+    },
+    {
+      "instrument": 2,
+      "note": 52,
+      "startTick": 112,
+      "durationTicks": 1,
+      "volume": 24
+    },
+    {
+      "instrument": 2,
+      "note": 59,
+      "startTick": 115,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 68,
+      "startTick": 116,
+      "durationTicks": 3,
+      "volume": 50
+    },
+    {
+      "instrument": 2,
+      "note": 56,
+      "startTick": 118,
+      "durationTicks": 1,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 71,
+      "startTick": 120,
+      "durationTicks": 3,
+      "volume": 56
+    },
+    {
+      "instrument": 1,
+      "note": 52,
+      "startTick": 120,
+      "durationTicks": 4,
+      "volume": 38
+    },
+    {
+      "instrument": 3,
+      "note": 59,
+      "startTick": 120,
+      "durationTicks": 4,
+      "volume": 28
+    },
+    {
+      "instrument": 2,
+      "note": 59,
+      "startTick": 122,
+      "durationTicks": 1,
+      "volume": 18
+    },
+    {
+      "instrument": 0,
+      "note": 74,
+      "startTick": 124,
+      "durationTicks": 2,
+      "volume": 48
+    },
+    {
+      "instrument": 1,
+      "note": 47,
+      "startTick": 124,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 2,
+      "note": 52,
+      "startTick": 124,
+      "durationTicks": 1,
+      "volume": 22
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 126,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 2,
+      "note": 56,
+      "startTick": 126,
+      "durationTicks": 1,
+      "volume": 17
+    },
+    {
+      "instrument": 3,
+      "note": 64,
+      "startTick": 126,
+      "durationTicks": 2,
+      "volume": 20
+    }
+  ]
+}
