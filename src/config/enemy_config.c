@@ -7,8 +7,8 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         .hp = 1,             // Hit points
         .scoreValue = 1,     // Score awarded on kill
         .moveSpeed = 600.0f, // Horizontal movement speed
-        .yMin = 0.0f,        // Minimum spawn Y offset from ground
-        .yMax = 0.0f,        // Maximum spawn Y offset from ground
+        .spawnYmin = 0.0f,   // Minimum spawn Y offset from ground
+        .spawnYmax = 0.0f,   // Maximum spawn Y offset from ground
         .hurt_zone = {
             .x = 0,
             .y = 16,
@@ -28,8 +28,8 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         .hp = 1,             // Hit points
         .scoreValue = 1,     // Score awarded on kill
         .moveSpeed = 300.0f, // Horizontal movement speed
-        .yMin = 0.0f,        // Minimum spawn Y offset from ground
-        .yMax = 0.0f,        // Maximum spawn Y offset from ground
+        .spawnYmin = 0.0f,   // Minimum spawn Y offset from ground
+        .spawnYmax = 0.0f,   // Maximum spawn Y offset from ground
         .hurt_zone = {
             .x = 0,
             .y = 4,
@@ -49,8 +49,8 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         .hp = 1,             // Hit points
         .scoreValue = 1,     // Score awarded on kill
         .moveSpeed = 900.0f, // Horizontal movement speed
-        .yMin = 0.0f,        // Minimum spawn Y offset from ground
-        .yMax = 0.0f,        // Maximum spawn Y offset from ground
+        .spawnYmin = 0.0f,   // Minimum spawn Y offset from ground
+        .spawnYmax = 0.0f,   // Maximum spawn Y offset from ground
         .hurt_zone = {
             .x = 0,
             .y = 10,
@@ -62,6 +62,27 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
             .color = 0x666666ff,     // Fallback rectangle color
             .sprite_id = SPRITE_RAT, // Generated sprite identifier
             .animationId = "walk",   // Future default animation
+        },
+    },
+    // Bird
+    {
+        .id = "enemy.bird",    // Stable enemy identifier
+        .hp = 1,               // Hit points
+        .scoreValue = 1,       // Score awarded on kill
+        .moveSpeed = 500.0f,   // Horizontal movement speed
+        .spawnYmin = -700.0f,  // Minimum spawn Y offset from ground
+        .spawnYmax = -350.0f,  // Maximum spawn Y offset from ground
+        .hurt_zone = {
+            .x = 0,
+            .y = 0,
+            .radius = 48,
+        },
+        .visual = {
+            .width = 300,              // Render width
+            .height = 130,             // Render height
+            .color = 0x3f7fd6ff,       // Fallback rectangle color
+            .sprite_id = SPRITE_BIRD,  // Generated sprite identifier
+            .animationId = "fly",      // Future default animation
         },
     },
 };

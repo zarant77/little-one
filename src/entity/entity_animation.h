@@ -29,6 +29,7 @@ typedef struct {
 const EntityAnimationConfig *entity_animation_player_config(void);
 const EntityAnimationConfig *entity_animation_boar_config(void);
 const EntityAnimationConfig *entity_animation_ork_config(void);
+const EntityAnimationConfig *entity_animation_bird_config(void);
 const EntityAnimationConfig *entity_animation_default_enemy_config(void);
 const EntityAnimationConfig *entity_animation_default_obstacle_config(void);
 

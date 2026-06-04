@@ -9,6 +9,7 @@ typedef enum {
     SPRITE_BOAR,
     SPRITE_ORK,
     SPRITE_RAT,
+    SPRITE_BIRD,
     SPRITE_ROCK,
     SPRITE_STUMP,
     SPRITE_BG_MOUNTAINS,

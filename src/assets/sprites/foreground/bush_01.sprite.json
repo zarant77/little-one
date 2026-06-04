@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "id": "bush_01",
+  "width": 550,
+  "height": 260,
+  "pivotX": 275,
+  "pivotY": 130,
+  "primitives": [
+    {
+      "kind": "rect",
+      "x": 151,
+      "y": 229,
+      "w": 16,
+      "h": 98,
+      "rotation": -8,
+      "color": "6b4125ff"
+    },
+    {
+      "kind": "rect",
+      "x": 261,
+      "y": 212,
+      "w": 16,
+      "h": 102,
+      "rotation": 0,
+      "color": "6b4125ff"
+    },
+    {
+      "kind": "rect",
+      "x": 367,
+      "y": 219,
+      "w": 16,
+      "h": 89,
+      "rotation": 8,
+      "color": "6b4125ff"
+    },
+    {
+      "kind": "circle",
+      "x": 91,
+      "y": 134,
+      "w": 180,
+      "h": 150,
+      "rotation": -10,
+      "color": "050505ff"
+    },
+    {
+      "kind": "circle",
+      "x": 91,
+      "y": 134,
+      "w": 158,
+      "h": 130,
+      "rotation": -10,
+      "color": "245e2cff"
+    },
+    {
+      "kind": "circle",
+      "x": 211,
+      "y": 94,
+      "w": 230,
+      "h": 180,
+      "rotation": -4,
+      "color": "050505ff"
+    },
+    {
+      "kind": "circle",
+      "x": 211,
+      "y": 94,
+      "w": 206,
+      "h": 158,
+      "rotation": -4,
+      "color": "2f7a35ff"
+    },
+    {
+      "kind": "circle",
+      "x": 341,
+      "y": 99,
+      "w": 220,
+      "h": 175,
+      "rotation": 6,
+      "color": "050505ff"
+    },
+    {
+      "kind": "circle",
+      "x": 341,
+      "y": 99,
+      "w": 198,
+      "h": 154,
+      "rotation": 6,
+      "color": "368a3cff"
+    },
+    {
+      "kind": "circle",
+      "x": 461,
+      "y": 134,
+      "w": 170,
+      "h": 145,
+      "rotation": 12,
+      "color": "050505ff"
+    },
+    {
+      "kind": "circle",
+      "x": 461,
+      "y": 134,
+      "w": 150,
+      "h": 126,
+      "rotation": 12,
+      "color": "2f7a35ff"
+    },
+    {
+      "kind": "circle",
+      "x": 166,
+      "y": 49,
+      "w": 90,
+      "h": 80,
+      "rotation": 0,
+      "color": "49aa50ff"
+    },
+    {
+      "kind": "circle",
+      "x": 301,
+      "y": 44,
+      "w": 86,
+      "h": 78,
+      "rotation": 0,
+      "color": "5bbf63ff"
+    },
+    {
+      "kind": "circle",
+      "x": 401,
+      "y": 69,
+      "w": 70,
+      "h": 64,
+      "rotation": 0,
+      "color": "62c96aff"
+    }
+  ]
+}

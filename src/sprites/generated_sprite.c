@@ -36,6 +36,7 @@ static const char *SPRITE_ID_NAMES[SPRITE_ID_COUNT] = {
     "boar",
     "ork",
     "rat",
+    "bird",
     "rock",
     "stump",
     "bg_mountains",

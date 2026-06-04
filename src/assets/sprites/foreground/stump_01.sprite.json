@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "id": "stump_01",
+  "width": 360,
+  "height": 300,
+  "pivotX": 180,
+  "pivotY": 150,
+  "primitives": [
+    {
+      "kind": "rect",
+      "x": 101,
+      "y": 123,
+      "w": 198,
+      "h": 150,
+      "rotation": 0,
+      "color": "050505ff"
+    },
+    {
+      "kind": "rect",
+      "x": 101,
+      "y": 123,
+      "w": 178,
+      "h": 134,
+      "rotation": 0,
+      "color": "6b4125ff"
+    },
+    {
+      "kind": "rect",
+      "x": 55,
+      "y": 134,
+      "w": 12,
+      "h": 108,
+      "rotation": -4,
+      "color": "7b4d2dff"
+    },
+    {
+      "kind": "rect",
+      "x": 101,
+      "y": 134,
+      "w": 10,
+      "h": 112,
+      "rotation": 0,
+      "color": "7b4d2dff"
+    },
+    {
+      "kind": "rect",
+      "x": 145,
+      "y": 136,
+      "w": 12,
+      "h": 106,
+      "rotation": 4,
+      "color": "7b4d2dff"
+    },
+    {
+      "kind": "circle",
+      "x": 101,
+      "y": 45,
+      "w": 200,
+      "h": 86,
+      "rotation": 0,
+      "color": "050505ff"
+    },
+    {
+      "kind": "circle",
+      "x": 101,
+      "y": 45,
+      "w": 176,
+      "h": 66,
+      "rotation": 0,
+      "color": "b0824dff"
+    },
+    {
+      "kind": "circle",
+      "x": 101,
+      "y": 45,
+      "w": 110,
+      "h": 38,
+      "rotation": 0,
+      "color": "996d3fff"
+    },
+    {
+      "kind": "circle",
+      "x": 101,
+      "y": 45,
+      "w": 62,
+      "h": 18,
+      "rotation": 0,
+      "color": "c7965dff"
+    }
+  ]
+}

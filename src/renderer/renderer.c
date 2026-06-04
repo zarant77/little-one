@@ -1645,6 +1645,37 @@ static void renderer_draw_player(
     );
 }
 
+static void renderer_draw_foreground_decorations(
+        ANativeWindow_Buffer* buffer,
+        const GameState* game,
+        int32_t shake_x,
+        int32_t shake_y
+) {
+    for (int decoration_index = 0;
+            decoration_index < FOREGROUND_MAX_INSTANCES;
+            ++decoration_index) {
+        const ForegroundDecoration* decoration =
+                game->foregroundDecorations + decoration_index;
+
+        if (!decoration->active
+                || decoration->sprite == 0
+                || decoration->sprite->pixels == 0
+                || decoration->width <= 0
+                || decoration->height <= 0) {
+            continue;
+        }
+
+        renderer_draw_generated_sprite_scaled(
+                buffer,
+                decoration->sprite,
+                (int)decoration->x + shake_x,
+                (int)decoration->y + shake_y,
+                decoration->width,
+                decoration->height
+        );
+    }
+}
+
 #if LITTLE_ONE_SHOW_WIREFRAMES
 static void renderer_draw_entity_wireframes(
         ANativeWindow_Buffer* buffer,
@@ -1765,6 +1796,7 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     renderer_draw_entities(buffer, game, shake_x, shake_y);
     renderer_draw_player(buffer, game, shake_x, shake_y);
     game_effects_render(buffer, shake_x, shake_y);
+    renderer_draw_foreground_decorations(buffer, game, shake_x, shake_y);
     #if LITTLE_ONE_SHOW_WIREFRAMES
     renderer_draw_entity_wireframes(buffer, game, shake_x, shake_y);
     renderer_draw_player_wireframe(buffer, game, shake_x, shake_y);

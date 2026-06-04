@@ -5,6 +5,7 @@
 #include "../audio/audio.h"
 #include "../config.h"
 #include "../config/enemy_config.h"
+#include "../config/foreground_decoration_config.h"
 #include "../config/obstacle_config.h"
 #include "../config/player_config.h"
 #include "../feedback/game_feedback.h"
@@ -165,12 +166,40 @@ static void game_clear_entities(GameState* game) {
     }
 }
 
+static void game_clear_foreground_decorations(GameState* game) {
+    for (int decoration_index = 0;
+            decoration_index < FOREGROUND_MAX_INSTANCES;
+            ++decoration_index) {
+        ForegroundDecoration* decoration = game->foregroundDecorations + decoration_index;
+
+        decoration->active = 0;
+        decoration->x = 0.0f;
+        decoration->y = 0.0f;
+        decoration->scale = 1.0f;
+        decoration->sprite = 0;
+        decoration->width = 0;
+        decoration->height = 0;
+    }
+}
+
 static void game_shift_entities_y(GameState* game, float y_delta) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         Entity* entity = game->entities + entity_index;
 
         if (entity->active) {
             entity->y += y_delta;
+        }
+    }
+}
+
+static void game_shift_foreground_decorations_y(GameState* game, float y_delta) {
+    for (int decoration_index = 0;
+            decoration_index < FOREGROUND_MAX_INSTANCES;
+            ++decoration_index) {
+        ForegroundDecoration* decoration = game->foregroundDecorations + decoration_index;
+
+        if (decoration->active) {
+            decoration->y += y_delta;
         }
     }
 }
@@ -207,7 +236,8 @@ static void game_spawn_entity(GameState* game) {
             return;
         }
 
-        y_offset = enemy_config->yMin + game_random_01() * (enemy_config->yMax - enemy_config->yMin);
+        y_offset = enemy_config->spawnYmin
+                + game_random_01() * (enemy_config->spawnYmax - enemy_config->spawnYmin);
         y = game_ground_y(game) + y_offset - (float)enemy_config->visual.height;
         entity_spawn_enemy(entity, enemy_config, x, y);
     } else {
@@ -256,6 +286,197 @@ static void game_update_entities(GameState* game, float dt) {
     }
 
     game->activeEntityCount = active_count;
+}
+
+static ForegroundDecoration* game_find_free_foreground_decoration(GameState* game) {
+    for (int decoration_index = 0;
+            decoration_index < FOREGROUND_MAX_INSTANCES;
+            ++decoration_index) {
+        if (!game->foregroundDecorations[decoration_index].active) {
+            return game->foregroundDecorations + decoration_index;
+        }
+    }
+
+    return 0;
+}
+
+static float game_foreground_config_gap(const ForegroundDecorationConfig* config) {
+    float min_gap = FOREGROUND_DEFAULT_MIN_GAP;
+    float max_gap = FOREGROUND_DEFAULT_MAX_GAP;
+
+    if (config != 0) {
+        if (config->min_gap >= 0.0f) {
+            min_gap = config->min_gap;
+        }
+        if (config->max_gap >= min_gap) {
+            max_gap = config->max_gap;
+        } else {
+            max_gap = min_gap;
+        }
+    }
+
+    return min_gap + game_random_01() * (max_gap - min_gap);
+}
+
+static float game_foreground_config_weight(const ForegroundDecorationConfig* config) {
+    if (config == 0 || config->spawn_weight < 0.0f) {
+        return 0.0f;
+    }
+
+    return config->spawn_weight > 0.0f ? config->spawn_weight : 1.0f;
+}
+
+static const GeneratedSprite* game_foreground_config_sprite(
+        const ForegroundDecorationConfig* config
+) {
+    const GeneratedSprite* sprite;
+
+    if (config == 0
+            || config->sprite_id == 0
+            || config->width <= 0
+            || config->height <= 0
+            || config->scale_min <= 0.0f
+            || config->scale_max < config->scale_min
+            || game_foreground_config_weight(config) <= 0.0f) {
+        return 0;
+    }
+
+    sprite = generated_sprite_get_by_id(config->sprite_id);
+    if (sprite == 0 || sprite->pixels == 0) {
+        return 0;
+    }
+
+    return sprite;
+}
+
+static const ForegroundDecorationConfig* game_pick_foreground_config(
+        const GeneratedSprite** out_sprite
+) {
+    const ForegroundDecorationConfig* configs;
+    const ForegroundDecorationConfig* last_valid_config = 0;
+    const GeneratedSprite* last_valid_sprite = 0;
+    float total_weight = 0.0f;
+    float selected_weight;
+    int config_count = 0;
+
+    if (out_sprite != 0) {
+        *out_sprite = 0;
+    }
+
+    configs = foreground_decoration_config_get_all(&config_count);
+    for (int config_index = 0; config_index < config_count; ++config_index) {
+        const ForegroundDecorationConfig* config = configs + config_index;
+
+        if (game_foreground_config_sprite(config) == 0) {
+            continue;
+        }
+
+        total_weight += game_foreground_config_weight(config);
+    }
+
+    if (total_weight <= 0.0f) {
+        return 0;
+    }
+
+    selected_weight = game_random_01() * total_weight;
+    for (int config_index = 0; config_index < config_count; ++config_index) {
+        const ForegroundDecorationConfig* config = configs + config_index;
+        const GeneratedSprite* sprite = game_foreground_config_sprite(config);
+
+        if (sprite == 0) {
+            continue;
+        }
+
+        last_valid_config = config;
+        last_valid_sprite = sprite;
+        selected_weight -= game_foreground_config_weight(config);
+        if (selected_weight <= 0.0f) {
+            if (out_sprite != 0) {
+                *out_sprite = sprite;
+            }
+            return config;
+        }
+    }
+
+    if (out_sprite != 0) {
+        *out_sprite = last_valid_sprite;
+    }
+    return last_valid_config;
+}
+
+static const ForegroundDecorationConfig* game_spawn_foreground_decoration(GameState* game) {
+    ForegroundDecoration* decoration = game_find_free_foreground_decoration(game);
+    const ForegroundDecorationConfig* config;
+    const GeneratedSprite* sprite;
+    float scale;
+    float y_min;
+    float y_max;
+    float y_offset;
+
+    if (decoration == 0 || game->screenWidth <= 0 || game->screenHeight <= 0) {
+        return 0;
+    }
+
+    config = game_pick_foreground_config(&sprite);
+    if (config == 0 || sprite == 0) {
+        return 0;
+    }
+
+    scale = config->scale_min + game_random_01() * (config->scale_max - config->scale_min);
+    if (scale <= 0.0f) {
+        return 0;
+    }
+
+    y_min = config->spawn_y_min;
+    y_max = config->spawn_y_max >= y_min ? config->spawn_y_max : y_min;
+    y_offset = y_min + game_random_01() * (y_max - y_min);
+
+    decoration->active = 1;
+    decoration->x = (float)game->screenWidth + FOREGROUND_SPAWN_RIGHT_PADDING;
+    decoration->scale = scale;
+    decoration->sprite = sprite;
+    decoration->width = (int)((float)config->width * scale);
+    decoration->height = (int)((float)config->height * scale);
+    if (decoration->width < 1) {
+        decoration->width = 1;
+    }
+    if (decoration->height < 1) {
+        decoration->height = 1;
+    }
+    decoration->y = game_ground_y(game)
+            + y_offset
+            + config->draw_offset_y
+            - (float)decoration->height;
+
+    return config;
+}
+
+static void game_update_foreground_decorations(GameState* game, float dt) {
+    float scroll_distance = game->worldSpeed * FOREGROUND_SCROLL_MULTIPLIER * dt;
+
+    for (int decoration_index = 0;
+            decoration_index < FOREGROUND_MAX_INSTANCES;
+            ++decoration_index) {
+        ForegroundDecoration* decoration = game->foregroundDecorations + decoration_index;
+
+        if (!decoration->active) {
+            continue;
+        }
+
+        decoration->x -= scroll_distance;
+        if (decoration->x + (float)decoration->width < 0.0f) {
+            decoration->active = 0;
+            decoration->sprite = 0;
+        }
+    }
+
+    game->foregroundSpawnGap -= scroll_distance;
+    if (game->foregroundSpawnGap <= 0.0f) {
+        const ForegroundDecorationConfig* spawned_config =
+                game_spawn_foreground_decoration(game);
+
+        game->foregroundSpawnGap = game_foreground_config_gap(spawned_config);
+    }
 }
 
 static int game_player_overlaps_entity_hurt_zone(const GameState* game, const Entity* entity) {
@@ -429,6 +650,10 @@ void game_init(GameState* game) {
     game->worldSpeed = LITTLE_ONE_WORLD_SCROLL_SPEED;
     game_clear_entities(game);
     game->spawnTimer = game_next_spawn_time();
+    game_clear_foreground_decorations(game);
+    game->foregroundSpawnGap = FOREGROUND_INITIAL_SPAWN_GAP_MIN
+            + game_random_01()
+            * (FOREGROUND_INITIAL_SPAWN_GAP_MAX - FOREGROUND_INITIAL_SPAWN_GAP_MIN);
     game->gameOver = 0;
     game->score = 0;
     game->bestScore = best_score;
@@ -516,6 +741,7 @@ void game_set_screen_size(GameState* game, float width, float height) {
     } else if (old_screen_width != game->screenWidth || old_screen_height != game->screenHeight) {
         game->playerY = new_ground_y - game_player_height() - player_ground_offset;
         game_shift_entities_y(game, new_ground_y - old_ground_y);
+        game_shift_foreground_decorations_y(game, new_ground_y - old_ground_y);
         if (was_grounded) {
             game->playerVelocityY = 0.0f;
             game->playerGrounded = 1;
@@ -617,4 +843,5 @@ void game_update(GameState* game, const InputState* input, float dt) {
     game_update_entities(game, dt);
     game_handle_collisions(game, player_was_smashing);
     game_update_player_animation(game, elapsed_ms);
+    game_update_foreground_decorations(game, dt);
 }

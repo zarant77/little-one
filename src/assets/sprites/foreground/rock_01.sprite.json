@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "id": "rock_01",
+  "width": 270,
+  "height": 172,
+  "pivotX": 135,
+  "pivotY": 86,
+  "primitives": [
+    {
+      "kind": "circle",
+      "x": 135,
+      "y": 86,
+      "w": 270,
+      "h": 170,
+      "rotation": -6,
+      "color": "050505ff"
+    },
+    {
+      "kind": "circle",
+      "x": 135,
+      "y": 86,
+      "w": 244,
+      "h": 146,
+      "rotation": -6,
+      "color": "5b5b60ff"
+    },
+    {
+      "kind": "circle",
+      "x": 60,
+      "y": 74,
+      "w": 110,
+      "h": 88,
+      "rotation": -14,
+      "color": "6f6f75ff"
+    },
+    {
+      "kind": "circle",
+      "x": 190,
+      "y": 101,
+      "w": 130,
+      "h": 92,
+      "rotation": 10,
+      "color": "4a4a50ff"
+    },
+    {
+      "kind": "rect",
+      "x": 115,
+      "y": 86,
+      "w": 70,
+      "h": 8,
+      "rotation": -15,
+      "color": "46464bff"
+    },
+    {
+      "kind": "rect",
+      "x": 160,
+      "y": 111,
+      "w": 82,
+      "h": 8,
+      "rotation": 8,
+      "color": "46464bff"
+    },
+    {
+      "kind": "circle",
+      "x": 85,
+      "y": 56,
+      "w": 34,
+      "h": 34,
+      "rotation": 0,
+      "color": "8b8b92ff"
+    }
+  ]
+}

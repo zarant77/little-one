@@ -44,6 +44,15 @@ static const EntityAnimationConfig ORK_ANIMATIONS = {
         },
 };
 
+static const EntityAnimationConfig BIRD_ANIMATIONS = {
+        .clips = {
+                [ENTITY_ANIM_IDLE] = "fly",
+                [ENTITY_ANIM_WALK] = "fly",
+                [ENTITY_ANIM_DAMAGE] = "damage",
+                [ENTITY_ANIM_DEATH] = "flying_death",
+        },
+};
+
 static const EntityAnimationConfig DEFAULT_ENEMY_ANIMATIONS = {
         .clips = {
                 [ENTITY_ANIM_IDLE] = "idle",
@@ -71,6 +80,10 @@ const EntityAnimationConfig *entity_animation_boar_config(void) {
 
 const EntityAnimationConfig *entity_animation_ork_config(void) {
     return &ORK_ANIMATIONS;
+}
+
+const EntityAnimationConfig *entity_animation_bird_config(void) {
+    return &BIRD_ANIMATIONS;
 }
 
 const EntityAnimationConfig *entity_animation_default_enemy_config(void) {

@@ -13,6 +13,10 @@ static const EntityAnimationConfig* entity_animation_config_for_enemy(const Enem
         return entity_animation_ork_config();
     }
 
+    if (config->visual.sprite_id == SPRITE_BIRD) {
+        return entity_animation_bird_config();
+    }
+
     return entity_animation_default_enemy_config();
 }
 

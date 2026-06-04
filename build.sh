@@ -169,6 +169,4 @@ while true; do
     *) echo "Invalid option" ;;
   esac
 
-  echo
-  read -rp "Press Enter to continue..."
 done

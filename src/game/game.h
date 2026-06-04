@@ -1,12 +1,24 @@
 #ifndef LITTLE_ONE_GAME_H
 #define LITTLE_ONE_GAME_H
 
+#include "../config/foreground_decoration_config.h"
 #include "../entity/entity.h"
 #include "../feedback/screen_shake.h"
 #include "../input/input.h"
 #include "../settings/game_settings.h"
+#include "../sprites/generated_sprite.h"
 
 #define MAX_ENTITIES 16
+
+typedef struct {
+    int active;
+    float x;
+    float y;
+    float scale;
+    const GeneratedSprite* sprite;
+    int width;
+    int height;
+} ForegroundDecoration;
 
 typedef enum {
     GAME_UI_PLAYING = 0,
@@ -31,6 +43,8 @@ typedef struct {
     float worldSpeed;
     Entity entities[MAX_ENTITIES];
     float spawnTimer;
+    ForegroundDecoration foregroundDecorations[FOREGROUND_MAX_INSTANCES];
+    float foregroundSpawnGap;
     int gameOver;
     int score;
     int bestScore;

@@ -8,8 +8,8 @@ typedef struct {
     int hp;
     int scoreValue;
     float moveSpeed;
-    float yMin;
-    float yMax;
+    float spawnYmin;
+    float spawnYmax;
     HurtZone hurt_zone;
     EntityVisualConfig visual;
 } EnemyConfig;
