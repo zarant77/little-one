@@ -20,6 +20,7 @@ typedef struct {
     int16_t scroll_den;
     int16_t repeat_x;
     int16_t repeat_y;
+    int16_t mirror_x;
     bool enabled;
 } ParallaxLayerConfig;
 

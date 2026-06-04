@@ -310,7 +310,7 @@
       "w": 32,
       "h": 32,
       "rotation": 0,
-      "color": "4d505aff"
+      "color": "55555aff"
     },
     {
       "kind": "circle",
@@ -319,7 +319,7 @@
       "w": 26,
       "h": 26,
       "rotation": 0,
-      "color": "4d505aff"
+      "color": "55555aff"
     },
     {
       "kind": "circle",
@@ -328,7 +328,7 @@
       "w": 28,
       "h": 28,
       "rotation": 0,
-      "color": "4d505aff"
+      "color": "55555aff"
     },
     {
       "kind": "rect",

@@ -26,6 +26,33 @@
     },
     {
       "kind": "triangle",
+      "x": 144,
+      "y": 76,
+      "w": 92,
+      "h": 84,
+      "rotation": 0,
+      "color": "f7fbffff"
+    },
+    {
+      "kind": "triangle",
+      "x": 122,
+      "y": 100,
+      "w": 56,
+      "h": 52,
+      "rotation": 0,
+      "color": "dbeaf4ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 169,
+      "y": 102,
+      "w": 52,
+      "h": 48,
+      "rotation": 0,
+      "color": "cfe1edff"
+    },
+    {
+      "kind": "triangle",
       "x": 358,
       "y": 139,
       "w": 432,
@@ -37,10 +64,37 @@
       "kind": "triangle",
       "x": 358,
       "y": 146,
-      "w": 326,
+      "w": 334,
       "h": 222,
       "rotation": 0,
       "color": "82a0b5ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 358,
+      "y": 58,
+      "w": 118,
+      "h": 102,
+      "rotation": 0,
+      "color": "fbfdffff"
+    },
+    {
+      "kind": "triangle",
+      "x": 329,
+      "y": 89,
+      "w": 70,
+      "h": 60,
+      "rotation": 0,
+      "color": "e2eef7ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 385,
+      "y": 86,
+      "w": 74,
+      "h": 64,
+      "rotation": 0,
+      "color": "d4e5f1ff"
     },
     {
       "kind": "triangle",
@@ -54,11 +108,38 @@
     {
       "kind": "triangle",
       "x": 636,
-      "y": 169,
+      "y": 155,
       "w": 331,
-      "h": 180,
+      "h": 224,
       "rotation": 0,
       "color": "7897adff"
+    },
+    {
+      "kind": "triangle",
+      "x": 636,
+      "y": 88,
+      "w": 132,
+      "h": 86,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "triangle",
+      "x": 602,
+      "y": 116,
+      "w": 82,
+      "h": 58,
+      "rotation": 0,
+      "color": "e4eff8ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 668,
+      "y": 114,
+      "w": 86,
+      "h": 60,
+      "rotation": 0,
+      "color": "d5e6f2ff"
     },
     {
       "kind": "triangle",
@@ -77,6 +158,33 @@
       "h": 203,
       "rotation": 0,
       "color": "82a0b5ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 880,
+      "y": 70,
+      "w": 96,
+      "h": 88,
+      "rotation": 0,
+      "color": "f9fcffff"
+    },
+    {
+      "kind": "triangle",
+      "x": 858,
+      "y": 94,
+      "w": 58,
+      "h": 54,
+      "rotation": 0,
+      "color": "deebf5ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 904,
+      "y": 95,
+      "w": 54,
+      "h": 50,
+      "rotation": 0,
+      "color": "d0e2eeff"
     },
     {
       "kind": "rect",

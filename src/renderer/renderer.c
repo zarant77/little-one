@@ -1327,16 +1327,49 @@ static void renderer_draw_parallax_tile(
         Framebuffer* framebuffer,
         const GeneratedSprite* sprite,
         int x,
-        int y
+        int y,
+        int mirrored
 ) {
-    renderer_draw_generated_sprite_scaled(
-            framebuffer,
-            sprite,
-            x,
-            y,
-            sprite->width,
-            sprite->height
-    );
+    if (!mirrored) {
+        renderer_draw_generated_sprite_scaled(
+                framebuffer,
+                sprite,
+                x,
+                y,
+                sprite->width,
+                sprite->height
+        );
+        return;
+    }
+
+    for (int target_y = y; target_y < y + sprite->height; ++target_y) {
+        int source_y;
+        const uint32_t* source_row;
+
+        if (target_y < 0 || target_y >= framebuffer->height) {
+            continue;
+        }
+
+        source_y = target_y - y;
+        source_row = sprite->pixels + (size_t)source_y * (size_t)sprite->width;
+
+        for (int target_x = x; target_x < x + sprite->width; ++target_x) {
+            int source_x;
+
+            if (target_x < 0 || target_x >= framebuffer->width) {
+                continue;
+            }
+
+            source_x = sprite->width - 1 - (target_x - x);
+            renderer_write_sprite_pixel(
+                    framebuffer,
+                    target_x,
+                    target_y,
+                    source_row[source_x],
+                    255
+            );
+        }
+    }
 }
 
 static void renderer_draw_parallax_layer(
@@ -1355,6 +1388,7 @@ static void renderer_draw_parallax_layer(
     int tile_h;
     int start_x;
     int start_y;
+    int start_tile_index;
 
     if (framebuffer == 0
             || layer == 0
@@ -1377,16 +1411,18 @@ static void renderer_draw_parallax_layer(
     layer_y = gameplay_ground_y - (int32_t)layer->y - tile_h + shake_y;
 
     if (!layer->repeat_x && !layer->repeat_y) {
-        renderer_draw_parallax_tile(framebuffer, sprite, screen_x, layer_y);
+        renderer_draw_parallax_tile(framebuffer, sprite, screen_x, layer_y, 0);
         return;
     }
 
     start_x = screen_x;
+    start_tile_index = 0;
     if (layer->repeat_x) {
         start_x = screen_x % tile_w;
         if (start_x > 0) {
             start_x -= tile_w;
         }
+        start_tile_index = (start_x - screen_x) / tile_w;
     }
 
     start_y = layer_y;
@@ -1399,10 +1435,12 @@ static void renderer_draw_parallax_layer(
     for (int y = start_y; y < layer_y + tile_h; y += tile_h) {
         if (layer->repeat_x) {
             for (int x = start_x; x < framebuffer->width; x += tile_w) {
-                renderer_draw_parallax_tile(framebuffer, sprite, x, y);
+                int tile_index = start_tile_index + (x - start_x) / tile_w;
+                int mirrored = layer->mirror_x && ((tile_index & 1) != 0);
+                renderer_draw_parallax_tile(framebuffer, sprite, x, y, mirrored);
             }
         } else {
-            renderer_draw_parallax_tile(framebuffer, sprite, screen_x, y);
+            renderer_draw_parallax_tile(framebuffer, sprite, screen_x, y, 0);
         }
 
         if (!layer->repeat_y) {

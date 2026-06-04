@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "id": "bg_clouds",
+  "width": 1020,
+  "height": 240,
+  "pivotX": 510,
+  "pivotY": 120,
+  "primitives": [
+    {
+      "kind": "circle",
+      "x": 95,
+      "y": 84,
+      "w": 120,
+      "h": 48,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "circle",
+      "x": 150,
+      "y": 72,
+      "w": 92,
+      "h": 58,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "circle",
+      "x": 210,
+      "y": 86,
+      "w": 128,
+      "h": 46,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "circle",
+      "x": 152,
+      "y": 98,
+      "w": 210,
+      "h": 40,
+      "rotation": 0,
+      "color": "f1f7ffff"
+    },
+    {
+      "kind": "circle",
+      "x": 346,
+      "y": 170,
+      "w": 88,
+      "h": 34,
+      "rotation": 0,
+      "color": "ffffffcc"
+    },
+    {
+      "kind": "circle",
+      "x": 388,
+      "y": 160,
+      "w": 72,
+      "h": 42,
+      "rotation": 0,
+      "color": "ffffffdd"
+    },
+    {
+      "kind": "circle",
+      "x": 436,
+      "y": 172,
+      "w": 96,
+      "h": 34,
+      "rotation": 0,
+      "color": "ffffffcc"
+    },
+    {
+      "kind": "circle",
+      "x": 392,
+      "y": 182,
+      "w": 156,
+      "h": 30,
+      "rotation": 0,
+      "color": "eef6ffcc"
+    },
+    {
+      "kind": "circle",
+      "x": 605,
+      "y": 63,
+      "w": 146,
+      "h": 52,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "circle",
+      "x": 675,
+      "y": 49,
+      "w": 112,
+      "h": 70,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "circle",
+      "x": 745,
+      "y": 67,
+      "w": 160,
+      "h": 54,
+      "rotation": 0,
+      "color": "ffffffff"
+    },
+    {
+      "kind": "circle",
+      "x": 675,
+      "y": 87,
+      "w": 260,
+      "h": 42,
+      "rotation": 0,
+      "color": "f1f7ffff"
+    },
+    {
+      "kind": "circle",
+      "x": 865,
+      "y": 143,
+      "w": 96,
+      "h": 36,
+      "rotation": 0,
+      "color": "ffffffbb"
+    },
+    {
+      "kind": "circle",
+      "x": 913,
+      "y": 133,
+      "w": 74,
+      "h": 46,
+      "rotation": 0,
+      "color": "ffffffcc"
+    },
+    {
+      "kind": "circle",
+      "x": 961,
+      "y": 145,
+      "w": 90,
+      "h": 34,
+      "rotation": 0,
+      "color": "ffffffbb"
+    }
+  ]
+}

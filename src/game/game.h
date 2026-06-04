@@ -41,7 +41,7 @@ typedef struct {
     EntityAnimationState playerAnimation;
     int screenWidth;
     int screenHeight;
-    float worldScrollX;
+    double worldScrollX;
     float worldSpeed;
     Entity entities[MAX_ENTITIES];
     float spawnTimer;

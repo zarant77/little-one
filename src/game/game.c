@@ -16,7 +16,7 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
 
 static const float GRAVITY = 3000.0f;
-static const float WORLD_SCROLL_WRAP = 10000.0f;
+static const double WORLD_SCROLL_WRAP = 80539200.0;
 static const float SPAWN_MIN_SECONDS = 1.5f;
 static const float SPAWN_SECONDS_RANGE = 1.0f;
 static const float SPAWN_RIGHT_PADDING = 16.0f;
@@ -761,7 +761,7 @@ void game_init(GameState* game) {
     );
     game->screenWidth = 0;
     game->screenHeight = 0;
-    game->worldScrollX = 0.0f;
+    game->worldScrollX = 0.0;
     game->worldSpeed = LITTLE_ONE_WORLD_SCROLL_SPEED;
     game_clear_entities(game);
     game->spawnTimer = game_next_spawn_time();
