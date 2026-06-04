@@ -7,14 +7,14 @@ static const ObstacleConfig OBSTACLE_CONFIGS[] = {
         .hurt_zone = {
             .x = 0,
             .y = 0,
-            .radius = 60,
+            .radius = 100,
         },
         .visual = {
-            .width = 200,              // Render width
-            .height = 200,             // Render height
-            .color = 0xff0000ff,       // Fallback rectangle color
-            .sprite_id = SPRITE_STUMP, // Generated sprite identifier
-            .animationId = "idle",     // Future default animation
+            .width = 250,                   // Render width
+            .height = 250,                  // Render height
+            .color = 0xff0000ff,            // Fallback rectangle color
+            .sprite_id = SPRITE_STUMP,      // Generated sprite identifier
+            .animationId = "predator_idle", // Future default animation
         },
     },
     // Rock
@@ -23,14 +23,14 @@ static const ObstacleConfig OBSTACLE_CONFIGS[] = {
         .hurt_zone = {
             .x = 0,
             .y = 0,
-            .radius = 60,
+            .radius = 100,
         },
         .visual = {
-            .width = 200,             // Render width
-            .height = 200,            // Render height
-            .color = 0xe500d2ff,      // Fallback rectangle color
-            .sprite_id = SPRITE_ROCK, // Generated sprite identifier
-            .animationId = "idle",    // Future default animation
+            .width = 250,                        // Render width
+            .height = 250,                       // Render height
+            .color = 0xe500d2ff,                 // Fallback rectangle color
+            .sprite_id = SPRITE_ROCK,            // Generated sprite identifier
+            .animationId = "predator_snap_idle", // Future default animation
         },
     },
 };

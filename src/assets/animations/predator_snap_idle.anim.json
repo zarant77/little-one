@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "id": "predator_snap_idle",
+  "durationMs": 720,
+  "loop": true,
+  "tracks": [
+    {
+      "property": "offset_x",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 180, "value": -4, "easing": "ease_in" },
+        { "timeMs": 300, "value": 16, "easing": "ease_out" },
+        { "timeMs": 360, "value": 9, "easing": "linear" },
+        { "timeMs": 460, "value": -5, "easing": "ease_out" },
+        { "timeMs": 720, "value": 0, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "offset_y",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 180, "value": 3, "easing": "ease_in" },
+        { "timeMs": 300, "value": -7, "easing": "ease_out" },
+        { "timeMs": 360, "value": -3, "easing": "linear" },
+        { "timeMs": 460, "value": 2, "easing": "ease_out" },
+        { "timeMs": 720, "value": 0, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 180, "value": -42, "easing": "ease_in" },
+        { "timeMs": 300, "value": 92, "easing": "ease_out" },
+        { "timeMs": 360, "value": 55, "easing": "linear" },
+        { "timeMs": 460, "value": -24, "easing": "ease_out" },
+        { "timeMs": 720, "value": 0, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 180, "value": 1100, "easing": "ease_in" },
+        { "timeMs": 300, "value": 840, "easing": "ease_out" },
+        { "timeMs": 360, "value": 920, "easing": "linear" },
+        { "timeMs": 460, "value": 1080, "easing": "ease_out" },
+        { "timeMs": 720, "value": 1000, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 180, "value": 900, "easing": "ease_in" },
+        { "timeMs": 300, "value": 1240, "easing": "ease_out" },
+        { "timeMs": 360, "value": 1120, "easing": "linear" },
+        { "timeMs": 460, "value": 930, "easing": "ease_out" },
+        { "timeMs": 720, "value": 1000, "easing": "ease_in" }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 #include "entity.h"
 
+#include "../sprites/animations/animation_evaluate.h"
+
 static const EntityAnimationConfig* entity_animation_config_for_enemy(const EnemyConfig* config) {
     if (config == 0) {
         return entity_animation_default_enemy_config();
@@ -18,6 +20,25 @@ static const EntityAnimationConfig* entity_animation_config_for_enemy(const Enem
     }
 
     return entity_animation_default_enemy_config();
+}
+
+static void entity_animation_set_obstacle_idle(Entity* entity) {
+    const AnimationClip* clip;
+
+    entity_animation_set(
+            &entity->animation,
+            entity_animation_default_obstacle_config(),
+            ENTITY_ANIM_IDLE
+    );
+
+    if (entity->obstacleConfig->visual.animationId == 0) {
+        return;
+    }
+
+    clip = animation_find_clip(entity->obstacleConfig->visual.animationId);
+    if (clip != 0) {
+        entity->animation.clip = clip;
+    }
 }
 
 void entity_clear(Entity* entity) {
@@ -71,11 +92,7 @@ void entity_spawn_obstacle(Entity* entity, const ObstacleConfig* config, float x
     entity->animation.slot = ENTITY_ANIM_IDLE;
     entity->animation.clip = 0;
     entity->animation.time_ms = 0;
-    entity_animation_set(
-            &entity->animation,
-            entity_animation_default_obstacle_config(),
-            ENTITY_ANIM_IDLE
-    );
+    entity_animation_set_obstacle_idle(entity);
 }
 
 void entity_update(Entity* entity, float world_speed, float dt) {
@@ -94,11 +111,7 @@ void entity_update(Entity* entity, float world_speed, float dt) {
                 speed != 0.0f ? ENTITY_ANIM_WALK : ENTITY_ANIM_IDLE
         );
     } else if (entity->type == ENTITY_OBSTACLE && entity->obstacleConfig != 0) {
-        entity_animation_set(
-                &entity->animation,
-                entity_animation_default_obstacle_config(),
-                ENTITY_ANIM_IDLE
-        );
+        entity_animation_set_obstacle_idle(entity);
     }
 
     entity->x -= speed * dt;

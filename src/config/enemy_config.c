@@ -58,7 +58,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
         },
         .visual = {
             .width = 200,            // Render width
-            .height = 100,            // Render height
+            .height = 100,           // Render height
             .color = 0x666666ff,     // Fallback rectangle color
             .sprite_id = SPRITE_RAT, // Generated sprite identifier
             .animationId = "walk",   // Future default animation
@@ -66,23 +66,23 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
     },
     // Bird
     {
-        .id = "enemy.bird",    // Stable enemy identifier
-        .hp = 1,               // Hit points
-        .scoreValue = 1,       // Score awarded on kill
-        .moveSpeed = 500.0f,   // Horizontal movement speed
-        .spawnYmin = -700.0f,  // Minimum spawn Y offset from ground
-        .spawnYmax = -350.0f,  // Maximum spawn Y offset from ground
+        .id = "enemy.bird",   // Stable enemy identifier
+        .hp = 1,              // Hit points
+        .scoreValue = 1,      // Score awarded on kill
+        .moveSpeed = 1200.0f, // Horizontal movement speed
+        .spawnYmin = -450.0f, // Minimum spawn Y offset from ground
+        .spawnYmax = -320.0f, // Maximum spawn Y offset from ground
         .hurt_zone = {
             .x = 0,
             .y = 0,
             .radius = 48,
         },
         .visual = {
-            .width = 300,              // Render width
-            .height = 130,             // Render height
-            .color = 0x3f7fd6ff,       // Fallback rectangle color
-            .sprite_id = SPRITE_BIRD,  // Generated sprite identifier
-            .animationId = "fly",      // Future default animation
+            .width = 220,             // Render width
+            .height = 95,             // Render height
+            .color = 0x3f7fd6ff,      // Fallback rectangle color
+            .sprite_id = SPRITE_BIRD, // Generated sprite identifier
+            .animationId = "fly",     // Future default animation
         },
     },
 };

@@ -533,6 +533,159 @@ static const AnimTrack ORK_WALK_TRACKS[] = {
     },
 };
 
+// Source: src/assets/animations/predator_idle.anim.json
+static const AnimKey PREDATOR_IDLE_OFFSET_X_KEYS[] = {
+    { 0, 0, ANIM_EASE_LINEAR },
+    { 220, -2, ANIM_EASE_IN },
+    { 420, -5, ANIM_EASE_IN_OUT },
+    { 540, 12, ANIM_EASE_OUT },
+    { 620, 7, ANIM_EASE_IN_OUT },
+    { 760, -3, ANIM_EASE_OUT },
+    { 960, 0, ANIM_EASE_IN },
+};
+
+static const AnimKey PREDATOR_IDLE_OFFSET_Y_KEYS[] = {
+    { 0, 0, ANIM_EASE_LINEAR },
+    { 220, 2, ANIM_EASE_IN },
+    { 420, 4, ANIM_EASE_IN_OUT },
+    { 540, -5, ANIM_EASE_OUT },
+    { 620, -2, ANIM_EASE_IN_OUT },
+    { 760, 1, ANIM_EASE_OUT },
+    { 960, 0, ANIM_EASE_IN },
+};
+
+static const AnimKey PREDATOR_IDLE_ROTATION_KEYS[] = {
+    { 0, 0, ANIM_EASE_LINEAR },
+    { 220, -18, ANIM_EASE_IN },
+    { 420, -34, ANIM_EASE_IN_OUT },
+    { 540, 68, ANIM_EASE_OUT },
+    { 620, 42, ANIM_EASE_IN_OUT },
+    { 760, -16, ANIM_EASE_OUT },
+    { 960, 0, ANIM_EASE_IN },
+};
+
+static const AnimKey PREDATOR_IDLE_SCALE_X_KEYS[] = {
+    { 0, 1000, ANIM_EASE_LINEAR },
+    { 220, 1040, ANIM_EASE_IN },
+    { 420, 1080, ANIM_EASE_IN_OUT },
+    { 540, 900, ANIM_EASE_OUT },
+    { 620, 960, ANIM_EASE_IN_OUT },
+    { 760, 1040, ANIM_EASE_OUT },
+    { 960, 1000, ANIM_EASE_IN },
+};
+
+static const AnimKey PREDATOR_IDLE_SCALE_Y_KEYS[] = {
+    { 0, 1000, ANIM_EASE_LINEAR },
+    { 220, 960, ANIM_EASE_IN },
+    { 420, 930, ANIM_EASE_IN_OUT },
+    { 540, 1160, ANIM_EASE_OUT },
+    { 620, 1080, ANIM_EASE_IN_OUT },
+    { 760, 960, ANIM_EASE_OUT },
+    { 960, 1000, ANIM_EASE_IN },
+};
+
+static const AnimTrack PREDATOR_IDLE_TRACKS[] = {
+    {
+        .property = ANIM_PROP_OFFSET_X,
+        .keys = PREDATOR_IDLE_OFFSET_X_KEYS,
+        .key_count = sizeof(PREDATOR_IDLE_OFFSET_X_KEYS) / sizeof(PREDATOR_IDLE_OFFSET_X_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_OFFSET_Y,
+        .keys = PREDATOR_IDLE_OFFSET_Y_KEYS,
+        .key_count = sizeof(PREDATOR_IDLE_OFFSET_Y_KEYS) / sizeof(PREDATOR_IDLE_OFFSET_Y_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_ROTATION,
+        .keys = PREDATOR_IDLE_ROTATION_KEYS,
+        .key_count = sizeof(PREDATOR_IDLE_ROTATION_KEYS) / sizeof(PREDATOR_IDLE_ROTATION_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_SCALE_X,
+        .keys = PREDATOR_IDLE_SCALE_X_KEYS,
+        .key_count = sizeof(PREDATOR_IDLE_SCALE_X_KEYS) / sizeof(PREDATOR_IDLE_SCALE_X_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_SCALE_Y,
+        .keys = PREDATOR_IDLE_SCALE_Y_KEYS,
+        .key_count = sizeof(PREDATOR_IDLE_SCALE_Y_KEYS) / sizeof(PREDATOR_IDLE_SCALE_Y_KEYS[0]),
+    },
+};
+
+// Source: src/assets/animations/predator_snap_idle.anim.json
+static const AnimKey PREDATOR_SNAP_IDLE_OFFSET_X_KEYS[] = {
+    { 0, 0, ANIM_EASE_LINEAR },
+    { 180, -4, ANIM_EASE_IN },
+    { 300, 16, ANIM_EASE_OUT },
+    { 360, 9, ANIM_EASE_LINEAR },
+    { 460, -5, ANIM_EASE_OUT },
+    { 720, 0, ANIM_EASE_IN },
+};
+
+static const AnimKey PREDATOR_SNAP_IDLE_OFFSET_Y_KEYS[] = {
+    { 0, 0, ANIM_EASE_LINEAR },
+    { 180, 3, ANIM_EASE_IN },
+    { 300, -7, ANIM_EASE_OUT },
+    { 360, -3, ANIM_EASE_LINEAR },
+    { 460, 2, ANIM_EASE_OUT },
+    { 720, 0, ANIM_EASE_IN },
+};
+
+static const AnimKey PREDATOR_SNAP_IDLE_ROTATION_KEYS[] = {
+    { 0, 0, ANIM_EASE_LINEAR },
+    { 180, -42, ANIM_EASE_IN },
+    { 300, 92, ANIM_EASE_OUT },
+    { 360, 55, ANIM_EASE_LINEAR },
+    { 460, -24, ANIM_EASE_OUT },
+    { 720, 0, ANIM_EASE_IN },
+};
+
+static const AnimKey PREDATOR_SNAP_IDLE_SCALE_X_KEYS[] = {
+    { 0, 1000, ANIM_EASE_LINEAR },
+    { 180, 1100, ANIM_EASE_IN },
+    { 300, 840, ANIM_EASE_OUT },
+    { 360, 920, ANIM_EASE_LINEAR },
+    { 460, 1080, ANIM_EASE_OUT },
+    { 720, 1000, ANIM_EASE_IN },
+};
+
+static const AnimKey PREDATOR_SNAP_IDLE_SCALE_Y_KEYS[] = {
+    { 0, 1000, ANIM_EASE_LINEAR },
+    { 180, 900, ANIM_EASE_IN },
+    { 300, 1240, ANIM_EASE_OUT },
+    { 360, 1120, ANIM_EASE_LINEAR },
+    { 460, 930, ANIM_EASE_OUT },
+    { 720, 1000, ANIM_EASE_IN },
+};
+
+static const AnimTrack PREDATOR_SNAP_IDLE_TRACKS[] = {
+    {
+        .property = ANIM_PROP_OFFSET_X,
+        .keys = PREDATOR_SNAP_IDLE_OFFSET_X_KEYS,
+        .key_count = sizeof(PREDATOR_SNAP_IDLE_OFFSET_X_KEYS) / sizeof(PREDATOR_SNAP_IDLE_OFFSET_X_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_OFFSET_Y,
+        .keys = PREDATOR_SNAP_IDLE_OFFSET_Y_KEYS,
+        .key_count = sizeof(PREDATOR_SNAP_IDLE_OFFSET_Y_KEYS) / sizeof(PREDATOR_SNAP_IDLE_OFFSET_Y_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_ROTATION,
+        .keys = PREDATOR_SNAP_IDLE_ROTATION_KEYS,
+        .key_count = sizeof(PREDATOR_SNAP_IDLE_ROTATION_KEYS) / sizeof(PREDATOR_SNAP_IDLE_ROTATION_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_SCALE_X,
+        .keys = PREDATOR_SNAP_IDLE_SCALE_X_KEYS,
+        .key_count = sizeof(PREDATOR_SNAP_IDLE_SCALE_X_KEYS) / sizeof(PREDATOR_SNAP_IDLE_SCALE_X_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_SCALE_Y,
+        .keys = PREDATOR_SNAP_IDLE_SCALE_Y_KEYS,
+        .key_count = sizeof(PREDATOR_SNAP_IDLE_SCALE_Y_KEYS) / sizeof(PREDATOR_SNAP_IDLE_SCALE_Y_KEYS[0]),
+    },
+};
+
 // Source: src/assets/animations/rat_walk.anim.json
 static const AnimKey RAT_WALK_OFFSET_Y_KEYS[] = {
     { 0, 0, ANIM_EASE_LINEAR },
@@ -783,6 +936,20 @@ const AnimationClip ANIMATION_CLIPS[] = {
         .loop = true,
         .tracks = ORK_WALK_TRACKS,
         .track_count = sizeof(ORK_WALK_TRACKS) / sizeof(ORK_WALK_TRACKS[0]),
+    },
+    {
+        .id = "predator_idle",
+        .duration_ms = 960,
+        .loop = true,
+        .tracks = PREDATOR_IDLE_TRACKS,
+        .track_count = sizeof(PREDATOR_IDLE_TRACKS) / sizeof(PREDATOR_IDLE_TRACKS[0]),
+    },
+    {
+        .id = "predator_snap_idle",
+        .duration_ms = 720,
+        .loop = true,
+        .tracks = PREDATOR_SNAP_IDLE_TRACKS,
+        .track_count = sizeof(PREDATOR_SNAP_IDLE_TRACKS) / sizeof(PREDATOR_SNAP_IDLE_TRACKS[0]),
     },
     {
         .id = "rat_walk",

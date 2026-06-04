@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "id": "predator_idle",
+  "durationMs": 960,
+  "loop": true,
+  "tracks": [
+    {
+      "property": "offset_x",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 220, "value": -2, "easing": "ease_in" },
+        { "timeMs": 420, "value": -5, "easing": "ease_in_out" },
+        { "timeMs": 540, "value": 12, "easing": "ease_out" },
+        { "timeMs": 620, "value": 7, "easing": "ease_in_out" },
+        { "timeMs": 760, "value": -3, "easing": "ease_out" },
+        { "timeMs": 960, "value": 0, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "offset_y",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 220, "value": 2, "easing": "ease_in" },
+        { "timeMs": 420, "value": 4, "easing": "ease_in_out" },
+        { "timeMs": 540, "value": -5, "easing": "ease_out" },
+        { "timeMs": 620, "value": -2, "easing": "ease_in_out" },
+        { "timeMs": 760, "value": 1, "easing": "ease_out" },
+        { "timeMs": 960, "value": 0, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "rotation",
+      "keys": [
+        { "timeMs": 0, "value": 0, "easing": "linear" },
+        { "timeMs": 220, "value": -18, "easing": "ease_in" },
+        { "timeMs": 420, "value": -34, "easing": "ease_in_out" },
+        { "timeMs": 540, "value": 68, "easing": "ease_out" },
+        { "timeMs": 620, "value": 42, "easing": "ease_in_out" },
+        { "timeMs": 760, "value": -16, "easing": "ease_out" },
+        { "timeMs": 960, "value": 0, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "scale_x",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 220, "value": 1040, "easing": "ease_in" },
+        { "timeMs": 420, "value": 1080, "easing": "ease_in_out" },
+        { "timeMs": 540, "value": 900, "easing": "ease_out" },
+        { "timeMs": 620, "value": 960, "easing": "ease_in_out" },
+        { "timeMs": 760, "value": 1040, "easing": "ease_out" },
+        { "timeMs": 960, "value": 1000, "easing": "ease_in" }
+      ]
+    },
+    {
+      "property": "scale_y",
+      "keys": [
+        { "timeMs": 0, "value": 1000, "easing": "linear" },
+        { "timeMs": 220, "value": 960, "easing": "ease_in" },
+        { "timeMs": 420, "value": 930, "easing": "ease_in_out" },
+        { "timeMs": 540, "value": 1160, "easing": "ease_out" },
+        { "timeMs": 620, "value": 1080, "easing": "ease_in_out" },
+        { "timeMs": 760, "value": 960, "easing": "ease_out" },
+        { "timeMs": 960, "value": 1000, "easing": "ease_in" }
+      ]
+    }
+  ]
+}
