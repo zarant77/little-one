@@ -103,7 +103,7 @@
       "w": 50,
       "h": 6,
       "rotation": 0,
-      "color": "243246ff"
+      "color": "203140ff"
     },
     {
       "kind": "rect",
@@ -121,7 +121,7 @@
       "w": 6,
       "h": 50,
       "rotation": 0,
-      "color": "243246ff"
+      "color": "203140ff"
     },
     {
       "kind": "circle",
@@ -148,7 +148,7 @@
       "w": 34,
       "h": 34,
       "rotation": 0,
-      "color": "243246ff"
+      "color": "203140ff"
     },
     {
       "kind": "circle",
@@ -157,7 +157,7 @@
       "w": 34,
       "h": 34,
       "rotation": 0,
-      "color": "243246ff"
+      "color": "203140ff"
     },
     {
       "kind": "circle",
