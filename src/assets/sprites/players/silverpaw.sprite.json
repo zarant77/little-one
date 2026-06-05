@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "id": "silverpaw",
+  "width": 240,
+  "height": 118,
+  "pivotX": 120,
+  "pivotY": 59,
+  "primitives": [
+    {"kind": "circle", "x": 45, "y": 66, "w": 80, "h": 22, "rotation": -24, "color": "8da9baff"},
+    {"kind": "circle", "x": 142, "y": 77, "w": 144, "h": 64, "rotation": 0, "color": "cfe1edff"},
+    {"kind": "circle", "x": 188, "y": 56, "w": 62, "h": 54, "rotation": 0, "color": "cfe1edff"},
+    {"kind": "triangle", "x": 172, "y": 30, "w": 28, "h": 38, "rotation": -22, "color": "e4eff8ff"},
+    {"kind": "triangle", "x": 204, "y": 29, "w": 28, "h": 40, "rotation": 24, "color": "e4eff8ff"},
+    {"kind": "rect", "x": 132, "y": 99, "w": 20, "h": 22, "rotation": 0, "color": "8b8b92ff"},
+    {"kind": "rect", "x": 181, "y": 99, "w": 20, "h": 22, "rotation": 0, "color": "8b8b92ff"},
+    {"kind": "rect", "x": 199, "y": 53, "w": 8, "h": 5, "rotation": 0, "color": "f6df43ff"},
+    {"kind": "rect", "x": 156, "y": 73, "w": 64, "h": 6, "rotation": 0, "color": "6db6ffff"}
+  ]
+}

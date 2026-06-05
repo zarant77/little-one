@@ -22,7 +22,7 @@
       "w": 340,
       "h": 340,
       "rotation": 0,
-      "color": "5a3417ff"
+      "color": "5d3618ff"
     },
     {
       "kind": "circle",
@@ -31,7 +31,7 @@
       "w": 284,
       "h": 284,
       "rotation": 0,
-      "color": "6b3e1cff"
+      "color": "6b4125ff"
     },
     {
       "kind": "circle",
@@ -58,7 +58,7 @@
       "w": 202,
       "h": 282,
       "rotation": 0,
-      "color": "6b3e1cff"
+      "color": "6b4125ff"
     },
     {
       "kind": "rect",
@@ -67,7 +67,7 @@
       "w": 72,
       "h": 276,
       "rotation": 0,
-      "color": "7a471fff"
+      "color": "7b481fff"
     },
     {
       "kind": "rect",
@@ -76,7 +76,7 @@
       "w": 76,
       "h": 278,
       "rotation": 0,
-      "color": "543016ff"
+      "color": "4b2a13ff"
     },
     {
       "kind": "triangle",
@@ -94,7 +94,7 @@
       "w": 74,
       "h": 136,
       "rotation": -24,
-      "color": "5b3417ff"
+      "color": "5d3618ff"
     },
     {
       "kind": "triangle",
@@ -130,7 +130,7 @@
       "w": 72,
       "h": 156,
       "rotation": 0,
-      "color": "8a5225ff"
+      "color": "8b4b24ff"
     },
     {
       "kind": "triangle",
@@ -148,7 +148,7 @@
       "w": 70,
       "h": 142,
       "rotation": 10,
-      "color": "6e3f1bff"
+      "color": "6b4125ff"
     },
     {
       "kind": "triangle",
@@ -166,7 +166,7 @@
       "w": 66,
       "h": 124,
       "rotation": 24,
-      "color": "4d2b13ff"
+      "color": "4b2a13ff"
     },
     {
       "kind": "rect",
@@ -184,7 +184,7 @@
       "w": 24,
       "h": 226,
       "rotation": 5,
-      "color": "8d5425ff"
+      "color": "8b4b24ff"
     },
     {
       "kind": "rect",
@@ -193,7 +193,7 @@
       "w": 24,
       "h": 224,
       "rotation": -5,
-      "color": "3a200fff"
+      "color": "3b210fff"
     },
     {
       "kind": "rect",
@@ -202,7 +202,7 @@
       "w": 18,
       "h": 230,
       "rotation": -2,
-      "color": "8f5525ff"
+      "color": "8b4b24ff"
     },
     {
       "kind": "rect",
@@ -211,7 +211,7 @@
       "w": 18,
       "h": 228,
       "rotation": 2,
-      "color": "301b0cff"
+      "color": "2a140bff"
     },
     {
       "kind": "circle",
@@ -238,7 +238,7 @@
       "w": 72,
       "h": 72,
       "rotation": 0,
-      "color": "6fa51fff"
+      "color": "65a51fff"
     },
     {
       "kind": "rect",
@@ -283,7 +283,7 @@
       "w": 36,
       "h": 92,
       "rotation": 30,
-      "color": "2c190bff"
+      "color": "2a140bff"
     },
     {
       "kind": "triangle",
@@ -292,7 +292,7 @@
       "w": 38,
       "h": 98,
       "rotation": -30,
-      "color": "2c190bff"
+      "color": "2a140bff"
     },
     {
       "kind": "rect",
@@ -310,7 +310,7 @@
       "w": 104,
       "h": 52,
       "rotation": 0,
-      "color": "1a0800ff"
+      "color": "160905ff"
     },
     {
       "kind": "circle",
@@ -427,7 +427,7 @@
       "w": 70,
       "h": 8,
       "rotation": 24,
-      "color": "2b180bff"
+      "color": "2a140bff"
     },
     {
       "kind": "rect",
@@ -436,7 +436,7 @@
       "w": 48,
       "h": 8,
       "rotation": 40,
-      "color": "2b180bff"
+      "color": "2a140bff"
     },
     {
       "kind": "rect",
@@ -445,7 +445,7 @@
       "w": 48,
       "h": 8,
       "rotation": -40,
-      "color": "2b180bff"
+      "color": "2a140bff"
     },
     {
       "kind": "rect",
@@ -463,7 +463,7 @@
       "w": 28,
       "h": 146,
       "rotation": -36,
-      "color": "6e401cff"
+      "color": "6b4125ff"
     },
     {
       "kind": "rect",
@@ -535,7 +535,7 @@
       "w": 96,
       "h": 24,
       "rotation": -15,
-      "color": "5f3718ff"
+      "color": "5d3618ff"
     },
     {
       "kind": "rect",
@@ -553,7 +553,7 @@
       "w": 98,
       "h": 24,
       "rotation": 15,
-      "color": "4b2b13ff"
+      "color": "4b2a13ff"
     },
     {
       "kind": "circle",
@@ -769,7 +769,7 @@
       "w": 26,
       "h": 204,
       "rotation": -10,
-      "color": "2b180bff"
+      "color": "2a140bff"
     },
     {
       "kind": "triangle",
@@ -805,7 +805,7 @@
       "w": 70,
       "h": 8,
       "rotation": -24,
-      "color": "2b180bff"
+      "color": "2a140bff"
     }
   ]
 }

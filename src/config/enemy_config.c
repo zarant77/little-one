@@ -5,7 +5,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
     {
         .id = "enemy.boar",  // Stable enemy identifier
         .hp = 1,             // Hit points
-        .scoreValue = 1,     // Score awarded on kill
+        .scoreValue = 2,     // Score awarded on kill
         .moveSpeed = 600.0f, // Horizontal movement speed
         .spawnYmin = 0.0f,   // Minimum spawn Y offset from ground
         .spawnYmax = 0.0f,   // Maximum spawn Y offset from ground
@@ -27,7 +27,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
     {
         .id = "enemy.ork",   // Stable enemy identifier
         .hp = 1,             // Hit points
-        .scoreValue = 1,     // Score awarded on kill
+        .scoreValue = 4,     // Score awarded on kill
         .moveSpeed = 300.0f, // Horizontal movement speed
         .spawnYmin = 0.0f,   // Minimum spawn Y offset from ground
         .spawnYmax = 0.0f,   // Maximum spawn Y offset from ground
@@ -71,7 +71,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
     {
         .id = "enemy.bird",   // Stable enemy identifier
         .hp = 1,              // Hit points
-        .scoreValue = 1,      // Score awarded on kill
+        .scoreValue = 3,      // Score awarded on kill
         .moveSpeed = 1200.0f, // Horizontal movement speed
         .spawnYmin = -400.0f, // Minimum spawn Y offset from ground
         .spawnYmax = -100.0f, // Maximum spawn Y offset from ground
@@ -93,7 +93,7 @@ static const EnemyConfig ENEMY_CONFIGS[] = {
     {
         .id = "enemy.bat",    // Stable enemy identifier
         .hp = 1,              // Hit points
-        .scoreValue = 1,      // Score awarded on kill
+        .scoreValue = 2,      // Score awarded on kill
         .moveSpeed = 900.0f,  // Horizontal movement speed
         .spawnYmin = -400.0f, // Minimum spawn Y offset from ground
         .spawnYmax = -100.0f, // Maximum spawn Y offset from ground

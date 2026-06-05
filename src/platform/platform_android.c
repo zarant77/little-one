@@ -5,7 +5,9 @@
 #include <android/looper.h>
 #include <android/native_window.h>
 #include <pthread.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "../audio/audio.h"
@@ -24,6 +26,7 @@
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LITTLE_ONE_LOG_TAG, __VA_ARGS__)
 
 typedef struct AndroidPlatform {
+    ANativeActivity* activity;
     ANativeWindow* window;
     pthread_mutex_t window_mutex;
     AInputQueue* input_queue;
@@ -41,6 +44,8 @@ typedef struct AndroidPlatform {
     int null_window_logged;
     int reset_frame_time;
     int buffer_format_logged;
+    char progress_path[512];
+    int finish_requested;
 } AndroidPlatform;
 
 static AndroidPlatform* platform_from_activity(ANativeActivity* activity) {
@@ -65,6 +70,128 @@ static void platform_sleep_seconds(double seconds) {
     sleep_time.tv_nsec = (long)((seconds - (double)sleep_time.tv_sec) * 1000000000.0);
 
     nanosleep(&sleep_time, NULL);
+}
+
+static void platform_set_progress_path(AndroidPlatform* platform, ANativeActivity* activity) {
+    const char* data_path;
+
+    if (platform == NULL || activity == NULL) {
+        return;
+    }
+
+    data_path = activity->internalDataPath;
+    if (data_path == NULL || data_path[0] == 0) {
+        platform->progress_path[0] = 0;
+        return;
+    }
+
+    snprintf(
+            platform->progress_path,
+            sizeof(platform->progress_path),
+            "%s/little_one_progress.txt",
+            data_path
+    );
+}
+
+static void platform_load_progress(AndroidPlatform* platform) {
+    ProgressionState progress;
+
+    if (platform == NULL || platform->progress_path[0] == 0) {
+        return;
+    }
+
+    if (progression_load_from_path(platform->progress_path, &progress)) {
+        platform->game.progress = progress;
+        platform->game.progressInitialized = 1;
+        platform->game.progressDirty = 0;
+    }
+}
+
+static void platform_save_progress(AndroidPlatform* platform) {
+    if (platform == NULL
+            || platform->progress_path[0] == 0
+            || !platform->game.progressDirty) {
+        return;
+    }
+
+    if (progression_save_to_path(platform->progress_path, &platform->game.progress)) {
+        platform->game.progressDirty = 0;
+    }
+}
+
+static GameLocale platform_detect_locale(ANativeActivity* activity) {
+    JNIEnv* env = NULL;
+    JavaVM* vm;
+    jclass locale_class;
+    jmethodID get_default_method;
+    jmethodID get_language_method;
+    jobject locale;
+    jstring language;
+    const char* language_chars;
+    GameLocale locale_value = GAME_LOCALE_ENGLISH;
+    int attached = 0;
+
+    if (activity == NULL || activity->vm == NULL) {
+        return GAME_LOCALE_ENGLISH;
+    }
+
+    vm = activity->vm;
+    if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_6) != JNI_OK) {
+        if ((*vm)->AttachCurrentThread(vm, &env, NULL) != JNI_OK) {
+            return GAME_LOCALE_ENGLISH;
+        }
+        attached = 1;
+    }
+
+    locale_class = (*env)->FindClass(env, "java/util/Locale");
+    if (locale_class == NULL) {
+        goto done;
+    }
+
+    get_default_method = (*env)->GetStaticMethodID(
+            env,
+            locale_class,
+            "getDefault",
+            "()Ljava/util/Locale;"
+    );
+    get_language_method = (*env)->GetMethodID(
+            env,
+            locale_class,
+            "getLanguage",
+            "()Ljava/lang/String;"
+    );
+    if (get_default_method == NULL || get_language_method == NULL) {
+        goto done;
+    }
+
+    locale = (*env)->CallStaticObjectMethod(env, locale_class, get_default_method);
+    if (locale == NULL) {
+        goto done;
+    }
+
+    language = (jstring)(*env)->CallObjectMethod(env, locale, get_language_method);
+    if (language == NULL) {
+        goto done;
+    }
+
+    language_chars = (*env)->GetStringUTFChars(env, language, NULL);
+    if (language_chars != NULL) {
+        if (strncmp(language_chars, "uk", 2) == 0) {
+            locale_value = GAME_LOCALE_UKRAINIAN;
+        }
+        (*env)->ReleaseStringUTFChars(env, language, language_chars);
+    }
+
+done:
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionClear(env);
+        locale_value = GAME_LOCALE_ENGLISH;
+    }
+    if (attached) {
+        (*vm)->DetachCurrentThread(vm);
+    }
+
+    return locale_value;
 }
 
 static int platform_motion_action_index(int action) {
@@ -332,6 +459,7 @@ static int platform_draw(AndroidPlatform* platform, float dt) {
         input_init(&platform->input);
     }
     game_update(&platform->game, &platform->input, dt);
+    platform_save_progress(platform);
     input_end_frame(&platform->input);
     renderer_draw_frame(&buffer, &platform->game);
     ANativeWindow_unlockAndPost(window);
@@ -382,6 +510,20 @@ static void platform_update_fps(AndroidPlatform* platform, float frame_time) {
     platform->fps_frame_count = 0;
 }
 
+static void platform_handle_exit_requested(AndroidPlatform* platform) {
+    if (platform == NULL
+            || !platform->game.exitRequested
+            || platform->finish_requested) {
+        return;
+    }
+
+    platform->finish_requested = 1;
+    platform_save_progress(platform);
+    if (platform->activity != NULL) {
+        ANativeActivity_finish(platform->activity);
+    }
+}
+
 static void* platform_game_loop(void* data) {
     AndroidPlatform* platform = (AndroidPlatform*)data;
     #if LITTLE_ONE_UNCAPPED_FPS
@@ -408,10 +550,12 @@ static void* platform_game_loop(void* data) {
 
         /* Keep input processing outside the window lock to avoid lifecycle deadlocks. */
         platform_process_input(platform, input_screen_width);
+        platform_handle_exit_requested(platform);
 
         if (platform_draw(platform, dt)) {
             platform_update_fps(platform, dt);
         }
+        platform_handle_exit_requested(platform);
 
         frame_elapsed = platform_now_seconds() - frame_start;
         if (target_frame_seconds > 0.0) {
@@ -533,6 +677,7 @@ static void platform_on_pause(ANativeActivity* activity) {
     }
 
     LOGI("Native activity paused");
+    platform_save_progress(platform);
     audio_pause();
 
     pthread_mutex_lock(&platform->input_queue_mutex);
@@ -562,6 +707,7 @@ static void platform_on_destroy(ANativeActivity* activity) {
 
     LOGI("Native activity destroyed");
     platform_stop_game_loop(platform);
+    platform_save_progress(platform);
     pthread_mutex_lock(&platform->window_mutex);
     platform->window = NULL;
     pthread_mutex_unlock(&platform->window_mutex);
@@ -597,6 +743,7 @@ void platform_android_on_create(
     }
 
     activity->instance = platform;
+    platform->activity = activity;
     pthread_mutex_init(&platform->window_mutex, NULL);
     pthread_mutex_init(&platform->input_queue_mutex, NULL);
     platform->fps_elapsed = 0.0;
@@ -604,12 +751,16 @@ void platform_android_on_create(
     platform->fps_frame_count = 0;
     platform->null_window_logged = 0;
     platform->reset_frame_time = 1;
+    platform_set_progress_path(platform, activity);
+    game_settings_init_with_locale(&platform->game.settings, platform_detect_locale(activity));
+    platform->game.settingsInitialized = 1;
     generated_sprite_initialize_all();
     hud_initialize();
     menu_initialize();
     sound_registry_initialize_all();
     music_registry_initialize_all();
     audio_init();
+    platform_load_progress(platform);
     game_init(&platform->game);
     input_init(&platform->input);
 

@@ -64,9 +64,12 @@ add_library(littleone SHARED
     ../../../../src/feedback/screen_shake.c
     ../../../../src/fonts/font_renderer.c
     ../../../../src/fonts/fonts_packed.c
+    ../../../../src/game/cat_profile.c
     ../../../../src/game/game.c
     ../../../../src/game/game_effects.c
+    ../../../../src/game/progression.c
     ../../../../src/input/input.c
+    ../../../../src/localization/localization.c
     ../../../../src/main.c
     ../../../../src/platform/platform_android.c
     ../../../../src/renderer/renderer.c

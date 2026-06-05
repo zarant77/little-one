@@ -7,6 +7,8 @@
 #include "../input/input.h"
 #include "../settings/game_settings.h"
 #include "../sprites/generated_sprite.h"
+#include "../config/player_config.h"
+#include "progression.h"
 
 #define MAX_ENTITIES 16
 
@@ -24,7 +26,9 @@ typedef struct {
 typedef enum {
     GAME_UI_PLAYING = 0,
     GAME_UI_PAUSED = 1,
-    GAME_UI_SETTINGS = 2
+    GAME_UI_SETTINGS = 2,
+    GAME_UI_CAT_SELECT = 3,
+    GAME_UI_CAT_UNLOCKED = 4
 } GameUiState;
 
 typedef struct {
@@ -56,15 +60,24 @@ typedef struct {
     int fps;
     int averageFrameMs;
     int activeEntityCount;
+    int exitRequested;
     ScreenShake screenShake;
     GameUiState uiState;
     GameSettings settings;
     int settingsInitialized;
+    ProgressionState progress;
+    int progressInitialized;
+    int progressDirty;
+    int unlockedCatIndex;
 } GameState;
 
 void game_init(GameState* game);
 void game_restart_run(GameState* game);
 int game_try_restart_after_game_over(GameState* game);
+int game_start_selected_cat(GameState* game);
+void game_show_cat_select(GameState* game);
+void game_dismiss_cat_unlocked(GameState* game);
+const PlayerConfig* game_player_config(const GameState* game);
 const EntityVisualConfig* game_player_visual_config(void);
 const HurtZone* game_player_hurt_zone_config(void);
 void game_set_screen_size(GameState* game, float width, float height);

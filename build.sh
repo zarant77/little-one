@@ -52,6 +52,19 @@ Tiny cat. Big world.
 EOF
 }
 
+unify_colors() {
+  echo
+  echo "Unifying colors..."
+
+  python3 tools/unify_sprite_colors.py src/assets/sprites \
+  --write \
+  --target-colors 256 \
+  --force-low-usage \
+  --max-uses 2 \
+  --force-max-distance 36 \
+  --report color_report.txt
+}
+
 pack_assets() {
   echo
   echo "Packing assets JSON files..."
@@ -140,33 +153,32 @@ show_devices() {
   adb devices
 }
 
-while true; do
-  clear
-  show_logo
+clear
+show_logo
 
-  echo
-  echo "1) Pack Assets JSON -> C"
-  echo "2) Build"
-  echo "3) Build + Install + Launch"
-  echo "4) Clean"
-  echo "5) Logs"
-  echo "6) APK size"
-  echo "7) Devices"
-  echo "0) Exit"
-  echo
+echo
+echo "1) Build + Install + Launch"
+echo "2) Build"
+echo "3) Pack Assets JSON -> C"
+echo "4) Unify Colors"
+echo "5) Clean"
+echo "6) Logs"
+echo "7) APK size"
+echo "8) Devices"
+echo "0) Exit"
+echo
 
-  read -rp "> " choice
+read -rp "> " choice
 
-  case "$choice" in
-    1) pack_assets ;;
-    2) build_apk ;;
-    3) build_apk; install_apk; launch_app ;;
-    4) clean_project ;;
-    5) show_logs ;;
-    6) show_apk_size ;;
-    7) show_devices ;;
-    0) exit 0 ;;
-    *) echo "Invalid option" ;;
-  esac
-
-done
+case "$choice" in
+  1) build_apk; install_apk; launch_app ;;
+  2) build_apk ;;
+  3) pack_assets ;;
+  4) unify_colors ;;
+  5) clean_project ;;
+  6) show_logs ;;
+  7) show_apk_size ;;
+  8) show_devices ;;
+  0) exit 0 ;;
+  *) echo "Invalid option"; exit 1 ;;
+esac

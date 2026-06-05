@@ -4,7 +4,9 @@
 
 #include "../audio/audio.h"
 #include "../fonts/font_renderer.h"
+#include "../game/cat_profile.h"
 #include "../input/input.h"
+#include "../localization/localization.h"
 #include "../settings/game_settings.h"
 #include "ui_controls.h"
 
@@ -14,15 +16,22 @@
 #define MENU_PAUSE_BUTTON_SIZE 120
 #define MENU_PAUSE_BUTTON_MARGIN 50
 #define MENU_PANEL_MAX_WIDTH 620
+#define MENU_CAT_PANEL_MAX_WIDTH 860
 #define MENU_PANEL_PADDING 44
 #define MENU_PANEL_GAP 28
 #define MENU_TITLE_SCALE 3
 #define MENU_BUTTON_HEIGHT 92
-#define MENU_SETTINGS_PANEL_HEIGHT 620
-#define MENU_PAUSE_PANEL_HEIGHT 410
+#define MENU_SETTINGS_PANEL_HEIGHT 740
+#define MENU_PAUSE_PANEL_HEIGHT 530
 #define MENU_GAME_OVER_PANEL_HEIGHT 500
+#define MENU_CAT_SELECT_PANEL_HEIGHT 700
 #define MENU_SLIDER_HEIGHT 94
 #define MENU_NO_POINTER -1
+#define MENU_LOCK_COLOR 0x00000099
+#define MENU_EXIT_BUTTON_COLOR 0x8f1d2cff
+#define MENU_EXIT_BUTTON_BORDER_COLOR 0xff6b6bff
+#define MENU_FLAG_BORDER_COLOR 0xffffffff
+#define MENU_FLAG_SELECTED_COLOR 0xf2cc8fff
 
 typedef enum {
     MENU_DRAG_NONE = 0,
@@ -41,9 +50,18 @@ typedef struct {
     UiRect panel;
     UiRect resume_button;
     UiRect settings_button;
+    UiRect exit_button;
     UiRect back_button;
+    UiRect cats_button;
+    UiRect prev_button;
+    UiRect next_button;
+    UiRect start_button;
+    UiRect preview;
     UiRect music_slider;
     UiRect sfx_slider;
+    UiRect language_label;
+    UiRect language_en_button;
+    UiRect language_uk_button;
 } MenuLayout;
 
 static MenuResources MENU_RESOURCES;
@@ -57,19 +75,22 @@ static int menu_min_int(int a, int b)
 
 static int menu_text_width(const PackedFont* font, int scale, const char* text)
 {
-    int width = 0;
+    return font_measure_text(font, scale, text);
+}
 
-    if (font == 0 || scale <= 0 || text == 0)
+static GameLocale menu_locale(const GameState* game)
+{
+    if (game == 0)
     {
-        return 0;
+        return GAME_LOCALE_ENGLISH;
     }
 
-    for (int index = 0; text[index] != 0; ++index)
-    {
-        width += (int)font->default_advance * scale;
-    }
+    return game_settings_normalize_locale(game->settings.locale);
+}
 
-    return width;
+static const char* menu_text(const GameState* game, LocalizedTextId text_id)
+{
+    return localization_text(menu_locale(game), text_id);
 }
 
 static const MenuResources* menu_resources_get(void)
@@ -99,10 +120,10 @@ static UiRect menu_pause_button_rect(const GameState* game)
     return rect;
 }
 
-static MenuLayout menu_layout_get(const GameState* game, int panel_height)
+static MenuLayout menu_layout_get_ex(const GameState* game, int panel_height, int panel_max_width)
 {
     MenuLayout layout;
-    int panel_width = menu_min_int(MENU_PANEL_MAX_WIDTH, game->screenWidth - MENU_PANEL_PADDING * 2);
+    int panel_width = menu_min_int(panel_max_width, game->screenWidth - MENU_PANEL_PADDING * 2);
 
     if (panel_width < 260)
     {
@@ -127,8 +148,36 @@ static MenuLayout menu_layout_get(const GameState* game, int panel_height)
     layout.settings_button = layout.resume_button;
     layout.settings_button.y += MENU_BUTTON_HEIGHT + MENU_PANEL_GAP;
 
+    layout.exit_button = layout.settings_button;
+    layout.exit_button.y += MENU_BUTTON_HEIGHT + MENU_PANEL_GAP;
+
     layout.back_button = layout.resume_button;
     layout.back_button.y = layout.panel.y + layout.panel.height - MENU_PANEL_PADDING - MENU_BUTTON_HEIGHT;
+
+    layout.cats_button = layout.back_button;
+    layout.cats_button.y -= MENU_BUTTON_HEIGHT + MENU_PANEL_GAP;
+
+    layout.prev_button.x = layout.panel.x + MENU_PANEL_PADDING;
+    layout.prev_button.y = layout.panel.y + 300;
+    layout.prev_button.width = 110;
+    layout.prev_button.height = MENU_BUTTON_HEIGHT;
+
+    layout.next_button = layout.prev_button;
+    layout.next_button.x = layout.panel.x + layout.panel.width - MENU_PANEL_PADDING - layout.next_button.width;
+
+    layout.preview.width = layout.panel.width - MENU_PANEL_PADDING * 2 - 260;
+    if (layout.preview.width < 180)
+    {
+        layout.preview.width = layout.panel.width - MENU_PANEL_PADDING * 2;
+    }
+    layout.preview.height = 180;
+    layout.preview.x = layout.panel.x + (layout.panel.width - layout.preview.width) / 2;
+    layout.preview.y = layout.panel.y + 150;
+
+    layout.start_button.x = layout.panel.x + MENU_PANEL_PADDING;
+    layout.start_button.y = layout.panel.y + layout.panel.height - MENU_PANEL_PADDING - MENU_BUTTON_HEIGHT;
+    layout.start_button.width = layout.panel.width - MENU_PANEL_PADDING * 2;
+    layout.start_button.height = MENU_BUTTON_HEIGHT;
 
     layout.music_slider.x = layout.panel.x + MENU_PANEL_PADDING;
     layout.music_slider.y = layout.panel.y + 142;
@@ -138,7 +187,30 @@ static MenuLayout menu_layout_get(const GameState* game, int panel_height)
     layout.sfx_slider = layout.music_slider;
     layout.sfx_slider.y += MENU_SLIDER_HEIGHT + MENU_PANEL_GAP;
 
+    layout.language_label.x = layout.panel.x + MENU_PANEL_PADDING;
+    layout.language_label.y = layout.sfx_slider.y + MENU_SLIDER_HEIGHT + 18;
+    layout.language_label.width = layout.panel.width - MENU_PANEL_PADDING * 2;
+    layout.language_label.height = 36;
+
+    layout.language_en_button.x = layout.panel.x + MENU_PANEL_PADDING;
+    layout.language_en_button.y = layout.language_label.y + layout.language_label.height + 18;
+    layout.language_en_button.width = (layout.panel.width - MENU_PANEL_PADDING * 2 - MENU_PANEL_GAP) / 2;
+    layout.language_en_button.height = MENU_BUTTON_HEIGHT;
+
+    layout.language_uk_button = layout.language_en_button;
+    layout.language_uk_button.x = layout.language_en_button.x + layout.language_en_button.width + MENU_PANEL_GAP;
+
     return layout;
+}
+
+static MenuLayout menu_layout_get(const GameState* game, int panel_height)
+{
+    return menu_layout_get_ex(game, panel_height, MENU_PANEL_MAX_WIDTH);
+}
+
+static MenuLayout menu_cat_layout_get(const GameState* game)
+{
+    return menu_layout_get_ex(game, MENU_CAT_SELECT_PANEL_HEIGHT, MENU_CAT_PANEL_MAX_WIDTH);
 }
 
 static void menu_draw_title(
@@ -148,11 +220,20 @@ static void menu_draw_title(
         const char* title
 )
 {
-    int text_width = menu_text_width(font, MENU_TITLE_SCALE, title);
-    int x = panel.x + (panel.width - text_width) / 2;
+    int scale = MENU_TITLE_SCALE;
+    int max_width = panel.width - MENU_PANEL_PADDING;
+    int text_width;
+    int x;
     int y = panel.y + MENU_PANEL_PADDING;
 
-    ui_draw_label(framebuffer, font, x, y, MENU_TITLE_SCALE, MENU_TEXT_COLOR, title);
+    while (scale > 1 && menu_text_width(font, scale, title) > max_width)
+    {
+        scale -= 1;
+    }
+
+    text_width = menu_text_width(font, scale, title);
+    x = panel.x + (panel.width - text_width) / 2;
+    ui_draw_label(framebuffer, font, x, y, scale, MENU_TEXT_COLOR, title);
 }
 
 static void menu_draw_centered_label(
@@ -164,10 +245,164 @@ static void menu_draw_centered_label(
         const char* label
 )
 {
-    int text_width = menu_text_width(font, scale, label);
-    int x = panel.x + (panel.width - text_width) / 2;
+    int max_width = panel.width - 16;
+    int text_width;
+    int x;
 
+    while (scale > 1 && menu_text_width(font, scale, label) > max_width)
+    {
+        scale -= 1;
+    }
+
+    text_width = menu_text_width(font, scale, label);
+    x = panel.x + (panel.width - text_width) / 2;
     ui_draw_label(framebuffer, font, x, y, scale, MENU_TEXT_COLOR, label);
+}
+
+static void menu_draw_rect_outline(Framebuffer* framebuffer, UiRect rect, int thickness, uint32_t color)
+{
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, thickness, color);
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y + rect.height - thickness, rect.width, thickness, color);
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, thickness, rect.height, color);
+    renderer_draw_color_rect(framebuffer, rect.x + rect.width - thickness, rect.y, thickness, rect.height, color);
+}
+
+static void menu_draw_ukrainian_flag(Framebuffer* framebuffer, UiRect rect)
+{
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height / 2, 0x0057b8ff);
+    renderer_draw_color_rect(
+            framebuffer,
+            rect.x,
+            rect.y + rect.height / 2,
+            rect.width,
+            rect.height - rect.height / 2,
+            0xffd700ff
+    );
+}
+
+static void menu_draw_british_flag(Framebuffer* framebuffer, UiRect rect)
+{
+    int cross_w = rect.width / 5;
+    int cross_h = rect.height / 5;
+    int diagonal = rect.height / 6;
+
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, 0x012169ff);
+
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, diagonal, diagonal, 0xffffffff);
+    renderer_draw_color_rect(framebuffer, rect.x + rect.width - diagonal, rect.y, diagonal, diagonal, 0xffffffff);
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y + rect.height - diagonal, diagonal, diagonal, 0xffffffff);
+    renderer_draw_color_rect(
+            framebuffer,
+            rect.x + rect.width - diagonal,
+            rect.y + rect.height - diagonal,
+            diagonal,
+            diagonal,
+            0xffffffff
+    );
+
+    renderer_draw_color_rect(
+            framebuffer,
+            rect.x + (rect.width - cross_w) / 2,
+            rect.y,
+            cross_w,
+            rect.height,
+            0xffffffff
+    );
+    renderer_draw_color_rect(
+            framebuffer,
+            rect.x,
+            rect.y + (rect.height - cross_h) / 2,
+            rect.width,
+            cross_h,
+            0xffffffff
+    );
+    renderer_draw_color_rect(
+            framebuffer,
+            rect.x + (rect.width - cross_w / 2) / 2,
+            rect.y,
+            cross_w / 2,
+            rect.height,
+            0xc8102eff
+    );
+    renderer_draw_color_rect(
+            framebuffer,
+            rect.x,
+            rect.y + (rect.height - cross_h / 2) / 2,
+            rect.width,
+            cross_h / 2,
+            0xc8102eff
+    );
+}
+
+static void menu_draw_language_flag(
+        Framebuffer* framebuffer,
+        UiRect rect,
+        GameLocale locale,
+        int selected
+)
+{
+    UiRect flag = rect;
+    int inset = 12;
+
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, 0x111827ff);
+    menu_draw_rect_outline(
+            framebuffer,
+            rect,
+            selected ? 5 : 3,
+            selected ? MENU_FLAG_SELECTED_COLOR : MENU_FLAG_BORDER_COLOR
+    );
+
+    flag.x += inset;
+    flag.y += inset;
+    flag.width -= inset * 2;
+    flag.height -= inset * 2;
+
+    if (locale == GAME_LOCALE_UKRAINIAN)
+    {
+        menu_draw_ukrainian_flag(framebuffer, flag);
+    }
+    else
+    {
+        menu_draw_british_flag(framebuffer, flag);
+    }
+
+    menu_draw_rect_outline(framebuffer, flag, 2, 0x00000088);
+}
+
+static void menu_draw_arrow_button(Framebuffer* framebuffer, UiRect rect, int direction)
+{
+    int arrow_width = rect.width / 2;
+    int arrow_height = rect.height / 2;
+    int center_x = rect.x + rect.width / 2;
+    int center_y = rect.y + rect.height / 2;
+    int half_height = arrow_height / 2;
+    int row;
+
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, 0x111827ff);
+    menu_draw_rect_outline(framebuffer, rect, 3, 0x81b29aff);
+
+    if (arrow_width < 10 || arrow_height < 10)
+    {
+        return;
+    }
+
+    for (row = -half_height; row <= half_height; ++row)
+    {
+        int distance = row < 0 ? -row : row;
+        int span = (arrow_width * (half_height - distance + 1)) / (half_height + 1);
+        int x = direction < 0
+                ? center_x - arrow_width / 2
+                : center_x + arrow_width / 2 - span;
+
+        renderer_draw_color_rect(
+                framebuffer,
+                x,
+                center_y + row,
+                span,
+                2,
+                0xf4f1deff
+        );
+    }
 }
 
 static void menu_render_game_over(
@@ -180,15 +415,207 @@ static void menu_render_game_over(
     char score_text[32];
     char time_text[32];
 
-    snprintf(score_text, sizeof(score_text), "SCORE %d", game->score);
-    snprintf(time_text, sizeof(time_text), "TIME %dS", game->runTimeMs / 1000);
+    snprintf(score_text, sizeof(score_text), "%s %d", menu_text(game, LOCALIZED_TEXT_SCORE), game->score);
+    snprintf(time_text, sizeof(time_text), "%s %dS", menu_text(game, LOCALIZED_TEXT_TIME), game->runTimeMs / 1000);
 
     renderer_draw_color_rect(framebuffer, 0, 0, framebuffer->width, framebuffer->height, MENU_DIM_COLOR);
     ui_draw_panel(framebuffer, layout.panel);
-    menu_draw_title(framebuffer, font, layout.panel, "GAME OVER");
+    menu_draw_title(framebuffer, font, layout.panel, menu_text(game, LOCALIZED_TEXT_GAME_OVER));
     menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 170, 2, score_text);
     menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 240, 2, time_text);
-    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 350, 2, "TAP TO RETRY");
+    ui_draw_button(framebuffer, font, layout.cats_button, menu_text(game, LOCALIZED_TEXT_CHANGE_CAT));
+    ui_draw_button(framebuffer, font, layout.back_button, menu_text(game, LOCALIZED_TEXT_RETRY));
+}
+
+static void menu_cat_requirement_text(
+        const CatProfile* profile,
+        const ProgressionState* progress,
+        GameLocale locale,
+        char* text,
+        int text_size
+)
+{
+    int written = 0;
+
+    if (text == 0 || text_size <= 0)
+    {
+        return;
+    }
+
+    if (profile == 0)
+    {
+        text[0] = 0;
+        return;
+    }
+
+    text[0] = 0;
+    if (profile->required_best_score > 0)
+    {
+        written += snprintf(
+                text + written,
+                (size_t)(text_size - written),
+                "%s %d/%d",
+                localization_text(locale, LOCALIZED_TEXT_BEST),
+                progress != 0 ? progress->best_score : 0,
+                profile->required_best_score
+        );
+    }
+
+    if (profile->required_total_score > 0 && written < text_size)
+    {
+        written += snprintf(
+                text + written,
+                (size_t)(text_size - written),
+                "%s%s %d/%d",
+                written > 0 ? " " : "",
+                localization_text(locale, LOCALIZED_TEXT_TOTAL),
+                progress != 0 ? progress->total_score : 0,
+                profile->required_total_score
+        );
+    }
+
+    if (profile->required_runs > 0 && written < text_size)
+    {
+        snprintf(
+                text + written,
+                (size_t)(text_size - written),
+                "%s%s %d/%d",
+                written > 0 ? " " : "",
+                localization_text(locale, LOCALIZED_TEXT_RUNS),
+                progress != 0 ? progress->total_runs : 0,
+                profile->required_runs
+        );
+    }
+}
+
+static void menu_render_cat_unlocked(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        const GameState* game
+)
+{
+    MenuLayout layout = menu_cat_layout_get(game);
+    const CatProfile* profile = cat_profile_get(game->unlockedCatIndex);
+    const GeneratedSprite* sprite = generated_sprite_get_by_id(profile->sprite_id);
+
+    renderer_draw_color_rect(framebuffer, 0, 0, framebuffer->width, framebuffer->height, MENU_DIM_COLOR);
+    ui_draw_panel(framebuffer, layout.panel);
+    menu_draw_title(framebuffer, font, layout.panel, menu_text(game, LOCALIZED_TEXT_NEW_CAT));
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 104, 2, menu_text(game, LOCALIZED_TEXT_UNLOCKED));
+
+    if (sprite != 0)
+    {
+        renderer_draw_generated_sprite_fit(
+                framebuffer,
+                sprite,
+                layout.preview.x,
+                layout.preview.y,
+                layout.preview.width,
+                layout.preview.height,
+                SPRITE_FIT_CONTAIN
+        );
+    }
+    else
+    {
+        renderer_draw_color_rect(
+                framebuffer,
+                layout.preview.x,
+                layout.preview.y,
+                layout.preview.width,
+                layout.preview.height,
+                profile->config.visual.color
+        );
+    }
+
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 390, 3, profile->name);
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 468, 2, menu_text(game, LOCALIZED_TEXT_READY_TO_PLAY));
+    ui_draw_button(framebuffer, font, layout.start_button, menu_text(game, LOCALIZED_TEXT_CONTINUE));
+}
+
+static void menu_render_cat_select(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        const GameState* game
+)
+{
+    MenuLayout layout = menu_cat_layout_get(game);
+    const CatProfile* profile = cat_profile_get(game->progress.selected_cat_index);
+    int unlocked = cat_profile_is_unlocked(profile, &game->progress);
+    const GeneratedSprite* sprite = generated_sprite_get_by_id(profile->sprite_id);
+    char count_text[24];
+    char requirement_text[128];
+
+    renderer_draw_color_rect(framebuffer, 0, 0, framebuffer->width, framebuffer->height, MENU_DIM_COLOR);
+    ui_draw_panel(framebuffer, layout.panel);
+    menu_draw_title(framebuffer, font, layout.panel, menu_text(game, LOCALIZED_TEXT_CHOOSE_CAT));
+
+    snprintf(
+            count_text,
+            sizeof(count_text),
+            "%d/%d",
+            game->progress.selected_cat_index + 1,
+            cat_profile_count()
+    );
+
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 104, 2, count_text);
+
+    if (sprite != 0)
+    {
+        renderer_draw_generated_sprite_fit(
+                framebuffer,
+                sprite,
+                layout.preview.x,
+                layout.preview.y,
+                layout.preview.width,
+                layout.preview.height,
+                SPRITE_FIT_CONTAIN
+        );
+    }
+    else
+    {
+        renderer_draw_color_rect(
+                framebuffer,
+                layout.preview.x,
+                layout.preview.y,
+                layout.preview.width,
+                layout.preview.height,
+                profile->config.visual.color
+        );
+    }
+
+    if (!unlocked)
+    {
+        renderer_draw_color_rect(
+                framebuffer,
+                layout.preview.x,
+                layout.preview.y,
+                layout.preview.width,
+                layout.preview.height,
+                MENU_LOCK_COLOR
+        );
+        menu_draw_centered_label(
+                framebuffer,
+                font,
+                layout.preview,
+                layout.preview.y + layout.preview.height / 2 - 18,
+                3,
+                menu_text(game, LOCALIZED_TEXT_LOCKED)
+        );
+    }
+
+    menu_draw_arrow_button(framebuffer, layout.prev_button, -1);
+    menu_draw_arrow_button(framebuffer, layout.next_button, 1);
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 390, 3, profile->name);
+
+    if (unlocked)
+    {
+        ui_draw_button(framebuffer, font, layout.start_button, menu_text(game, LOCALIZED_TEXT_START));
+    }
+    else
+    {
+        menu_cat_requirement_text(profile, &game->progress, menu_locale(game), requirement_text, sizeof(requirement_text));
+        menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 462, 2, requirement_text);
+    }
 }
 
 static void menu_draw_pause_button(
@@ -266,9 +693,21 @@ void menu_render(Framebuffer* framebuffer, const GameState* game)
         return;
     }
 
+    if (game->uiState == GAME_UI_CAT_UNLOCKED)
+    {
+        menu_render_cat_unlocked(framebuffer, resources->font, game);
+        return;
+    }
+
     if (game->gameOver)
     {
         menu_render_game_over(framebuffer, resources->font, game);
+        return;
+    }
+
+    if (game->uiState == GAME_UI_CAT_SELECT)
+    {
+        menu_render_cat_select(framebuffer, resources->font, game);
         return;
     }
 
@@ -284,32 +723,61 @@ void menu_render(Framebuffer* framebuffer, const GameState* game)
     {
         layout = menu_layout_get(game, MENU_PAUSE_PANEL_HEIGHT);
         ui_draw_panel(framebuffer, layout.panel);
-        menu_draw_title(framebuffer, resources->font, layout.panel, "PAUSED");
-        ui_draw_button(framebuffer, resources->font, layout.resume_button, "RESUME");
-        ui_draw_button(framebuffer, resources->font, layout.settings_button, "SETTINGS");
+        menu_draw_title(framebuffer, resources->font, layout.panel, menu_text(game, LOCALIZED_TEXT_PAUSED));
+        ui_draw_button(framebuffer, resources->font, layout.resume_button, menu_text(game, LOCALIZED_TEXT_RESUME));
+        ui_draw_button(framebuffer, resources->font, layout.settings_button, menu_text(game, LOCALIZED_TEXT_SETTINGS));
+        ui_draw_button_colored(
+                framebuffer,
+                resources->font,
+                layout.exit_button,
+                menu_text(game, LOCALIZED_TEXT_EXIT),
+                MENU_EXIT_BUTTON_COLOR,
+                MENU_EXIT_BUTTON_BORDER_COLOR
+        );
         return;
     }
 
     if (game->uiState == GAME_UI_SETTINGS)
     {
         layout = menu_layout_get(game, MENU_SETTINGS_PANEL_HEIGHT);
+
         ui_draw_panel(framebuffer, layout.panel);
-        menu_draw_title(framebuffer, resources->font, layout.panel, "SETTINGS");
+        menu_draw_title(framebuffer, resources->font, layout.panel, menu_text(game, LOCALIZED_TEXT_SETTINGS));
         ui_draw_slider(
                 framebuffer,
                 resources->font,
                 layout.music_slider,
-                "MUSIC",
+                menu_text(game, LOCALIZED_TEXT_MUSIC),
                 game->settings.music_volume
         );
         ui_draw_slider(
                 framebuffer,
                 resources->font,
                 layout.sfx_slider,
-                "SFX",
+                menu_text(game, LOCALIZED_TEXT_SFX),
                 game->settings.sfx_volume
         );
-        ui_draw_button(framebuffer, resources->font, layout.back_button, "BACK");
+        menu_draw_centered_label(
+                framebuffer,
+                resources->font,
+                layout.language_label,
+                layout.language_label.y,
+                2,
+                menu_text(game, LOCALIZED_TEXT_LANGUAGE)
+        );
+        menu_draw_language_flag(
+                framebuffer,
+                layout.language_en_button,
+                GAME_LOCALE_ENGLISH,
+                menu_locale(game) == GAME_LOCALE_ENGLISH
+        );
+        menu_draw_language_flag(
+                framebuffer,
+                layout.language_uk_button,
+                GAME_LOCALE_UKRAINIAN,
+                menu_locale(game) == GAME_LOCALE_UKRAINIAN
+        );
+        ui_draw_button(framebuffer, resources->font, layout.back_button, menu_text(game, LOCALIZED_TEXT_BACK));
     }
 }
 
@@ -322,11 +790,36 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         return 0;
     }
 
+    if (game->uiState == GAME_UI_CAT_UNLOCKED)
+    {
+        if (action_type == INPUT_TOUCH_DOWN)
+        {
+            layout = menu_cat_layout_get(game);
+            if (ui_rect_contains(&layout.start_button, x, y))
+            {
+                game_dismiss_cat_unlocked(game);
+                return 1;
+            }
+        }
+
+        return 1;
+    }
+
     if (game->gameOver)
     {
         if (action_type == INPUT_TOUCH_DOWN)
         {
-            game_try_restart_after_game_over(game);
+            layout = menu_layout_get(game, MENU_GAME_OVER_PANEL_HEIGHT);
+            if (ui_rect_contains(&layout.cats_button, x, y))
+            {
+                game_show_cat_select(game);
+                return 1;
+            }
+            if (ui_rect_contains(&layout.back_button, x, y))
+            {
+                game_try_restart_after_game_over(game);
+                return 1;
+            }
             return 1;
         }
 
@@ -350,6 +843,37 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         }
 
         return 0;
+    }
+
+    if (game->uiState == GAME_UI_CAT_SELECT)
+    {
+        if (action_type == INPUT_TOUCH_DOWN)
+        {
+            layout = menu_cat_layout_get(game);
+            if (ui_rect_contains(&layout.prev_button, x, y))
+            {
+                int count = cat_profile_count();
+                game->progress.selected_cat_index =
+                        (game->progress.selected_cat_index + count - 1) % count;
+                game->progressDirty = 1;
+                return 1;
+            }
+            if (ui_rect_contains(&layout.next_button, x, y))
+            {
+                int count = cat_profile_count();
+                game->progress.selected_cat_index =
+                        (game->progress.selected_cat_index + 1) % count;
+                game->progressDirty = 1;
+                return 1;
+            }
+            if (ui_rect_contains(&layout.start_button, x, y))
+            {
+                game_start_selected_cat(game);
+                return 1;
+            }
+        }
+
+        return 1;
     }
 
     if (action_type == INPUT_TOUCH_UP)
@@ -377,6 +901,11 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
             menu_set_state(game, GAME_UI_SETTINGS);
             return 1;
         }
+        if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&layout.exit_button, x, y))
+        {
+            game->exitRequested = 1;
+            return 1;
+        }
 
         return 1;
     }
@@ -387,6 +916,18 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&layout.back_button, x, y))
         {
             menu_pause(game);
+            return 1;
+        }
+
+        if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&layout.language_en_button, x, y))
+        {
+            game_settings_set_locale(&game->settings, GAME_LOCALE_ENGLISH);
+            return 1;
+        }
+
+        if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&layout.language_uk_button, x, y))
+        {
+            game_settings_set_locale(&game->settings, GAME_LOCALE_UKRAINIAN);
             return 1;
         }
 

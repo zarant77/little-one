@@ -37,20 +37,87 @@ const PackedFontGlyph* font_glyph_find(const PackedFont* font, uint32_t codepoin
     return 0;
 }
 
-static uint32_t font_read_ascii_codepoint(const char** text) {
-    unsigned char value;
+static uint32_t font_read_utf8_codepoint(const char** text) {
+    const unsigned char* cursor;
+    unsigned char first;
+    uint32_t codepoint;
 
     if (text == 0 || *text == 0 || **text == '\0') {
         return 0;
     }
 
-    value = (unsigned char)**text;
-    *text += 1;
-    if (value < 0x80u) {
-        return (uint32_t)value;
+    cursor = (const unsigned char*)*text;
+    first = cursor[0];
+    if (first < 0x80u) {
+        *text += 1;
+        return (uint32_t)first;
     }
 
-    return 0;
+    if ((first & 0xe0u) == 0xc0u
+            && (cursor[1] & 0xc0u) == 0x80u) {
+        codepoint = ((uint32_t)(first & 0x1fu) << 6)
+                | (uint32_t)(cursor[1] & 0x3fu);
+        *text += 2;
+        return codepoint;
+    }
+
+    if ((first & 0xf0u) == 0xe0u
+            && (cursor[1] & 0xc0u) == 0x80u
+            && (cursor[2] & 0xc0u) == 0x80u) {
+        codepoint = ((uint32_t)(first & 0x0fu) << 12)
+                | ((uint32_t)(cursor[1] & 0x3fu) << 6)
+                | (uint32_t)(cursor[2] & 0x3fu);
+        *text += 3;
+        return codepoint;
+    }
+
+    if ((first & 0xf8u) == 0xf0u
+            && (cursor[1] & 0xc0u) == 0x80u
+            && (cursor[2] & 0xc0u) == 0x80u
+            && (cursor[3] & 0xc0u) == 0x80u) {
+        codepoint = ((uint32_t)(first & 0x07u) << 18)
+                | ((uint32_t)(cursor[1] & 0x3fu) << 12)
+                | ((uint32_t)(cursor[2] & 0x3fu) << 6)
+                | (uint32_t)(cursor[3] & 0x3fu);
+        *text += 4;
+        return codepoint;
+    }
+
+    *text += 1;
+    return '?';
+}
+
+int font_measure_text(const PackedFont* font, int scale, const char* text) {
+    int width = 0;
+
+    if (font == 0 || scale <= 0 || text == 0) {
+        return 0;
+    }
+
+    while (*text != '\0') {
+        uint32_t codepoint = font_read_utf8_codepoint(&text);
+        const PackedFontGlyph* glyph;
+
+        if (codepoint == 0) {
+            continue;
+        }
+
+        if (codepoint == ' ') {
+            width += (int)font->default_advance * scale;
+            continue;
+        }
+
+        glyph = font_glyph_find(font, codepoint);
+        if (glyph == 0) {
+            glyph = font_glyph_find(font, '?');
+        }
+
+        if (glyph != 0) {
+            width += (int)glyph->advance * scale;
+        }
+    }
+
+    return width;
 }
 
 static void font_draw_scaled_point(
@@ -149,7 +216,7 @@ void font_draw_text(
     }
 
     while (*text != '\0') {
-        uint32_t codepoint = font_read_ascii_codepoint(&text);
+        uint32_t codepoint = font_read_utf8_codepoint(&text);
         const PackedFontGlyph* glyph;
 
         if (codepoint == 0) {

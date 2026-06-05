@@ -13,13 +13,34 @@ typedef struct {
     int height;
 } UiRect;
 
+typedef struct {
+    int left;
+    int top;
+    int right;
+    int bottom;
+} UiNineSlice;
+
 int ui_rect_contains(const UiRect* rect, int x, int y);
 void ui_draw_panel(Framebuffer* framebuffer, UiRect rect);
+void ui_draw_nine_slice_panel(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        UiRect rect,
+        UiNineSlice slice
+);
 void ui_draw_button(
         Framebuffer* framebuffer,
         const PackedFont* font,
         UiRect rect,
         const char* label
+);
+void ui_draw_button_colored(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        UiRect rect,
+        const char* label,
+        uint32_t fill_color,
+        uint32_t border_color
 );
 void ui_draw_label(
         Framebuffer* framebuffer,

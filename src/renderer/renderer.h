@@ -48,6 +48,18 @@ void renderer_draw_generated_sprite_scaled(
         int dst_width,
         int dst_height
 );
+void renderer_draw_generated_sprite_region_scaled(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int src_x,
+        int src_y,
+        int src_width,
+        int src_height,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height
+);
 
 void renderer_draw_color_rect(
         Framebuffer* framebuffer,

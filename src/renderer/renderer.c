@@ -737,6 +737,88 @@ void renderer_draw_generated_sprite_fit(
     );
 }
 
+void renderer_draw_generated_sprite_region_scaled(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int src_x,
+        int src_y,
+        int src_width,
+        int src_height,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height
+) {
+    int clip_left;
+    int clip_top;
+    int clip_right;
+    int clip_bottom;
+
+    if (framebuffer == 0
+            || framebuffer->bits == 0
+            || sprite == 0
+            || sprite->pixels == 0
+            || sprite->width <= 0
+            || sprite->height <= 0
+            || src_width <= 0
+            || src_height <= 0
+            || dst_width <= 0
+            || dst_height <= 0) {
+        return;
+    }
+
+    if (src_x < 0) {
+        src_width += src_x;
+        src_x = 0;
+    }
+    if (src_y < 0) {
+        src_height += src_y;
+        src_y = 0;
+    }
+    if (src_x + src_width > sprite->width) {
+        src_width = sprite->width - src_x;
+    }
+    if (src_y + src_height > sprite->height) {
+        src_height = sprite->height - src_y;
+    }
+    if (src_width <= 0 || src_height <= 0) {
+        return;
+    }
+
+    clip_left = dst_x < 0 ? 0 : dst_x;
+    clip_top = dst_y < 0 ? 0 : dst_y;
+    clip_right = dst_x + dst_width;
+    clip_bottom = dst_y + dst_height;
+    if (clip_right > framebuffer->width) {
+        clip_right = framebuffer->width;
+    }
+    if (clip_bottom > framebuffer->height) {
+        clip_bottom = framebuffer->height;
+    }
+    if (clip_left >= clip_right || clip_top >= clip_bottom) {
+        return;
+    }
+
+    for (int target_y = clip_top; target_y < clip_bottom; ++target_y) {
+        int dst_local_y = target_y - dst_y;
+        int source_y = src_y + (int)((int64_t)dst_local_y * (int64_t)src_height / (int64_t)dst_height);
+        const uint32_t* source_row = sprite->pixels + (size_t)source_y * (size_t)sprite->width;
+
+        for (int target_x = clip_left; target_x < clip_right; ++target_x) {
+            int dst_local_x = target_x - dst_x;
+            int source_x = src_x + (int)((int64_t)dst_local_x * (int64_t)src_width / (int64_t)dst_width);
+
+            renderer_write_sprite_pixel(
+                    framebuffer,
+                    target_x,
+                    target_y,
+                    source_row[source_x],
+                    255
+            );
+        }
+    }
+}
+
 typedef struct {
     int x;
     int y;
@@ -1656,8 +1738,8 @@ static void renderer_draw_player(
         int32_t shake_x,
         int32_t shake_y
 ) {
-    const EntityVisualConfig* visual = game_player_visual_config();
-    const GeneratedSprite* sprite = generated_sprite_get(SPRITE_PLAYER);
+    const EntityVisualConfig* visual = &game_player_config(game)->visual;
+    const GeneratedSprite* sprite = generated_sprite_get(visual->sprite_id);
     AnimationImpact impact = entity_animation_get_impact(&game->playerAnimation);
 
     if (sprite == 0) {
@@ -1880,7 +1962,7 @@ static void renderer_draw_player_wireframe(
         int32_t shake_x,
         int32_t shake_y
 ) {
-    const EntityVisualConfig* visual = game_player_visual_config();
+    const EntityVisualConfig* visual = &game_player_config(game)->visual;
 
     renderer_draw_size_wireframe_rect(
             buffer,
@@ -1895,7 +1977,7 @@ static void renderer_draw_player_wireframe(
             (int)game->playerY + shake_y,
             visual->width,
             visual->height,
-            game_player_hurt_zone_config()
+            &game_player_config(game)->hurt_zone
     );
 }
 #endif

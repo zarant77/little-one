@@ -8,6 +8,7 @@
 
 const PackedFont* font_registry_find(const char* id);
 const PackedFontGlyph* font_glyph_find(const PackedFont* font, uint32_t codepoint);
+int font_measure_text(const PackedFont* font, int scale, const char* text);
 
 void font_draw_text(
         Framebuffer* framebuffer,

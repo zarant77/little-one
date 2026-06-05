@@ -40,7 +40,7 @@
       "w": 210,
       "h": 40,
       "rotation": 0,
-      "color": "f1f7ffff"
+      "color": "f9fcffff"
     },
     {
       "kind": "circle",
@@ -112,7 +112,7 @@
       "w": 260,
       "h": 42,
       "rotation": 0,
-      "color": "f1f7ffff"
+      "color": "f9fcffff"
     },
     {
       "kind": "circle",

@@ -31,7 +31,7 @@
       "w": 92,
       "h": 84,
       "rotation": 0,
-      "color": "f7fbffff"
+      "color": "f9fcffff"
     },
     {
       "kind": "triangle",
@@ -40,7 +40,7 @@
       "w": 56,
       "h": 52,
       "rotation": 0,
-      "color": "dbeaf4ff"
+      "color": "e4eff8ff"
     },
     {
       "kind": "triangle",
@@ -76,7 +76,7 @@
       "w": 118,
       "h": 102,
       "rotation": 0,
-      "color": "fbfdffff"
+      "color": "f9fcffff"
     },
     {
       "kind": "triangle",
@@ -85,7 +85,7 @@
       "w": 70,
       "h": 60,
       "rotation": 0,
-      "color": "e2eef7ff"
+      "color": "e4eff8ff"
     },
     {
       "kind": "triangle",
@@ -94,7 +94,7 @@
       "w": 74,
       "h": 64,
       "rotation": 0,
-      "color": "d4e5f1ff"
+      "color": "cfe1edff"
     },
     {
       "kind": "triangle",
@@ -139,7 +139,7 @@
       "w": 86,
       "h": 60,
       "rotation": 0,
-      "color": "d5e6f2ff"
+      "color": "cfe1edff"
     },
     {
       "kind": "triangle",
@@ -175,7 +175,7 @@
       "w": 58,
       "h": 54,
       "rotation": 0,
-      "color": "deebf5ff"
+      "color": "e4eff8ff"
     },
     {
       "kind": "triangle",
@@ -184,7 +184,7 @@
       "w": 54,
       "h": 50,
       "rotation": 0,
-      "color": "d0e2eeff"
+      "color": "cfe1edff"
     },
     {
       "kind": "rect",

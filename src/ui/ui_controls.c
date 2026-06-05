@@ -15,6 +15,11 @@
 #define UI_BUTTON_BORDER_SIZE 3
 #define UI_SLIDER_TRACK_HEIGHT 14
 #define UI_SLIDER_HANDLE_WIDTH 30
+#define UI_PANEL_SKIN_ID "panel_bg"
+#define UI_PANEL_SLICE_LEFT 24
+#define UI_PANEL_SLICE_TOP 24
+#define UI_PANEL_SLICE_RIGHT 24
+#define UI_PANEL_SLICE_BOTTOM 24
 
 static int ui_clamp_int(int value, int min_value, int max_value)
 {
@@ -33,19 +38,12 @@ static int ui_clamp_int(int value, int min_value, int max_value)
 
 static int ui_text_width(const PackedFont* font, int scale, const char* text)
 {
-    int width = 0;
+    return font_measure_text(font, scale, text);
+}
 
-    if (font == 0 || scale <= 0 || text == 0)
-    {
-        return 0;
-    }
-
-    for (int index = 0; text[index] != 0; ++index)
-    {
-        width += (int)font->default_advance * scale;
-    }
-
-    return width;
+static int ui_min_int(int a, int b)
+{
+    return a < b ? a : b;
 }
 
 static void ui_draw_rect_outline(Framebuffer* framebuffer, UiRect rect, int thickness, uint32_t color)
@@ -85,8 +83,199 @@ int ui_rect_contains(const UiRect* rect, int x, int y)
 
 void ui_draw_panel(Framebuffer* framebuffer, UiRect rect)
 {
+    const GeneratedSprite* sprite = generated_sprite_get_by_id(UI_PANEL_SKIN_ID);
+    UiNineSlice slice = {
+        .left = UI_PANEL_SLICE_LEFT,
+        .top = UI_PANEL_SLICE_TOP,
+        .right = UI_PANEL_SLICE_RIGHT,
+        .bottom = UI_PANEL_SLICE_BOTTOM,
+    };
+
+    if (sprite != 0)
+    {
+        ui_draw_nine_slice_panel(framebuffer, sprite, rect, slice);
+        return;
+    }
+
     renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, UI_COLOR_PANEL);
     ui_draw_rect_outline(framebuffer, rect, UI_PANEL_BORDER_SIZE, UI_COLOR_PANEL_BORDER);
+}
+
+void ui_draw_nine_slice_panel(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        UiRect rect,
+        UiNineSlice slice
+)
+{
+    int left;
+    int top;
+    int right;
+    int bottom;
+    int src_left;
+    int src_top;
+    int src_right;
+    int src_bottom;
+    int center_src_w;
+    int center_src_h;
+    int center_dst_w;
+    int center_dst_h;
+
+    if (framebuffer == 0
+            || sprite == 0
+            || sprite->pixels == 0
+            || sprite->width <= 0
+            || sprite->height <= 0
+            || rect.width <= 0
+            || rect.height <= 0)
+    {
+        return;
+    }
+
+    src_left = ui_clamp_int(slice.left, 0, sprite->width);
+    src_top = ui_clamp_int(slice.top, 0, sprite->height);
+    src_right = ui_clamp_int(slice.right, 0, sprite->width - src_left);
+    src_bottom = ui_clamp_int(slice.bottom, 0, sprite->height - src_top);
+
+    left = ui_min_int(src_left, rect.width / 2);
+    right = ui_min_int(src_right, rect.width - left);
+    top = ui_min_int(src_top, rect.height / 2);
+    bottom = ui_min_int(src_bottom, rect.height - top);
+
+    center_src_w = sprite->width - src_left - src_right;
+    center_src_h = sprite->height - src_top - src_bottom;
+    if (center_src_w < 1)
+    {
+        center_src_w = 1;
+    }
+    if (center_src_h < 1)
+    {
+        center_src_h = 1;
+    }
+
+    center_dst_w = rect.width - left - right;
+    center_dst_h = rect.height - top - bottom;
+
+    renderer_draw_generated_sprite_region_scaled(
+            framebuffer,
+            sprite,
+            0,
+            0,
+            src_left,
+            src_top,
+            rect.x,
+            rect.y,
+            left,
+            top
+    );
+    renderer_draw_generated_sprite_region_scaled(
+            framebuffer,
+            sprite,
+            sprite->width - src_right,
+            0,
+            src_right,
+            src_top,
+            rect.x + rect.width - right,
+            rect.y,
+            right,
+            top
+    );
+    renderer_draw_generated_sprite_region_scaled(
+            framebuffer,
+            sprite,
+            0,
+            sprite->height - src_bottom,
+            src_left,
+            src_bottom,
+            rect.x,
+            rect.y + rect.height - bottom,
+            left,
+            bottom
+    );
+    renderer_draw_generated_sprite_region_scaled(
+            framebuffer,
+            sprite,
+            sprite->width - src_right,
+            sprite->height - src_bottom,
+            src_right,
+            src_bottom,
+            rect.x + rect.width - right,
+            rect.y + rect.height - bottom,
+            right,
+            bottom
+    );
+
+    if (center_dst_w > 0)
+    {
+        renderer_draw_generated_sprite_region_scaled(
+                framebuffer,
+                sprite,
+                src_left,
+                0,
+                center_src_w,
+                src_top,
+                rect.x + left,
+                rect.y,
+                center_dst_w,
+                top
+        );
+        renderer_draw_generated_sprite_region_scaled(
+                framebuffer,
+                sprite,
+                src_left,
+                sprite->height - src_bottom,
+                center_src_w,
+                src_bottom,
+                rect.x + left,
+                rect.y + rect.height - bottom,
+                center_dst_w,
+                bottom
+        );
+    }
+
+    if (center_dst_h > 0)
+    {
+        renderer_draw_generated_sprite_region_scaled(
+                framebuffer,
+                sprite,
+                0,
+                src_top,
+                src_left,
+                center_src_h,
+                rect.x,
+                rect.y + top,
+                left,
+                center_dst_h
+        );
+        renderer_draw_generated_sprite_region_scaled(
+                framebuffer,
+                sprite,
+                sprite->width - src_right,
+                src_top,
+                src_right,
+                center_src_h,
+                rect.x + rect.width - right,
+                rect.y + top,
+                right,
+                center_dst_h
+        );
+    }
+
+    if (center_dst_w > 0 && center_dst_h > 0)
+    {
+        renderer_draw_generated_sprite_region_scaled(
+                framebuffer,
+                sprite,
+                src_left,
+                src_top,
+                center_src_w,
+                center_src_h,
+                rect.x + left,
+                rect.y + top,
+                center_dst_w,
+                center_dst_h
+        );
+    }
 }
 
 void ui_draw_label(
@@ -110,18 +299,43 @@ void ui_draw_button(
         const char* label
 )
 {
+    ui_draw_button_colored(
+            framebuffer,
+            font,
+            rect,
+            label,
+            UI_COLOR_BUTTON,
+            UI_COLOR_BUTTON_BORDER
+    );
+}
+
+void ui_draw_button_colored(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        UiRect rect,
+        const char* label,
+        uint32_t fill_color,
+        uint32_t border_color
+)
+{
     int scale = 2;
+    int max_text_width = rect.width - 16;
     int text_width;
     int text_height;
     int text_x;
     int text_y;
 
-    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, UI_COLOR_BUTTON);
-    ui_draw_rect_outline(framebuffer, rect, UI_BUTTON_BORDER_SIZE, UI_COLOR_BUTTON_BORDER);
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, fill_color);
+    ui_draw_rect_outline(framebuffer, rect, UI_BUTTON_BORDER_SIZE, border_color);
 
     if (font == 0 || label == 0)
     {
         return;
+    }
+
+    while (scale > 1 && ui_text_width(font, scale, label) > max_text_width)
+    {
+        scale -= 1;
     }
 
     text_width = ui_text_width(font, scale, label);

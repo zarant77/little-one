@@ -10,6 +10,7 @@
 #include "../config/player_config.h"
 #include "../feedback/game_feedback.h"
 #include "../sprites/animations/animation_evaluate.h"
+#include "cat_profile.h"
 #include "game_effects.h"
 #include "game_settings.h"
 
@@ -33,12 +34,36 @@ static void game_set_music(const char* music_id) {
     #endif
 }
 
-static float game_player_width(void) {
-    return (float)player_config_get()->visual.width;
+static const PlayerConfig* game_active_player_config(const GameState* game) {
+    if (game == 0 || !game->progressInitialized) {
+        return &cat_profile_default()->config;
+    }
+
+    return &cat_profile_get(game->progress.selected_cat_index)->config;
 }
 
-static float game_player_height(void) {
-    return (float)player_config_get()->visual.height;
+static const char* game_active_cat_music_id(const GameState* game) {
+    const CatProfile* profile;
+
+    if (game == 0 || !game->progressInitialized) {
+        profile = cat_profile_default();
+    } else {
+        profile = cat_profile_get(game->progress.selected_cat_index);
+    }
+
+    if (profile == 0 || profile->music_id == 0) {
+        return "main_theme";
+    }
+
+    return profile->music_id;
+}
+
+static float game_player_width(const GameState* game) {
+    return (float)game_active_player_config(game)->visual.width;
+}
+
+static float game_player_height(const GameState* game) {
+    return (float)game_active_player_config(game)->visual.height;
 }
 
 static float game_ground_y(const GameState* game) {
@@ -109,7 +134,7 @@ static void game_update_player_animation(GameState* game, int32_t elapsed_ms) {
 }
 
 static void game_clamp_player_x(GameState* game) {
-    float max_x = (float)game->screenWidth - game_player_width();
+    float max_x = (float)game->screenWidth - game_player_width(game);
 
     if (max_x < 0.0f) {
         max_x = 0.0f;
@@ -126,7 +151,7 @@ static void game_clamp_player_x(GameState* game) {
 
 static void game_clamp_player_to_ground(GameState* game) {
     float ground_y = game_ground_y(game);
-    float player_bottom = game->playerY + game_player_height();
+    float player_bottom = game->playerY + game_player_height(game);
     int was_grounded = game->playerGrounded;
     int was_smashing = game->playerSmashing;
 
@@ -138,7 +163,7 @@ static void game_clamp_player_to_ground(GameState* game) {
     }
 
     if (player_bottom >= ground_y) {
-        game->playerY = ground_y - game_player_height();
+        game->playerY = ground_y - game_player_height(game);
         if (game->playerY < 0.0f) {
             game->playerY = 0.0f;
         }
@@ -148,7 +173,7 @@ static void game_clamp_player_to_ground(GameState* game) {
         game->playerCanSmash = 0;
         if (!was_grounded) {
             if (was_smashing) {
-                int impact_x = (int)game->playerX + (int)game_player_width() / 2;
+                int impact_x = (int)game->playerX + (int)game_player_width(game) / 2;
                 int impact_y = (int)ground_y;
                 uint32_t effect_seed = game_random_state
                         ^ (uint32_t)impact_x
@@ -488,8 +513,8 @@ static float game_foreground_decoration_alpha(
     float min_alpha = FOREGROUND_FADE_MIN_ALPHA;
     float player_left = game->playerX;
     float player_top = game->playerY;
-    float player_right = player_left + game_player_width();
-    float player_bottom = player_top + game_player_height();
+    float player_right = player_left + game_player_width(game);
+    float player_bottom = player_top + game_player_height(game);
     float decoration_left = decoration->x;
     float decoration_top = decoration->y;
     float decoration_right = decoration_left + (float)decoration->width;
@@ -580,9 +605,9 @@ static int game_player_overlaps_entity_hurt_zone(const GameState* game, const En
     return hurt_zones_overlap(
             (int32_t)game->playerX,
             (int32_t)game->playerY,
-            player_config_get()->visual.width,
-            player_config_get()->visual.height,
-            &player_config_get()->hurt_zone,
+            game_active_player_config(game)->visual.width,
+            game_active_player_config(game)->visual.height,
+            &game_active_player_config(game)->hurt_zone,
             (int32_t)entity->x,
             (int32_t)entity->y,
             entity_get_width(entity),
@@ -599,7 +624,7 @@ static int game_player_boundary_overlaps_enemy_hurt_zone(const GameState* game, 
     return rect_overlaps_hurt_zone(
             (int32_t)game->playerX,
             (int32_t)game->playerY,
-            &player_config_get()->boundary,
+            &game_active_player_config(game)->boundary,
             (int32_t)enemy->x,
             (int32_t)enemy->y,
             entity_get_width(enemy),
@@ -648,9 +673,14 @@ static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
 }
 
 static void game_enter_game_over(GameState* game) {
+    ProgressionState progress_before;
+    int unlocked_cat_index;
+
     if (game->gameOver) {
         return;
     }
+
+    progress_before = game->progress;
 
     game->gameOver = 1;
     game->gameOverElapsedMs = 0;
@@ -664,9 +694,9 @@ static void game_enter_game_over(GameState* game) {
             entity_animation_player_config(),
             ENTITY_ANIM_DEATH
     );
-    if (player_config_get()->visual.deathAnimationId != 0) {
+    if (game_active_player_config(game)->visual.deathAnimationId != 0) {
         const AnimationClip* death_clip =
-                animation_find_clip(player_config_get()->visual.deathAnimationId);
+                animation_find_clip(game_active_player_config(game)->visual.deathAnimationId);
 
         if (death_clip != 0) {
             game->playerAnimation.clip = death_clip;
@@ -674,8 +704,13 @@ static void game_enter_game_over(GameState* game) {
     }
     audio_play_sound("death");
     game_feedback_player_death(&game->screenShake);
-    if (game->score > game->bestScore) {
-        game->bestScore = game->score;
+    progression_apply_run(&game->progress, game->score);
+    game->bestScore = game->progress.best_score;
+    game->progressDirty = 1;
+    unlocked_cat_index = cat_profile_first_new_unlock(&progress_before, &game->progress);
+    if (unlocked_cat_index >= 0) {
+        game->unlockedCatIndex = unlocked_cat_index;
+        game->uiState = GAME_UI_CAT_UNLOCKED;
     }
     game_set_music("game_over");
 
@@ -732,6 +767,9 @@ void game_init(GameState* game) {
     int best_score;
     GameSettings settings;
     int settings_initialized;
+    ProgressionState progress;
+    int progress_initialized;
+    int progress_dirty;
 
     if (game == 0) {
         return;
@@ -740,6 +778,18 @@ void game_init(GameState* game) {
     best_score = game->bestScore;
     settings = game->settings;
     settings_initialized = game->settingsInitialized;
+    progress = game->progress;
+    progress_initialized = game->progressInitialized;
+    progress_dirty = game->progressDirty;
+    if (!progress_initialized) {
+        progression_init(&progress);
+        progress_initialized = 1;
+    }
+    progress.selected_cat_index = cat_profile_clamp_index(progress.selected_cat_index);
+    if (best_score > progress.best_score) {
+        progress.best_score = best_score;
+        progress_dirty = 1;
+    }
 
     game->playerX = 0.0f;
     game->playerY = 0.0f;
@@ -748,7 +798,7 @@ void game_init(GameState* game) {
     game->playerGrounded = 0;
     game->playerSmashing = 0;
     game->playerCanSmash = 0;
-    game->playerHp = player_config_get()->hp;
+    game->playerHp = cat_profile_get(progress.selected_cat_index)->config.hp;
     game->playerInvulnerableMs = 0;
     game->hitstopMs = 0;
     game->playerAnimation.slot = ENTITY_ANIM_IDLE;
@@ -773,20 +823,25 @@ void game_init(GameState* game) {
     game->gameOverElapsedMs = 0;
     game->gameOverInputArmed = 0;
     game->score = 0;
-    game->bestScore = best_score;
+    game->bestScore = progress.best_score;
     game->runTimeMs = 0;
     game->fps = 0;
     game->averageFrameMs = 0;
     game->activeEntityCount = 0;
+    game->exitRequested = 0;
     screen_shake_start(&game->screenShake, 0, 0, 1u);
     game_effects_init();
-    game->uiState = GAME_UI_PLAYING;
+    game->uiState = GAME_UI_CAT_SELECT;
     if (!settings_initialized) {
         game_settings_init(&settings);
         settings_initialized = 1;
     }
     game->settings = settings;
     game->settingsInitialized = settings_initialized;
+    game->progress = progress;
+    game->progressInitialized = progress_initialized;
+    game->progressDirty = progress_dirty;
+    game->unlockedCatIndex = -1;
     audio_set_music_volume(game->settings.music_volume);
     audio_set_sfx_volume(game->settings.sfx_volume);
     game_set_music("main_theme");
@@ -804,6 +859,8 @@ void game_restart_run(GameState* game) {
     screen_height = game->screenHeight;
     game_init(game);
     game_set_screen_size(game, (float)screen_width, (float)screen_height);
+    game->uiState = GAME_UI_PLAYING;
+    game_set_music(game_active_cat_music_id(game));
 
     #if LITTLE_ONE_DEBUG_GAME_STATE
     LOGI("Game run restarted");
@@ -820,6 +877,46 @@ int game_try_restart_after_game_over(GameState* game) {
 
     game_restart_run(game);
     return 1;
+}
+
+int game_start_selected_cat(GameState* game) {
+    if (game == 0) {
+        return 0;
+    }
+
+    if (!cat_profile_is_unlocked(
+            cat_profile_get(game->progress.selected_cat_index),
+            &game->progress)) {
+        return 0;
+    }
+
+    game_restart_run(game);
+    return 1;
+}
+
+void game_show_cat_select(GameState* game) {
+    if (game == 0) {
+        return;
+    }
+
+    game->uiState = GAME_UI_CAT_SELECT;
+    game->gameOver = 0;
+    game->gameOverElapsedMs = 0;
+    game->gameOverInputArmed = 0;
+}
+
+void game_dismiss_cat_unlocked(GameState* game) {
+    if (game == 0) {
+        return;
+    }
+
+    if (game->uiState == GAME_UI_CAT_UNLOCKED) {
+        game->uiState = GAME_UI_PLAYING;
+    }
+}
+
+const PlayerConfig* game_player_config(const GameState* game) {
+    return game_active_player_config(game);
 }
 
 const EntityVisualConfig* game_player_visual_config(void) {
@@ -849,7 +946,7 @@ void game_set_screen_size(GameState* game, float width, float height) {
     was_grounded = game->playerGrounded;
 
     if (old_screen_width > 0 && old_screen_height > 0) {
-        player_ground_offset = old_ground_y - (game->playerY + game_player_height());
+        player_ground_offset = old_ground_y - (game->playerY + game_player_height(game));
         if (was_grounded || player_ground_offset < 0.0f) {
             player_ground_offset = 0.0f;
         }
@@ -861,14 +958,14 @@ void game_set_screen_size(GameState* game, float width, float height) {
 
     if (old_screen_width <= 0 || old_screen_height <= 0) {
         game->playerX = 0.0f;
-        game->playerY = new_ground_y - game_player_height();
+        game->playerY = new_ground_y - game_player_height(game);
         game->playerVelocityX = 0.0f;
         game->playerVelocityY = 0.0f;
         game->playerGrounded = 1;
         game->playerSmashing = 0;
         game->playerCanSmash = 0;
     } else if (old_screen_width != game->screenWidth || old_screen_height != game->screenHeight) {
-        game->playerY = new_ground_y - game_player_height() - player_ground_offset;
+        game->playerY = new_ground_y - game_player_height(game) - player_ground_offset;
         game_shift_entities_y(game, new_ground_y - old_ground_y);
         game_shift_foreground_decorations_y(game, new_ground_y - old_ground_y);
         if (was_grounded) {
@@ -876,7 +973,7 @@ void game_set_screen_size(GameState* game, float width, float height) {
             game->playerGrounded = 1;
             game->playerSmashing = 0;
             game->playerCanSmash = 0;
-        } else if (game->playerY + game_player_height() >= new_ground_y) {
+        } else if (game->playerY + game_player_height(game) >= new_ground_y) {
             game->playerVelocityY = 0.0f;
         }
     }
@@ -951,16 +1048,16 @@ void game_update(GameState* game, const InputState* input, float dt) {
     game->playerVelocityX = 0.0f;
 
     if (input != 0 && input->left) {
-        game->playerVelocityX = -player_config_get()->moveSpeed;
+        game->playerVelocityX = -game_active_player_config(game)->moveSpeed;
     }
 
     if (input != 0 && input->right) {
-        game->playerVelocityX = player_config_get()->moveSpeed;
+        game->playerVelocityX = game_active_player_config(game)->moveSpeed;
     }
 
     if (input != 0 && input->actionPressed) {
         if (game->playerGrounded) {
-            game->playerVelocityY = player_config_get()->jumpVelocity;
+            game->playerVelocityY = game_active_player_config(game)->jumpVelocity;
             game->playerGrounded = 0;
             game->playerSmashing = 0;
             game->playerCanSmash = 1;
@@ -969,7 +1066,7 @@ void game_update(GameState* game, const InputState* input, float dt) {
             LOGI("Jump start");
             #endif
         } else if (game->playerCanSmash) {
-            game->playerVelocityY = player_config_get()->smashVelocity;
+            game->playerVelocityY = game_active_player_config(game)->smashVelocity;
             game->playerSmashing = 1;
             game->playerCanSmash = 0;
             audio_play_sound("smash");
