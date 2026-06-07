@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <android/log.h>
+#include <stdio.h>
 
 #include "../audio/audio.h"
 #include "../config.h"
@@ -24,6 +25,10 @@ static const float SPAWN_RIGHT_PADDING = 16.0f;
 static const int PLAYER_HIT_INVULNERABLE_MS = 900;
 static const int GAME_OVER_MIN_VISIBLE_MS = 1000;
 static const int SMASH_HITSTOP_MS = 70;
+static const int FLOATING_TEXT_LIFETIME_MS = 1300;
+static const float FLOATING_TEXT_RISE_SPEED = -125.0f;
+static const uint32_t FLOATING_TEXT_SCORE_COLOR = 0x64ff7dff;
+static const uint32_t FLOATING_TEXT_DAMAGE_COLOR = 0xff4f5cff;
 static unsigned int game_random_state = 12345;
 
 static void game_set_music(const char* music_id) {
@@ -56,6 +61,21 @@ static const char* game_active_cat_music_id(const GameState* game) {
     }
 
     return profile->music_id;
+}
+
+static void game_play_active_cat_music(const GameState* game) {
+    game_set_music(game_active_cat_music_id(game));
+}
+
+static void game_present_unlocked_cat(GameState* game) {
+    if (game == 0) {
+        return;
+    }
+
+    audio_stop_music();
+    audio_play_sound("cat_unlock");
+    game_play_active_cat_music(game);
+    game->catUnlockPresentationMs = 0;
 }
 
 static float game_player_width(const GameState* game) {
@@ -213,6 +233,97 @@ static void game_clear_foreground_decorations(GameState* game) {
         decoration->sprite = 0;
         decoration->width = 0;
         decoration->height = 0;
+    }
+}
+
+static void game_clear_floating_texts(GameState* game)
+{
+    for (int text_index = 0; text_index < MAX_FLOATING_TEXTS; ++text_index)
+    {
+        FloatingText* text = game->floatingTexts + text_index;
+
+        text->active = 0;
+        text->x = 0.0f;
+        text->y = 0.0f;
+        text->velocity_y = 0.0f;
+        text->age_ms = 0;
+        text->lifetime_ms = 0;
+        text->color = 0xffffffff;
+        text->text[0] = 0;
+    }
+}
+
+static void game_spawn_floating_text(
+        GameState* game,
+        float x,
+        float y,
+        uint32_t color,
+        const char* text_value)
+{
+    FloatingText* target = 0;
+
+    if (game == 0 || text_value == 0)
+    {
+        return;
+    }
+
+    for (int text_index = 0; text_index < MAX_FLOATING_TEXTS; ++text_index)
+    {
+        FloatingText* text = game->floatingTexts + text_index;
+
+        if (!text->active)
+        {
+            target = text;
+            break;
+        }
+
+        if (target == 0 || text->age_ms > target->age_ms)
+        {
+            target = text;
+        }
+    }
+
+    if (target == 0)
+    {
+        return;
+    }
+
+    target->active = 1;
+    target->x = x;
+    target->y = y;
+    target->velocity_y = FLOATING_TEXT_RISE_SPEED;
+    target->age_ms = 0;
+    target->lifetime_ms = FLOATING_TEXT_LIFETIME_MS;
+    target->color = color;
+    snprintf(target->text, sizeof(target->text), "%s", text_value);
+}
+
+static void game_update_floating_texts(GameState* game, int elapsed_ms)
+{
+    float dt = (float)elapsed_ms / 1000.0f;
+
+    if (game == 0)
+    {
+        return;
+    }
+
+    for (int text_index = 0; text_index < MAX_FLOATING_TEXTS; ++text_index)
+    {
+        FloatingText* text = game->floatingTexts + text_index;
+
+        if (!text->active)
+        {
+            continue;
+        }
+
+        text->age_ms += elapsed_ms;
+        if (text->age_ms >= text->lifetime_ms)
+        {
+            text->active = 0;
+            continue;
+        }
+
+        text->y += text->velocity_y * dt;
     }
 }
 
@@ -658,9 +769,53 @@ static const char* game_enemy_death_sound_id(const Entity* entity) {
     return "death";
 }
 
+static void game_award_score(GameState* game, int score)
+{
+    ProgressionState progress_before;
+    int unlocked_cat_index;
+
+    if (game == 0 || score <= 0)
+    {
+        return;
+    }
+
+    progress_before = game->progress;
+    game->score += score;
+    progression_apply_score(&game->progress, score);
+    game->progressDirty = 1;
+
+    if (game->uiState == GAME_UI_PLAYING)
+    {
+        unlocked_cat_index = cat_profile_first_new_unlock(&progress_before, &game->progress);
+        if (unlocked_cat_index >= 0)
+        {
+            const CatProfile* unlocked_profile = cat_profile_get(unlocked_cat_index);
+
+            game->progress.selected_cat_index = unlocked_cat_index;
+            game->playerHp = unlocked_profile->config.hp;
+            game->unlockedCatIndex = unlocked_cat_index;
+            game->uiState = unlocked_cat_index == cat_profile_count() - 1
+                    ? GAME_UI_CATS_COMPLETE
+                    : GAME_UI_CAT_UNLOCKED;
+            game_present_unlocked_cat(game);
+        }
+    }
+}
+
 static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
     if (entity->enemyConfig != 0) {
-        game->score += entity->enemyConfig->scoreValue;
+        char score_text[12];
+        int score_value = entity->enemyConfig->scoreValue;
+
+        snprintf(score_text, sizeof(score_text), "+%d", score_value);
+        game_spawn_floating_text(
+                game,
+                entity->x + (float)entity_get_width(entity) * 0.5f,
+                entity->y + (float)entity_get_height(entity) * 0.25f,
+                FLOATING_TEXT_SCORE_COLOR,
+                score_text
+        );
+        game_award_score(game, entity->enemyConfig->scoreValue);
     }
     audio_play_sound(game_enemy_death_sound_id(entity));
     entity_kill(entity);
@@ -673,14 +828,9 @@ static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
 }
 
 static void game_enter_game_over(GameState* game) {
-    ProgressionState progress_before;
-    int unlocked_cat_index;
-
     if (game->gameOver) {
         return;
     }
-
-    progress_before = game->progress;
 
     game->gameOver = 1;
     game->gameOverElapsedMs = 0;
@@ -707,11 +857,6 @@ static void game_enter_game_over(GameState* game) {
     progression_apply_run(&game->progress, game->score);
     game->bestScore = game->progress.best_score;
     game->progressDirty = 1;
-    unlocked_cat_index = cat_profile_first_new_unlock(&progress_before, &game->progress);
-    if (unlocked_cat_index >= 0) {
-        game->unlockedCatIndex = unlocked_cat_index;
-        game->uiState = GAME_UI_CAT_UNLOCKED;
-    }
     game_set_music("game_over");
 
     #if LITTLE_ONE_DEBUG_GAME_STATE
@@ -725,6 +870,13 @@ static void game_damage_player(GameState* game) {
     }
 
     game->playerHp -= 1;
+    game_spawn_floating_text(
+            game,
+            game->playerX + (float)game_active_player_config(game)->visual.width * 0.5f,
+            game->playerY - 20.0f,
+            FLOATING_TEXT_DAMAGE_COLOR,
+            "-1HP"
+    );
     if (game->playerHp <= 0) {
         game_enter_game_over(game);
         return;
@@ -751,6 +903,9 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
                 && player_was_smashing
                 && game_player_boundary_overlaps_enemy_hurt_zone(game, entity)) {
             game_kill_enemy_by_smash(game, entity);
+            if (game->uiState != GAME_UI_PLAYING) {
+                return;
+            }
             continue;
         }
 
@@ -816,6 +971,7 @@ void game_init(GameState* game) {
     game_clear_entities(game);
     game->spawnTimer = game_next_spawn_time();
     game_clear_foreground_decorations(game);
+    game_clear_floating_texts(game);
     game->foregroundSpawnGap = FOREGROUND_INITIAL_SPAWN_GAP_MIN
             + game_random_01()
             * (FOREGROUND_INITIAL_SPAWN_GAP_MAX - FOREGROUND_INITIAL_SPAWN_GAP_MIN);
@@ -842,6 +998,7 @@ void game_init(GameState* game) {
     game->progressInitialized = progress_initialized;
     game->progressDirty = progress_dirty;
     game->unlockedCatIndex = -1;
+    game->catUnlockPresentationMs = 0;
     audio_set_music_volume(game->settings.music_volume);
     audio_set_sfx_volume(game->settings.sfx_volume);
     game_set_music("main_theme");
@@ -860,7 +1017,7 @@ void game_restart_run(GameState* game) {
     game_init(game);
     game_set_screen_size(game, (float)screen_width, (float)screen_height);
     game->uiState = GAME_UI_PLAYING;
-    game_set_music(game_active_cat_music_id(game));
+    game_play_active_cat_music(game);
 
     #if LITTLE_ONE_DEBUG_GAME_STATE
     LOGI("Game run restarted");
@@ -903,6 +1060,7 @@ void game_show_cat_select(GameState* game) {
     game->gameOver = 0;
     game->gameOverElapsedMs = 0;
     game->gameOverInputArmed = 0;
+    game_set_music("main_theme");
 }
 
 void game_dismiss_cat_unlocked(GameState* game) {
@@ -910,8 +1068,9 @@ void game_dismiss_cat_unlocked(GameState* game) {
         return;
     }
 
-    if (game->uiState == GAME_UI_CAT_UNLOCKED) {
+    if (game->uiState == GAME_UI_CAT_UNLOCKED || game->uiState == GAME_UI_CATS_COMPLETE) {
         game->uiState = GAME_UI_PLAYING;
+        game_play_active_cat_music(game);
     }
 }
 
@@ -992,16 +1151,22 @@ void game_update(GameState* game, const InputState* input, float dt) {
         return;
     }
 
-    if (game->uiState != GAME_UI_PLAYING) {
-        return;
-    }
-
     elapsed_ms = (int32_t)(dt * 1000.0f);
     if (elapsed_ms < 0) {
         elapsed_ms = 0;
     }
+
+    if (game->uiState == GAME_UI_CAT_UNLOCKED || game->uiState == GAME_UI_CATS_COMPLETE) {
+        game->catUnlockPresentationMs += elapsed_ms;
+    }
+
+    if (game->uiState != GAME_UI_PLAYING) {
+        return;
+    }
+
     screen_shake_update(&game->screenShake, elapsed_ms);
     game_effects_update(elapsed_ms);
+    game_update_floating_texts(game, elapsed_ms);
     if (game->playerInvulnerableMs > 0) {
         game->playerInvulnerableMs -= elapsed_ms;
         if (game->playerInvulnerableMs < 0) {

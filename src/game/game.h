@@ -1,6 +1,8 @@
 #ifndef LITTLE_ONE_GAME_H
 #define LITTLE_ONE_GAME_H
 
+#include <stdint.h>
+
 #include "../config/foreground_decoration_config.h"
 #include "../entity/entity.h"
 #include "../feedback/screen_shake.h"
@@ -11,6 +13,18 @@
 #include "progression.h"
 
 #define MAX_ENTITIES 16
+#define MAX_FLOATING_TEXTS 12
+
+typedef struct {
+    int active;
+    float x;
+    float y;
+    float velocity_y;
+    int age_ms;
+    int lifetime_ms;
+    uint32_t color;
+    char text[12];
+} FloatingText;
 
 typedef struct {
     int active;
@@ -28,7 +42,8 @@ typedef enum {
     GAME_UI_PAUSED = 1,
     GAME_UI_SETTINGS = 2,
     GAME_UI_CAT_SELECT = 3,
-    GAME_UI_CAT_UNLOCKED = 4
+    GAME_UI_CAT_UNLOCKED = 4,
+    GAME_UI_CATS_COMPLETE = 5
 } GameUiState;
 
 typedef struct {
@@ -51,6 +66,7 @@ typedef struct {
     float spawnTimer;
     ForegroundDecoration foregroundDecorations[FOREGROUND_MAX_INSTANCES];
     float foregroundSpawnGap;
+    FloatingText floatingTexts[MAX_FLOATING_TEXTS];
     int gameOver;
     int gameOverElapsedMs;
     int gameOverInputArmed;
@@ -69,6 +85,7 @@ typedef struct {
     int progressInitialized;
     int progressDirty;
     int unlockedCatIndex;
+    int catUnlockPresentationMs;
 } GameState;
 
 void game_init(GameState* game);

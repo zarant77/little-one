@@ -141,6 +141,31 @@ static const SoundCommand RAT_DEATH_SOUND_COMMANDS[] = {
     },
 };
 
+// Source: src/assets/sfx/cat_unlock.sfx.json
+static const SoundCommand CAT_UNLOCK_SOUND_COMMANDS[] = {
+    {
+        .wave = SOUND_WAVE_TRIANGLE,
+        .frequency_start = 660,
+        .frequency_end = 990,
+        .duration_ms = 90,
+        .volume = 70,
+    },
+    {
+        .wave = SOUND_WAVE_SINE,
+        .frequency_start = 990,
+        .frequency_end = 1320,
+        .duration_ms = 110,
+        .volume = 58,
+    },
+    {
+        .wave = SOUND_WAVE_SQUARE,
+        .frequency_start = 1320,
+        .frequency_end = 1760,
+        .duration_ms = 80,
+        .volume = 34,
+    },
+};
+
 const SoundDefinition PACKED_SOUND_DEFINITIONS[] = {
     {
         .id = "jump",
@@ -176,6 +201,11 @@ const SoundDefinition PACKED_SOUND_DEFINITIONS[] = {
         .id = "rat_death",
         .commands = RAT_DEATH_SOUND_COMMANDS,
         .command_count = sizeof(RAT_DEATH_SOUND_COMMANDS) / sizeof(RAT_DEATH_SOUND_COMMANDS[0]),
+    },
+    {
+        .id = "cat_unlock",
+        .commands = CAT_UNLOCK_SOUND_COMMANDS,
+        .command_count = sizeof(CAT_UNLOCK_SOUND_COMMANDS) / sizeof(CAT_UNLOCK_SOUND_COMMANDS[0]),
     },
 };
 

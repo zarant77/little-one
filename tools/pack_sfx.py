@@ -28,6 +28,7 @@ SOUND_ID_ORDER = {
     "ork_death": 4,
     "boar_death": 5,
     "rat_death": 6,
+    "cat_unlock": 7,
 }
 
 

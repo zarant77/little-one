@@ -5,6 +5,7 @@
 #include "music_definition.h"
 
 int music_generator_generate(const MusicDefinition* definition, GeneratedMusic* music);
+int music_generator_generate_from_packed(const PackedMusicDefinition* definition, GeneratedMusic* music);
 void music_generator_release(GeneratedMusic* music);
 
 #endif

@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "../config/background_config.h"
+#include "../fonts/font_renderer.h"
 #include "../game/game_effects.h"
 #include "../game/game_settings.h"
 #include "../sprites/animations/animation_evaluate.h"
@@ -25,6 +26,8 @@
 #define RENDERER_HALF_PI_MILLIRADIANS 1571
 #define BIRD_CAMERA_HIT_IMPACT_MS 520
 #define BIRD_CAMERA_HIT_CRACK_DURATION_MS 500
+#define FLOATING_TEXT_FONT_ID "vector_16_basic"
+#define FLOATING_TEXT_SCALE 4
 
 /* Canonical Little One colors are 0xRRGGBBAA:
  * 0xff0000ff red, 0x00ff00ff green, 0x0000ffff blue,
@@ -1915,6 +1918,83 @@ static void renderer_draw_foreground_decorations(
     }
 }
 
+static uint32_t renderer_color_with_alpha(uint32_t color, uint8_t alpha)
+{
+    uint32_t base_alpha = color & 0xffu;
+    uint32_t out_alpha = (base_alpha * (uint32_t)alpha) / 255u;
+
+    return (color & 0xffffff00u) | out_alpha;
+}
+
+static void renderer_draw_floating_texts(
+        ANativeWindow_Buffer* buffer,
+        const GameState* game,
+        int32_t shake_x,
+        int32_t shake_y
+) {
+    static const PackedFont* floating_text_font = 0;
+    const PackedFont* font;
+
+    if (buffer == 0 || game == 0) {
+        return;
+    }
+
+    if (floating_text_font == 0) {
+        floating_text_font = font_registry_find(FLOATING_TEXT_FONT_ID);
+    }
+
+    font = floating_text_font;
+    if (font == 0) {
+        return;
+    }
+
+    for (int text_index = 0; text_index < MAX_FLOATING_TEXTS; ++text_index) {
+        const FloatingText* text = game->floatingTexts + text_index;
+        int alpha;
+        int text_width;
+        int text_height;
+        int draw_x;
+        int draw_y;
+        uint32_t color;
+
+        if (!text->active || text->text[0] == 0 || text->lifetime_ms <= 0) {
+            continue;
+        }
+
+        alpha = 255 - (text->age_ms * 255) / text->lifetime_ms;
+        if (alpha < 0) {
+            alpha = 0;
+        } else if (alpha > 255) {
+            alpha = 255;
+        }
+
+        text_width = font_measure_text(font, FLOATING_TEXT_SCALE, text->text);
+        text_height = (int)font->grid_size * FLOATING_TEXT_SCALE;
+        draw_x = (int)text->x + shake_x - text_width / 2;
+        draw_y = (int)text->y + shake_y - text_height / 2;
+        color = renderer_color_with_alpha(text->color, (uint8_t)alpha);
+
+        font_draw_text(
+                buffer,
+                font,
+                draw_x + 2,
+                draw_y + 2,
+                FLOATING_TEXT_SCALE,
+                renderer_color_with_alpha(0x000000ccu, (uint8_t)alpha),
+                text->text
+        );
+        font_draw_text(
+                buffer,
+                font,
+                draw_x,
+                draw_y,
+                FLOATING_TEXT_SCALE,
+                color,
+                text->text
+        );
+    }
+}
+
 #if LITTLE_ONE_SHOW_WIREFRAMES
 static void renderer_draw_entity_wireframes(
         ANativeWindow_Buffer* buffer,
@@ -2038,6 +2118,7 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     }
     game_effects_render(buffer, shake_x, shake_y);
     renderer_draw_foreground_decorations(buffer, game, shake_x, shake_y);
+    renderer_draw_floating_texts(buffer, game, shake_x, shake_y);
     #if LITTLE_ONE_SHOW_WIREFRAMES
     renderer_draw_entity_wireframes(buffer, game, shake_x, shake_y);
     renderer_draw_player_wireframe(buffer, game, shake_x, shake_y);

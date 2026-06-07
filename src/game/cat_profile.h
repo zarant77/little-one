@@ -2,11 +2,13 @@
 #define LITTLE_ONE_CAT_PROFILE_H
 
 #include "../config/player_config.h"
+#include "../localization/localization.h"
 #include "progression.h"
 
 typedef struct {
     const char* id;
-    const char* name;
+    LocalizedTextId name_text_id;
+    LocalizedTextId intro_text_id;
     const char* sprite_id;
     const char* music_id;
     int required_best_score;

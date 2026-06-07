@@ -25,6 +25,8 @@
 #define MENU_PAUSE_PANEL_HEIGHT 530
 #define MENU_GAME_OVER_PANEL_HEIGHT 500
 #define MENU_CAT_SELECT_PANEL_HEIGHT 700
+#define MENU_CAT_UNLOCK_PANEL_HEIGHT 780
+#define MENU_CATS_COMPLETE_PANEL_HEIGHT 700
 #define MENU_SLIDER_HEIGHT 94
 #define MENU_NO_POINTER -1
 #define MENU_LOCK_COLOR 0x00000099
@@ -32,6 +34,10 @@
 #define MENU_EXIT_BUTTON_BORDER_COLOR 0xff6b6bff
 #define MENU_FLAG_BORDER_COLOR 0xffffffff
 #define MENU_FLAG_SELECTED_COLOR 0xf2cc8fff
+#define MENU_CAT_PANEL_BG_SLICE_LEFT 48
+#define MENU_CAT_PANEL_BG_SLICE_TOP 48
+#define MENU_CAT_PANEL_BG_SLICE_RIGHT 48
+#define MENU_CAT_PANEL_BG_SLICE_BOTTOM 48
 
 typedef enum {
     MENU_DRAG_NONE = 0,
@@ -42,6 +48,9 @@ typedef enum {
 typedef struct {
     const PackedFont* font;
     const GeneratedSprite* pause_button;
+    const GeneratedSprite* cat_panel_bg;
+    const GeneratedSprite* arrow_left;
+    const GeneratedSprite* arrow_right;
     int initialized;
 } MenuResources;
 
@@ -73,6 +82,16 @@ static int menu_min_int(int a, int b)
     return a < b ? a : b;
 }
 
+static int menu_ceil_div_int(int value, int divisor)
+{
+    if (divisor <= 0)
+    {
+        return 0;
+    }
+
+    return (value + divisor - 1) / divisor;
+}
+
 static int menu_text_width(const PackedFont* font, int scale, const char* text)
 {
     return font_measure_text(font, scale, text);
@@ -93,6 +112,11 @@ static const char* menu_text(const GameState* game, LocalizedTextId text_id)
     return localization_text(menu_locale(game), text_id);
 }
 
+static const char* menu_profile_text(const GameState* game, LocalizedTextId text_id)
+{
+    return localization_text(menu_locale(game), text_id);
+}
+
 static const MenuResources* menu_resources_get(void)
 {
     if (!MENU_RESOURCES.initialized)
@@ -100,7 +124,11 @@ static const MenuResources* menu_resources_get(void)
         menu_initialize();
     }
 
-    if (MENU_RESOURCES.font == 0 || MENU_RESOURCES.pause_button == 0)
+    if (MENU_RESOURCES.font == 0
+            || MENU_RESOURCES.pause_button == 0
+            || MENU_RESOURCES.cat_panel_bg == 0
+            || MENU_RESOURCES.arrow_left == 0
+            || MENU_RESOURCES.arrow_right == 0)
     {
         return 0;
     }
@@ -124,10 +152,15 @@ static MenuLayout menu_layout_get_ex(const GameState* game, int panel_height, in
 {
     MenuLayout layout;
     int panel_width = menu_min_int(panel_max_width, game->screenWidth - MENU_PANEL_PADDING * 2);
+    int max_panel_height = game->screenHeight - 24;
 
     if (panel_width < 260)
     {
         panel_width = game->screenWidth - 24;
+    }
+    if (max_panel_height > 0 && panel_height > max_panel_height)
+    {
+        panel_height = max_panel_height;
     }
 
     layout.pause_button = menu_pause_button_rect(game);
@@ -135,9 +168,13 @@ static MenuLayout menu_layout_get_ex(const GameState* game, int panel_height, in
     layout.panel.height = panel_height;
     layout.panel.x = (game->screenWidth - layout.panel.width) / 2;
     layout.panel.y = (game->screenHeight - layout.panel.height) / 2;
-    if (layout.panel.y < MENU_PANEL_PADDING)
+    if (layout.panel.y + layout.panel.height > game->screenHeight - 12)
     {
-        layout.panel.y = MENU_PANEL_PADDING;
+        layout.panel.y = game->screenHeight - 12 - layout.panel.height;
+    }
+    if (layout.panel.y < 12)
+    {
+        layout.panel.y = 12;
     }
 
     layout.resume_button.x = layout.panel.x + MENU_PANEL_PADDING;
@@ -211,6 +248,39 @@ static MenuLayout menu_layout_get(const GameState* game, int panel_height)
 static MenuLayout menu_cat_layout_get(const GameState* game)
 {
     return menu_layout_get_ex(game, MENU_CAT_SELECT_PANEL_HEIGHT, MENU_CAT_PANEL_MAX_WIDTH);
+}
+
+static MenuLayout menu_cat_unlock_layout_get(const GameState* game)
+{
+    MenuLayout layout = menu_layout_get_ex(game, MENU_CAT_UNLOCK_PANEL_HEIGHT, MENU_CAT_PANEL_MAX_WIDTH);
+
+    layout.preview.width = layout.panel.width - MENU_PANEL_PADDING * 2;
+    if (layout.preview.width > 520)
+    {
+        layout.preview.width = 520;
+    }
+    layout.preview.height = 300;
+    layout.preview.x = layout.panel.x + (layout.panel.width - layout.preview.width) / 2;
+    layout.preview.y = layout.panel.y + 132;
+
+    return layout;
+}
+
+static MenuLayout menu_cat_select_layout_get(const GameState* game)
+{
+    MenuLayout layout = menu_cat_layout_get(game);
+    int button_width = (layout.panel.width - MENU_PANEL_PADDING * 2 - MENU_PANEL_GAP) / 2;
+
+    layout.start_button.width = button_width;
+    layout.exit_button = layout.start_button;
+    layout.exit_button.x = layout.start_button.x + button_width + MENU_PANEL_GAP;
+
+    return layout;
+}
+
+static MenuLayout menu_cats_complete_layout_get(const GameState* game)
+{
+    return menu_layout_get_ex(game, MENU_CATS_COMPLETE_PANEL_HEIGHT, MENU_CAT_PANEL_MAX_WIDTH);
 }
 
 static void menu_draw_title(
@@ -369,40 +439,42 @@ static void menu_draw_language_flag(
     menu_draw_rect_outline(framebuffer, flag, 2, 0x00000088);
 }
 
-static void menu_draw_arrow_button(Framebuffer* framebuffer, UiRect rect, int direction)
+static void menu_draw_cat_panel_background(
+        Framebuffer* framebuffer,
+        const MenuResources* resources,
+        UiRect panel
+)
 {
-    int arrow_width = rect.width / 2;
-    int arrow_height = rect.height / 2;
-    int center_x = rect.x + rect.width / 2;
-    int center_y = rect.y + rect.height / 2;
-    int half_height = arrow_height / 2;
-    int row;
+    UiNineSlice slice = {
+        .left = MENU_CAT_PANEL_BG_SLICE_LEFT,
+        .top = MENU_CAT_PANEL_BG_SLICE_TOP,
+        .right = MENU_CAT_PANEL_BG_SLICE_RIGHT,
+        .bottom = MENU_CAT_PANEL_BG_SLICE_BOTTOM,
+    };
 
-    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, 0x111827ff);
-    menu_draw_rect_outline(framebuffer, rect, 3, 0x81b29aff);
+    ui_draw_nine_slice_panel(framebuffer, resources->cat_panel_bg, panel, slice);
+}
 
-    if (arrow_width < 10 || arrow_height < 10)
+static void menu_draw_arrow_button(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* arrow,
+        UiRect rect
+)
+{
+    if (arrow == 0)
     {
         return;
     }
 
-    for (row = -half_height; row <= half_height; ++row)
-    {
-        int distance = row < 0 ? -row : row;
-        int span = (arrow_width * (half_height - distance + 1)) / (half_height + 1);
-        int x = direction < 0
-                ? center_x - arrow_width / 2
-                : center_x + arrow_width / 2 - span;
-
-        renderer_draw_color_rect(
-                framebuffer,
-                x,
-                center_y + row,
-                span,
-                2,
-                0xf4f1deff
-        );
-    }
+    renderer_draw_generated_sprite_fit(
+            framebuffer,
+            arrow,
+            rect.x,
+            rect.y,
+            rect.width,
+            rect.height,
+            SPRITE_FIT_STRETCH
+    );
 }
 
 static void menu_render_game_over(
@@ -491,54 +563,181 @@ static void menu_cat_requirement_text(
 static void menu_render_cat_unlocked(
         Framebuffer* framebuffer,
         const PackedFont* font,
+        const MenuResources* resources,
         const GameState* game
 )
 {
-    MenuLayout layout = menu_cat_layout_get(game);
+    MenuLayout layout = menu_cat_unlock_layout_get(game);
     const CatProfile* profile = cat_profile_get(game->unlockedCatIndex);
     const GeneratedSprite* sprite = generated_sprite_get_by_id(profile->sprite_id);
 
     renderer_draw_color_rect(framebuffer, 0, 0, framebuffer->width, framebuffer->height, MENU_DIM_COLOR);
-    ui_draw_panel(framebuffer, layout.panel);
-    menu_draw_title(framebuffer, font, layout.panel, menu_text(game, LOCALIZED_TEXT_NEW_CAT));
-    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 104, 2, menu_text(game, LOCALIZED_TEXT_UNLOCKED));
+    menu_draw_cat_panel_background(framebuffer, resources, layout.panel);
+    menu_draw_title(framebuffer, font, layout.panel, menu_profile_text(game, profile->name_text_id));
 
     if (sprite != 0)
     {
+        int animation_ms = game->catUnlockPresentationMs;
+        int scale_percent;
+        int draw_width;
+        int draw_height;
+        int draw_x;
+        int draw_y;
+
+        if (animation_ms < 0)
+        {
+            animation_ms = 0;
+        }
+        if (animation_ms < 360)
+        {
+            scale_percent = 72 + animation_ms * 34 / 360;
+        }
+        else if (animation_ms < 520)
+        {
+            scale_percent = 106 - (animation_ms - 360) * 6 / 160;
+        }
+        else
+        {
+            scale_percent = 100;
+        }
+
+        draw_width = layout.preview.width * scale_percent / 100;
+        draw_height = layout.preview.height * scale_percent / 100;
+        draw_x = layout.preview.x + (layout.preview.width - draw_width) / 2;
+        draw_y = layout.preview.y + (layout.preview.height - draw_height) / 2;
+        if (animation_ms < 360)
+        {
+            draw_y += 28 - animation_ms * 28 / 360;
+        }
+
         renderer_draw_generated_sprite_fit(
                 framebuffer,
                 sprite,
-                layout.preview.x,
-                layout.preview.y,
-                layout.preview.width,
-                layout.preview.height,
+                draw_x,
+                draw_y,
+                draw_width,
+                draw_height,
                 SPRITE_FIT_CONTAIN
         );
     }
-    else
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 470, 2, menu_profile_text(game, profile->intro_text_id));
+    ui_draw_button(framebuffer, font, layout.start_button, menu_text(game, LOCALIZED_TEXT_CONTINUE));
+}
+
+static void menu_render_cats_complete(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        const MenuResources* resources,
+        const GameState* game
+)
+{
+    MenuLayout layout = menu_cats_complete_layout_get(game);
+    int count = cat_profile_count();
+    int grid_x = layout.panel.x + MENU_PANEL_PADDING;
+    int grid_y = layout.panel.y + 150;
+    int grid_width = layout.panel.width - MENU_PANEL_PADDING * 2;
+    int grid_height = layout.start_button.y - grid_y - MENU_PANEL_GAP;
+    int columns = grid_width >= 760 ? 7 : (grid_width >= 420 ? 4 : 3);
+    int rows = menu_ceil_div_int(count, columns);
+    int gap = 12;
+    int cell_width;
+    int cell_height;
+    int sprite_width;
+    int sprite_height;
+
+    if (rows < 1)
     {
-        renderer_draw_color_rect(
+        rows = 1;
+    }
+
+    cell_width = (grid_width - gap * (columns - 1)) / columns;
+    cell_height = (grid_height - gap * (rows - 1)) / rows;
+    sprite_width = cell_width;
+    sprite_height = (sprite_width * 16) / 25;
+    if (sprite_height > cell_height)
+    {
+        sprite_height = cell_height;
+        sprite_width = (sprite_height * 25) / 16;
+    }
+
+    renderer_draw_color_rect(framebuffer, 0, 0, framebuffer->width, framebuffer->height, MENU_DIM_COLOR);
+    menu_draw_cat_panel_background(framebuffer, resources, layout.panel);
+    menu_draw_title(framebuffer, font, layout.panel, menu_text(game, LOCALIZED_TEXT_CONGRATULATIONS));
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 104, 2, menu_text(game, LOCALIZED_TEXT_ALL_CATS_READY));
+
+    for (int index = 0; index < count; ++index)
+    {
+        const CatProfile* profile = cat_profile_get(index);
+        const GeneratedSprite* sprite = generated_sprite_get_by_id(profile->sprite_id);
+        int column = index % columns;
+        int row = index / columns;
+        int cell_x = grid_x + column * (cell_width + gap);
+        int cell_y = grid_y + row * (cell_height + gap);
+        int draw_width = sprite_width;
+        int draw_height = sprite_height;
+        int draw_x;
+        int draw_y;
+
+        if (sprite == 0)
+        {
+            continue;
+        }
+
+        if (index == game->unlockedCatIndex)
+        {
+            int animation_ms = game->catUnlockPresentationMs;
+            int scale_percent;
+
+            if (animation_ms < 0)
+            {
+                animation_ms = 0;
+            }
+            if (animation_ms < 360)
+            {
+                scale_percent = 72 + animation_ms * 34 / 360;
+            }
+            else if (animation_ms < 520)
+            {
+                scale_percent = 106 - (animation_ms - 360) * 6 / 160;
+            }
+            else
+            {
+                scale_percent = 100;
+            }
+
+            draw_width = sprite_width * scale_percent / 100;
+            draw_height = sprite_height * scale_percent / 100;
+        }
+
+        draw_x = cell_x + (cell_width - draw_width) / 2;
+        draw_y = cell_y + (cell_height - draw_height) / 2;
+        if (index == game->unlockedCatIndex && game->catUnlockPresentationMs < 360)
+        {
+            draw_y += 18 - game->catUnlockPresentationMs * 18 / 360;
+        }
+
+        renderer_draw_generated_sprite_fit(
                 framebuffer,
-                layout.preview.x,
-                layout.preview.y,
-                layout.preview.width,
-                layout.preview.height,
-                profile->config.visual.color
+                sprite,
+                draw_x,
+                draw_y,
+                draw_width,
+                draw_height,
+                SPRITE_FIT_CONTAIN
         );
     }
 
-    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 390, 3, profile->name);
-    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 468, 2, menu_text(game, LOCALIZED_TEXT_READY_TO_PLAY));
     ui_draw_button(framebuffer, font, layout.start_button, menu_text(game, LOCALIZED_TEXT_CONTINUE));
 }
 
 static void menu_render_cat_select(
         Framebuffer* framebuffer,
         const PackedFont* font,
+        const MenuResources* resources,
         const GameState* game
 )
 {
-    MenuLayout layout = menu_cat_layout_get(game);
+    MenuLayout layout = menu_cat_select_layout_get(game);
     const CatProfile* profile = cat_profile_get(game->progress.selected_cat_index);
     int unlocked = cat_profile_is_unlocked(profile, &game->progress);
     const GeneratedSprite* sprite = generated_sprite_get_by_id(profile->sprite_id);
@@ -546,7 +745,7 @@ static void menu_render_cat_select(
     char requirement_text[128];
 
     renderer_draw_color_rect(framebuffer, 0, 0, framebuffer->width, framebuffer->height, MENU_DIM_COLOR);
-    ui_draw_panel(framebuffer, layout.panel);
+    menu_draw_cat_panel_background(framebuffer, resources, layout.panel);
     menu_draw_title(framebuffer, font, layout.panel, menu_text(game, LOCALIZED_TEXT_CHOOSE_CAT));
 
     snprintf(
@@ -571,18 +770,6 @@ static void menu_render_cat_select(
                 SPRITE_FIT_CONTAIN
         );
     }
-    else
-    {
-        renderer_draw_color_rect(
-                framebuffer,
-                layout.preview.x,
-                layout.preview.y,
-                layout.preview.width,
-                layout.preview.height,
-                profile->config.visual.color
-        );
-    }
-
     if (!unlocked)
     {
         renderer_draw_color_rect(
@@ -603,9 +790,9 @@ static void menu_render_cat_select(
         );
     }
 
-    menu_draw_arrow_button(framebuffer, layout.prev_button, -1);
-    menu_draw_arrow_button(framebuffer, layout.next_button, 1);
-    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 390, 3, profile->name);
+    menu_draw_arrow_button(framebuffer, resources->arrow_left, layout.prev_button);
+    menu_draw_arrow_button(framebuffer, resources->arrow_right, layout.next_button);
+    menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 390, 3, menu_profile_text(game, profile->name_text_id));
 
     if (unlocked)
     {
@@ -616,6 +803,15 @@ static void menu_render_cat_select(
         menu_cat_requirement_text(profile, &game->progress, menu_locale(game), requirement_text, sizeof(requirement_text));
         menu_draw_centered_label(framebuffer, font, layout.panel, layout.panel.y + 462, 2, requirement_text);
     }
+
+    ui_draw_button_colored(
+            framebuffer,
+            font,
+            layout.exit_button,
+            menu_text(game, LOCALIZED_TEXT_EXIT),
+            MENU_EXIT_BUTTON_COLOR,
+            MENU_EXIT_BUTTON_BORDER_COLOR
+    );
 }
 
 static void menu_draw_pause_button(
@@ -669,6 +865,9 @@ void menu_initialize(void)
 {
     MENU_RESOURCES.font = font_registry_find(MENU_FONT_ID);
     MENU_RESOURCES.pause_button = generated_sprite_get_by_id("btn_pause");
+    MENU_RESOURCES.cat_panel_bg = generated_sprite_get_by_id("cat_select_panel_bg");
+    MENU_RESOURCES.arrow_left = generated_sprite_get_by_id("arrow_left");
+    MENU_RESOURCES.arrow_right = generated_sprite_get_by_id("arrow_right");
     MENU_RESOURCES.initialized = 1;
 }
 
@@ -693,9 +892,15 @@ void menu_render(Framebuffer* framebuffer, const GameState* game)
         return;
     }
 
+    if (game->uiState == GAME_UI_CATS_COMPLETE)
+    {
+        menu_render_cats_complete(framebuffer, resources->font, resources, game);
+        return;
+    }
+
     if (game->uiState == GAME_UI_CAT_UNLOCKED)
     {
-        menu_render_cat_unlocked(framebuffer, resources->font, game);
+        menu_render_cat_unlocked(framebuffer, resources->font, resources, game);
         return;
     }
 
@@ -707,7 +912,7 @@ void menu_render(Framebuffer* framebuffer, const GameState* game)
 
     if (game->uiState == GAME_UI_CAT_SELECT)
     {
-        menu_render_cat_select(framebuffer, resources->font, game);
+        menu_render_cat_select(framebuffer, resources->font, resources, game);
         return;
     }
 
@@ -790,11 +995,13 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         return 0;
     }
 
-    if (game->uiState == GAME_UI_CAT_UNLOCKED)
+    if (game->uiState == GAME_UI_CAT_UNLOCKED || game->uiState == GAME_UI_CATS_COMPLETE)
     {
         if (action_type == INPUT_TOUCH_DOWN)
         {
-            layout = menu_cat_layout_get(game);
+            layout = game->uiState == GAME_UI_CATS_COMPLETE
+                    ? menu_cats_complete_layout_get(game)
+                    : menu_cat_unlock_layout_get(game);
             if (ui_rect_contains(&layout.start_button, x, y))
             {
                 game_dismiss_cat_unlocked(game);
@@ -849,7 +1056,7 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
     {
         if (action_type == INPUT_TOUCH_DOWN)
         {
-            layout = menu_cat_layout_get(game);
+            layout = menu_cat_select_layout_get(game);
             if (ui_rect_contains(&layout.prev_button, x, y))
             {
                 int count = cat_profile_count();
@@ -869,6 +1076,11 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
             if (ui_rect_contains(&layout.start_button, x, y))
             {
                 game_start_selected_cat(game);
+                return 1;
+            }
+            if (ui_rect_contains(&layout.exit_button, x, y))
+            {
+                game->exitRequested = 1;
                 return 1;
             }
         }
@@ -903,7 +1115,7 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         }
         if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&layout.exit_button, x, y))
         {
-            game->exitRequested = 1;
+            game_show_cat_select(game);
             return 1;
         }
 

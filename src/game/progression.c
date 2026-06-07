@@ -34,8 +34,22 @@ void progression_apply_run(ProgressionState* progress, int score)
         progress->best_score = score;
     }
 
-    progress->total_score += score;
     progress->total_runs += 1;
+}
+
+void progression_apply_score(ProgressionState* progress, int score)
+{
+    if (progress == 0)
+    {
+        return;
+    }
+
+    if (score < 0)
+    {
+        score = 0;
+    }
+
+    progress->total_score += score;
 }
 
 int progression_load_from_path(const char* path, ProgressionState* progress)

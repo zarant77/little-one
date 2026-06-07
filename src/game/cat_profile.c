@@ -1,46 +1,65 @@
 #include "cat_profile.h"
 
-#define CAT_PROFILE(profile_id, display_name, sprite_name, music_name, sprite_enum, best_score, total_score, runs, tint) \
-    { \
-        .id = profile_id, \
-        .name = display_name, \
-        .sprite_id = sprite_name, \
-        .music_id = music_name, \
-        .required_best_score = best_score, \
-        .required_total_score = total_score, \
-        .required_runs = runs, \
-        .config = { \
-            .hp = 3, \
-            .moveSpeed = 600.0f, \
-            .jumpVelocity = -1800.0f, \
-            .smashVelocity = 4000.0f, \
-            .hurt_zone = {.x = 0, .y = 0, .radius = 70}, \
-            .boundary = {.x = 0, .y = 0, .width = 250, .height = 160}, \
-            .visual = { \
-                .width = 250, \
-                .height = 160, \
-                .color = tint, \
-                .sprite_id = sprite_enum, \
-                .animationId = "idle", \
-                .deathAnimationId = "player_death_fall", \
-            }, \
-        }, \
+#define CAT_PROFILE(profile_id, name_text, intro_text, sprite_name, music_name, sprite_enum, total_score) \
+    {                                                                                                     \
+        .id = profile_id,                                                                                 \
+        .name_text_id = name_text,                                                                        \
+        .intro_text_id = intro_text,                                                                      \
+        .sprite_id = sprite_name,                                                                         \
+        .music_id = music_name,                                                                           \
+        .required_best_score = 0,                                                                         \
+        .required_total_score = total_score,                                                              \
+        .required_runs = 0,                                                                               \
+        .config = {                                                                                       \
+            .hp = 3,                                                                                      \
+            .moveSpeed = 600.0f,                                                                          \
+            .jumpVelocity = -1800.0f,                                                                     \
+            .smashVelocity = 4000.0f,                                                                     \
+            .hurt_zone = {.x = 0, .y = 0, .radius = 70},                                                  \
+            .boundary = {.x = 0, .y = 0, .width = 250, .height = 160},                                    \
+            .visual = {                                                                                   \
+                .width = 250,                                                                             \
+                .height = 160,                                                                            \
+                .color = 0xffffffff,                                                                      \
+                .sprite_id = sprite_enum,                                                                 \
+                .animationId = "idle",                                                                    \
+                .deathAnimationId = "player_death_fall",                                                  \
+            },                                                                                            \
+        },                                                                                                \
     }
 
 static const CatProfile CAT_PROFILES[] = {
-    CAT_PROFILE("batcat", "BATCAT", "batcat", "batcat", SPRITE_BATCAT, 0, 0, 0, 0x171a20ff),
-    CAT_PROFILE("iron_cat", "IRON CAT", "iron_cat", "iron_cat", SPRITE_IRON_CAT, 0, 0, 0, 0xb11f2aff),
-    CAT_PROFILE("darkcat", "DARKCAT", "darkcat", "darkcat", SPRITE_DARKCAT, 30, 0, 0, 0x1d1f28ff),
-    CAT_PROFILE("robocat", "ROBOCAT", "robocat", "robocat", SPRITE_ROBOCAT, 0, 120, 0, 0x9ca6afff),
-    CAT_PROFILE("termicator", "TERMICATOR", "termicator", "termicator", SPRITE_TERMICATOR, 60, 0, 5, 0x4b4f56ff),
-    CAT_PROFILE("punishcat", "PUNISHCAT", "punishcat", "punishcat", SPRITE_PUNISHCAT, 0, 220, 0, 0x101218ff),
-    CAT_PROFILE("carrambacat", "CARRAMBACAT", "carrambacat", "carrambacat", SPRITE_CARRAMBACAT, 90, 0, 0, 0x7a4a2aff),
-    CAT_PROFILE("commandocat", "COMMANDOCAT", "commandocat", "commandocat", SPRITE_COMMANDOCAT, 120, 0, 8, 0x355d34ff),
-    CAT_PROFILE("silverpaw", "SILVERPAW", "silverpaw", "silverpaw", SPRITE_SILVERPAW, 0, 420, 0, 0xc9d4ddff),
-    CAT_PROFILE("samurcat", "SAMURCAT", "samurcat", "samurcat", SPRITE_SAMURCAT, 150, 0, 12, 0x2f415cff),
-    CAT_PROFILE("zombocat", "ZOMBOCAT", "zombocat", "zombocat", SPRITE_ZOMBOCAT, 0, 620, 0, 0x6f9b61ff),
-    CAT_PROFILE("ghostcat", "GHOSTCAT", "ghostcat", "ghostcat", SPRITE_GHOSTCAT, 180, 0, 16, 0xdde8ffff),
-    CAT_PROFILE("kotan_the_destroyer", "KOTAN THE DESTROYER", "kotan_the_destroyer", "kotan_the_destroyer", SPRITE_KOTAN_THE_DESTROYER, 220, 900, 20, 0xa85d36ff),
+    // Test profiles with very low requirements for unlocking, for testing purposes
+    CAT_PROFILE("pinkpawther", LOCALIZED_TEXT_CAT_PINKPAWTHER_NAME, LOCALIZED_TEXT_CAT_PINKPAWTHER_INTRO, "pinkpawther", "pinkpawther", SPRITE_PINKPAWTHER, 0),
+    CAT_PROFILE("agent00cat", LOCALIZED_TEXT_CAT_AGENT00CAT_NAME, LOCALIZED_TEXT_CAT_AGENT00CAT_INTRO, "agent00cat", "agent00cat", SPRITE_AGENT00CAT, 10),
+    CAT_PROFILE("rockpaw", LOCALIZED_TEXT_CAT_ROCKPAW_NAME, LOCALIZED_TEXT_CAT_ROCKPAW_INTRO, "rockpaw", "rockpaw", SPRITE_ROCKPAW, 20),
+    CAT_PROFILE("impawsiblecat", LOCALIZED_TEXT_CAT_IMPAWSIBLECAT_NAME, LOCALIZED_TEXT_CAT_IMPAWSIBLECAT_INTRO, "impawsiblecat", "impawsiblecat", SPRITE_IMPAWSIBLECAT, 30),
+    CAT_PROFILE("indicat", LOCALIZED_TEXT_CAT_INDICAT_NAME, LOCALIZED_TEXT_CAT_INDICAT_INTRO, "indicat", "indicat", SPRITE_INDICAT, 40),
+    CAT_PROFILE("catbuster", LOCALIZED_TEXT_CAT_CATBUSTER_NAME, LOCALIZED_TEXT_CAT_CATBUSTER_INTRO, "catbuster", "catbuster", SPRITE_CATBUSTER, 50),
+    CAT_PROFILE("harrypurrter", LOCALIZED_TEXT_CAT_HARRYPURRTER_NAME, LOCALIZED_TEXT_CAT_HARRYPURRTER_INTRO, "harrypurrter", "harrypurrter", SPRITE_HARRYPURRTER, 60),
+    CAT_PROFILE("carrambacat", LOCALIZED_TEXT_CAT_CARRAMBACAT_NAME, LOCALIZED_TEXT_CAT_CARRAMBACAT_INTRO, "carrambacat", "carrambacat", SPRITE_CARRAMBACAT, 70),
+    CAT_PROFILE("scarcat", LOCALIZED_TEXT_CAT_SCARCAT_NAME, LOCALIZED_TEXT_CAT_SCARCAT_INTRO, "scarcat", "scarcat", SPRITE_SCARCAT, 80),
+    CAT_PROFILE("robocat", LOCALIZED_TEXT_CAT_ROBOCAT_NAME, LOCALIZED_TEXT_CAT_ROBOCAT_INTRO, "robocat", "robocat", SPRITE_ROBOCAT, 90),
+    CAT_PROFILE("termicator", LOCALIZED_TEXT_CAT_TERMICATOR_NAME, LOCALIZED_TEXT_CAT_TERMICATOR_INTRO, "termicator", "termicator", SPRITE_TERMICATOR, 100),
+    CAT_PROFILE("doomcat", LOCALIZED_TEXT_CAT_DOOMCAT_NAME, LOCALIZED_TEXT_CAT_DOOMCAT_INTRO, "doomcat", "doomcat", SPRITE_DOOMCAT, 110),
+    CAT_PROFILE("jawscat", LOCALIZED_TEXT_CAT_JAWSCAT_NAME, LOCALIZED_TEXT_CAT_JAWSCAT_INTRO, "jawscat", "jawscat", SPRITE_JAWSCAT, 120),
+    CAT_PROFILE("darthcat", LOCALIZED_TEXT_CAT_DARTHCAT_NAME, LOCALIZED_TEXT_CAT_DARTHCAT_INTRO, "darthcat", "darthcat", SPRITE_DARTHCAT, 130),
+
+    // Original requirements for unlocking profiles, for actual gameplay
+    // CAT_PROFILE("pinkpawther", LOCALIZED_TEXT_CAT_PINKPAWTHER_NAME, LOCALIZED_TEXT_CAT_PINKPAWTHER_INTRO, "pinkpawther", "pinkpawther", SPRITE_PINKPAWTHER, 0),
+    // CAT_PROFILE("agent00cat", LOCALIZED_TEXT_CAT_AGENT00CAT_NAME, LOCALIZED_TEXT_CAT_AGENT00CAT_INTRO, "agent00cat", "agent00cat", SPRITE_AGENT00CAT, 50),
+    // CAT_PROFILE("rockpaw", LOCALIZED_TEXT_CAT_ROCKPAW_NAME, LOCALIZED_TEXT_CAT_ROCKPAW_INTRO, "rockpaw", "rockpaw", SPRITE_ROCKPAW, 100),
+    // CAT_PROFILE("impawsiblecat", LOCALIZED_TEXT_CAT_IMPAWSIBLECAT_NAME, LOCALIZED_TEXT_CAT_IMPAWSIBLECAT_INTRO, "impawsiblecat", "impawsiblecat", SPRITE_IMPAWSIBLECAT, 150),
+    // CAT_PROFILE("indicat", LOCALIZED_TEXT_CAT_INDICAT_NAME, LOCALIZED_TEXT_CAT_INDICAT_INTRO, "indicat", "indicat", SPRITE_INDICAT, 250),
+    // CAT_PROFILE("catbuster", LOCALIZED_TEXT_CAT_CATBUSTER_NAME, LOCALIZED_TEXT_CAT_CATBUSTER_INTRO, "catbuster", "catbuster", SPRITE_CATBUSTER, 350),
+    // CAT_PROFILE("harrypurrter", LOCALIZED_TEXT_CAT_HARRYPURRTER_NAME, LOCALIZED_TEXT_CAT_HARRYPURRTER_INTRO, "harrypurrter", "harrypurrter", SPRITE_HARRYPURRTER, 500),
+    // CAT_PROFILE("carrambacat", LOCALIZED_TEXT_CAT_CARRAMBACAT_NAME, LOCALIZED_TEXT_CAT_CARRAMBACAT_INTRO, "carrambacat", "carrambacat", SPRITE_CARRAMBACAT, 650),
+    // CAT_PROFILE("scarcat", LOCALIZED_TEXT_CAT_SCARCAT_NAME, LOCALIZED_TEXT_CAT_SCARCAT_INTRO, "scarcat", "scarcat", SPRITE_SCARCAT, 800),
+    // CAT_PROFILE("robocat", LOCALIZED_TEXT_CAT_ROBOCAT_NAME, LOCALIZED_TEXT_CAT_ROBOCAT_INTRO, "robocat", "robocat", SPRITE_ROBOCAT, 1000),
+    // CAT_PROFILE("termicator", LOCALIZED_TEXT_CAT_TERMICATOR_NAME, LOCALIZED_TEXT_CAT_TERMICATOR_INTRO, "termicator", "termicator", SPRITE_TERMICATOR, 1200),
+    // CAT_PROFILE("doomcat", LOCALIZED_TEXT_CAT_DOOMCAT_NAME, LOCALIZED_TEXT_CAT_DOOMCAT_INTRO, "doomcat", "doomcat", SPRITE_DOOMCAT, 1400),
+    // CAT_PROFILE("jawscat", LOCALIZED_TEXT_CAT_JAWSCAT_NAME, LOCALIZED_TEXT_CAT_JAWSCAT_INTRO, "jawscat", "jawscat", SPRITE_JAWSCAT, 1600),
+    // CAT_PROFILE("darthcat", LOCALIZED_TEXT_CAT_DARTHCAT_NAME, LOCALIZED_TEXT_CAT_DARTHCAT_INTRO, "darthcat", "darthcat", SPRITE_DARTHCAT, 1800),
 };
 
 #undef CAT_PROFILE

@@ -6,7 +6,7 @@ import argparse
 import json
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -16,10 +16,15 @@ DEFAULT_OUTPUT_FILE = Path("src/audio/generated_music.c")
 
 WAVE_MAP = {
     "square": "SOUND_WAVE_SQUARE",
-    "triangle": "SOUND_WAVE_TRIANGLE",
     "sine": "SOUND_WAVE_SINE",
+    "triangle": "SOUND_WAVE_TRIANGLE",
     "noise": "SOUND_WAVE_NOISE",
 }
+
+INSTRUMENT_FLAG_BASS = 1
+INSTRUMENT_FLAG_LEAD = 2
+INSTRUMENT_FLAG_PAD = 4
+INSTRUMENT_FLAG_SPARK = 8
 
 
 @dataclass(frozen=True)
@@ -29,26 +34,46 @@ class MusicInstrument:
     volume: int
     attack_ms: int
     decay_ms: int
+    sustain: int
+    release_ms: int
+    flags: int
+
+
+@dataclass(frozen=True)
+class MusicLoop:
+    enabled: bool
+    start_tick: int
+    end_tick: int
 
 
 @dataclass(frozen=True)
 class MusicNote:
-    instrument_index: int
+    instrument: int
+    note: int
     start_tick: int
     duration_ticks: int
-    midi_note: int
     volume: int
 
 
 @dataclass(frozen=True)
-class MusicPattern:
+class PackedStats:
+    original_note_bytes: int
+    packed_bytes: int
+    note_count: int
+
+
+@dataclass(frozen=True)
+class PackedMusic:
     music_id: str
+    symbol: str
     bpm: int
     ticks_per_beat: int
     length_ticks: int
+    loop: MusicLoop
     instruments: list[MusicInstrument]
     notes: list[MusicNote]
     source_path: Path
+    stats: PackedStats
 
 
 def as_dict(value: Any, label: str) -> dict[str, Any]:
@@ -70,14 +95,19 @@ def as_str(value: Any, label: str) -> str:
 
 
 def as_int(value: Any, label: str) -> int:
-    if not isinstance(value, int):
+    if not isinstance(value, int) or isinstance(value, bool):
         raise ValueError(f"{label} must be an integer")
     return value
 
 
+def as_bool(value: Any, label: str) -> bool:
+    if not isinstance(value, bool):
+        raise ValueError(f"{label} must be a boolean")
+    return value
+
+
 def optional_int(data: dict[str, Any], key: str, default: int, label: str) -> int:
-    value = data.get(key, default)
-    return as_int(value, f"{label}.{key}")
+    return as_int(data.get(key, default), f"{label}.{key}")
 
 
 def validate_id(value: str, label: str) -> None:
@@ -95,19 +125,84 @@ def validate_u16(value: int, label: str) -> None:
         raise ValueError(f"{label} must be in range 0..65535")
 
 
+def infer_instrument_flags(instrument: MusicInstrument, average_note: float | None) -> int:
+    instrument_id = instrument.instrument_id.lower()
+
+    if "bass" in instrument_id:
+        return INSTRUMENT_FLAG_BASS
+    if "lead" in instrument_id:
+        return INSTRUMENT_FLAG_LEAD
+    if "harmony" in instrument_id or "pad" in instrument_id:
+        return INSTRUMENT_FLAG_PAD
+    if "spark" in instrument_id:
+        return INSTRUMENT_FLAG_SPARK
+    if average_note is not None and average_note <= 45:
+        return INSTRUMENT_FLAG_BASS
+    if average_note is not None and average_note >= 78:
+        return INSTRUMENT_FLAG_SPARK
+    if average_note is not None and average_note < 52:
+        return INSTRUMENT_FLAG_BASS
+    return INSTRUMENT_FLAG_LEAD
+
+
+def assign_instrument_flags(instruments: list[MusicInstrument], notes: list[MusicNote]) -> list[MusicInstrument]:
+    note_totals = [0] * len(instruments)
+    note_counts = [0] * len(instruments)
+
+    for note in notes:
+        note_totals[note.instrument] += note.note
+        note_counts[note.instrument] += 1
+
+    flagged: list[MusicInstrument] = []
+    for index, instrument in enumerate(instruments):
+        average_note = None if note_counts[index] == 0 else note_totals[index] / note_counts[index]
+        flagged.append(replace(instrument, flags=infer_instrument_flags(instrument, average_note)))
+    return flagged
+
+
 def make_symbol(value: str) -> str:
     symbol = re.sub(r"[^A-Za-z0-9]+", "_", value).strip("_").upper()
-
     if not symbol:
         raise ValueError("Generated C symbol is empty")
-
     if symbol[0].isdigit():
         symbol = f"MUSIC_{symbol}"
-
     return symbol
 
 
-def parse_music_file(path: Path) -> MusicPattern:
+def music_id_symbol(value: str) -> str:
+    return f"MUSIC_ID_{make_symbol(value)}"
+
+
+def c_array_count(name: str) -> str:
+    return f"sizeof({name}) / sizeof({name}[0])"
+
+
+def parse_loop(data: dict[str, Any], path: Path, length_ticks: int) -> MusicLoop:
+    raw_loop = data.get("loop")
+    if raw_loop is None:
+        return MusicLoop(enabled=False, start_tick=0, end_tick=0)
+
+    label = f"{path}: loop"
+    loop = as_dict(raw_loop, label)
+    enabled = as_bool(loop.get("enabled", False), f"{label}.enabled")
+    start_tick = optional_int(loop, "startTick", 0, label)
+    end_tick = optional_int(loop, "endTick", 0, label)
+
+    validate_u16(start_tick, f"{label}.startTick")
+    validate_u16(end_tick, f"{label}.endTick")
+
+    if not enabled:
+        return MusicLoop(enabled=False, start_tick=0, end_tick=0)
+
+    if end_tick <= start_tick:
+        raise ValueError(f"{label}: endTick must be greater than startTick")
+    if end_tick > length_ticks:
+        raise ValueError(f"{label}: endTick must be <= lengthTicks")
+
+    return MusicLoop(enabled=True, start_tick=start_tick, end_tick=end_tick)
+
+
+def parse_music_file(path: Path) -> tuple[str, int, int, int, MusicLoop, list[MusicInstrument], list[MusicNote]]:
     data = as_dict(json.loads(path.read_text(encoding="utf-8")), str(path))
 
     file_type = as_str(data.get("type"), f"{path}: type")
@@ -118,20 +213,24 @@ def parse_music_file(path: Path) -> MusicPattern:
     validate_id(music_id, f"{path}: id")
 
     bpm = as_int(data.get("bpm"), f"{path}: bpm")
-    if bpm <= 0 or bpm > 255:
-        raise ValueError(f"{path}: bpm must be in range 1..255")
+    if bpm <= 0 or bpm > 65535:
+        raise ValueError(f"{path}: bpm must be in range 1..65535")
 
     ticks_per_beat = as_int(data.get("ticksPerBeat"), f"{path}: ticksPerBeat")
-    if ticks_per_beat <= 0 or ticks_per_beat > 255:
-        raise ValueError(f"{path}: ticksPerBeat must be in range 1..255")
+    if ticks_per_beat <= 0 or ticks_per_beat > 65535:
+        raise ValueError(f"{path}: ticksPerBeat must be in range 1..65535")
 
     length_ticks = as_int(data.get("lengthTicks"), f"{path}: lengthTicks")
     if length_ticks <= 0 or length_ticks > 65535:
         raise ValueError(f"{path}: lengthTicks must be in range 1..65535")
 
-    raw_instruments = as_list(data.get("instruments"), f"{path}: instruments")
-    instruments: list[MusicInstrument] = []
+    loop = parse_loop(data, path, length_ticks)
 
+    raw_instruments = as_list(data.get("instruments"), f"{path}: instruments")
+    if not raw_instruments:
+        raise ValueError(f"{path}: instruments must not be empty")
+
+    instruments: list[MusicInstrument] = []
     for index, raw_instrument in enumerate(raw_instruments):
         label = f"{path}: instruments[{index}]"
         instrument = as_dict(raw_instrument, label)
@@ -141,18 +240,20 @@ def parse_music_file(path: Path) -> MusicPattern:
 
         wave = as_str(instrument.get("wave"), f"{label}.wave")
         if wave not in WAVE_MAP:
-            if wave == "saw":
-                raise ValueError(f"{label}: unsupported wave 'saw' because SoundWaveKind has no SOUND_WAVE_SAW")
             raise ValueError(f"{label}: unsupported wave '{wave}'")
 
         volume = as_int(instrument.get("volume"), f"{label}.volume")
-        validate_u8(volume, f"{label}.volume")
-
         attack_ms = optional_int(instrument, "attackMs", 0, label)
         decay_ms = optional_int(instrument, "decayMs", 0, label)
+        sustain = optional_int(instrument, "sustain", 255, label)
+        release_ms = optional_int(instrument, "releaseMs", 0, label)
 
-        validate_u16(attack_ms, f"{label}.attackMs")
-        validate_u16(decay_ms, f"{label}.decayMs")
+        if volume < 0 or volume > 100:
+            raise ValueError(f"{label}.volume must be in range 0..100")
+        validate_u8(attack_ms, f"{label}.attackMs")
+        validate_u8(decay_ms, f"{label}.decayMs")
+        validate_u8(sustain, f"{label}.sustain")
+        validate_u16(release_ms, f"{label}.releaseMs")
 
         instruments.append(
             MusicInstrument(
@@ -161,175 +262,216 @@ def parse_music_file(path: Path) -> MusicPattern:
                 volume=volume,
                 attack_ms=attack_ms,
                 decay_ms=decay_ms,
+                sustain=sustain,
+                release_ms=release_ms,
+                flags=0,
             )
         )
 
+    if len(instruments) > 255:
+        raise ValueError(f"{path}: instrument count must be <= 255")
+
     raw_notes = as_list(data.get("notes"), f"{path}: notes")
+    raw_note_dicts = [as_dict(item, f"{path}: notes[{index}]") for index, item in enumerate(raw_notes)]
     notes: list[MusicNote] = []
 
-    for index, raw_note in enumerate(raw_notes):
+    for index, note in enumerate(raw_note_dicts):
         label = f"{path}: notes[{index}]"
-        note = as_dict(raw_note, label)
 
-        instrument_index = as_int(note.get("instrument"), f"{label}.instrument")
-        if instrument_index < 0 or instrument_index >= len(instruments):
-            raise ValueError(f"{label}: instrument index is out of range")
-
+        instrument = as_int(note.get("instrument"), f"{label}.instrument")
         midi_note = as_int(note.get("note"), f"{label}.note")
-        if midi_note < 0 or midi_note > 127:
-            raise ValueError(f"{label}: note must be in range 0..127")
-
         start_tick = as_int(note.get("startTick"), f"{label}.startTick")
         duration_ticks = as_int(note.get("durationTicks"), f"{label}.durationTicks")
         volume = as_int(note.get("volume"), f"{label}.volume")
 
+        if instrument < 0 or instrument >= len(instruments):
+            raise ValueError(f"{label}: instrument index is out of range")
+        if midi_note < 0 or midi_note > 127:
+            raise ValueError(f"{label}: note must be in range 0..127")
+
         validate_u16(start_tick, f"{label}.startTick")
         validate_u16(duration_ticks, f"{label}.durationTicks")
-        validate_u8(volume, f"{label}.volume")
+        if volume < 0 or volume > 100:
+            raise ValueError(f"{label}.volume must be in range 0..100")
 
         if duration_ticks == 0:
-            print(f"Warning: {label}: skipped zero-length note")
-            continue
-
+            raise ValueError(f"{label}: durationTicks must be > 0")
         if start_tick >= length_ticks:
-            print(f"Warning: {label}: skipped note starting outside song length")
-            continue
+            raise ValueError(f"{label}: startTick must be < lengthTicks")
 
         note_end_tick = start_tick + duration_ticks
         if note_end_tick > length_ticks:
-            fixed_duration_ticks = length_ticks - start_tick
-            print(
-                f"Warning: {label}: trimmed note duration "
-                f"from {duration_ticks} to {fixed_duration_ticks} "
-                f"to fit lengthTicks={length_ticks}"
+            raise ValueError(
+                f"{label}: note crosses music length: "
+                f"startTick={start_tick} durationTicks={duration_ticks} lengthTicks={length_ticks}"
             )
-            duration_ticks = fixed_duration_ticks
-
         notes.append(
             MusicNote(
-                instrument_index=instrument_index,
+                instrument=instrument,
+                note=midi_note,
                 start_tick=start_tick,
                 duration_ticks=duration_ticks,
-                midi_note=midi_note,
                 volume=volume,
             )
         )
 
-    notes.sort(key=lambda item: (item.start_tick, item.instrument_index, item.midi_note))
+    notes.sort(key=lambda item: (item.start_tick, item.instrument, item.note, item.duration_ticks, item.volume))
+    instruments = assign_instrument_flags(instruments, notes)
+    return music_id, bpm, ticks_per_beat, length_ticks, loop, instruments, notes
 
-    return MusicPattern(
+
+def pack_music(path: Path) -> PackedMusic:
+    music_id, bpm, ticks_per_beat, length_ticks, loop, instruments, notes = parse_music_file(path)
+    symbol = make_symbol(music_id)
+
+    if len(notes) > 65535:
+        raise ValueError(f"{path}: note count must be <= 65535")
+
+    original_note_bytes = len(notes) * 7
+    instrument_bytes = len(instruments) * 5
+    note_bytes = len(notes) * 7
+    definition_estimate = 64
+    packed_bytes = instrument_bytes + note_bytes + definition_estimate
+
+    return PackedMusic(
         music_id=music_id,
+        symbol=symbol,
         bpm=bpm,
         ticks_per_beat=ticks_per_beat,
         length_ticks=length_ticks,
+        loop=loop,
         instruments=instruments,
         notes=notes,
         source_path=path,
+        stats=PackedStats(
+            original_note_bytes=original_note_bytes,
+            packed_bytes=packed_bytes,
+            note_count=len(notes),
+        ),
     )
 
 
-def emit_instruments(pattern: MusicPattern) -> str:
-    symbol = make_symbol(pattern.music_id)
-    name = f"{symbol}_MUSIC_INSTRUMENTS"
+def emit_generated_header() -> str:
+    return """// Generated by tools/pack_music.py. Do not edit manually.
+#include "generated_music.h"
+#include <stddef.h>
+#include <stdint.h>
 
-    lines: list[str] = []
-    lines.append(f"// Source: {pattern.source_path.as_posix()}")
-    lines.append(f"static const MusicInstrument {name}[] = {{")
+"""
 
+
+def emit_instruments(pattern: PackedMusic) -> str:
+    name = f"{pattern.symbol}_MUSIC_INSTRUMENTS"
+    lines = [f"// Source: {pattern.source_path.as_posix()}", f"static const PackedMusicInstrument {name}[] = {{"]
     for instrument in pattern.instruments:
-        lines.append("    {")
-        lines.append(f"        .wave = {WAVE_MAP[instrument.wave]},")
-        lines.append(f"        .volume = {instrument.volume},")
-        lines.append("    },")
-
+        lines.extend(
+            [
+                "    {",
+                f"        .wave = {WAVE_MAP[instrument.wave]},",
+                f"        .volume = {instrument.volume},",
+                f"        .attack_ms = {instrument.attack_ms},",
+                f"        .decay_ms = {instrument.decay_ms},",
+                f"        .flags = {instrument.flags},",
+                "    },",
+            ]
+        )
     lines.append("};")
     return "\n".join(lines)
 
 
-def emit_notes(pattern: MusicPattern) -> str:
-    symbol = make_symbol(pattern.music_id)
-    name = f"{symbol}_MUSIC_NOTES"
-
-    lines: list[str] = []
-    lines.append(f"static const MusicNote {name}[] = {{")
-
+def emit_notes(pattern: PackedMusic) -> str:
+    name = f"{pattern.symbol}_MUSIC_NOTES"
+    lines = [f"static const PackedMusicNote {name}[] = {{"]
     for note in pattern.notes:
-        lines.append("    {")
-        lines.append(f"        .instrument = {note.instrument_index},")
-        lines.append(f"        .midi_note = {note.midi_note},")
-        lines.append(f"        .start_tick = {note.start_tick},")
-        lines.append(f"        .duration_ticks = {note.duration_ticks},")
-        lines.append(f"        .volume = {note.volume},")
-        lines.append("    },")
-
+        lines.append(
+            f"    {{ {note.instrument}, {note.note}, {note.volume}, "
+            f"{note.start_tick}, {note.duration_ticks} }},"
+        )
     lines.append("};")
     return "\n".join(lines)
 
 
-def emit_music_registry(patterns: list[MusicPattern]) -> str:
-    lines: list[str] = []
-
-    lines.append("const MusicDefinition PACKED_MUSIC_DEFINITIONS[] = {")
-
-    for pattern in patterns:
-        symbol = make_symbol(pattern.music_id)
-        instruments_name = f"{symbol}_MUSIC_INSTRUMENTS"
-        notes_name = f"{symbol}_MUSIC_NOTES"
-
-        lines.append("    {")
-        lines.append(f'        .id = "{pattern.music_id}",')
-        lines.append(f"        .bpm = {pattern.bpm},")
-        lines.append(f"        .ticks_per_beat = {pattern.ticks_per_beat},")
-        lines.append(f"        .loop_ticks = {pattern.length_ticks},")
-        lines.append(f"        .instruments = {instruments_name},")
-        lines.append(f"        .instrument_count = sizeof({instruments_name}) / sizeof({instruments_name}[0]),")
-        lines.append(f"        .notes = {notes_name},")
-        lines.append(f"        .note_count = sizeof({notes_name}) / sizeof({notes_name}[0]),")
-        lines.append("    },")
-
-    lines.append("};")
-    lines.append("")
-    lines.append(
-        "const size_t PACKED_MUSIC_COUNT = "
-        "sizeof(PACKED_MUSIC_DEFINITIONS) / sizeof(PACKED_MUSIC_DEFINITIONS[0]);"
-    )
-
-    return "\n".join(lines)
-
-
-def emit_music_c(patterns: list[MusicPattern]) -> str:
-    chunks: list[str] = []
-
-    chunks.append("// Generated by tools/pack_music.py. Do not edit manually.")
-    chunks.append('#include "generated_music.h"')
-    chunks.append("")
-
-    for pattern in patterns:
-        chunks.append(emit_instruments(pattern))
-        chunks.append("")
-        chunks.append(emit_notes(pattern))
-        chunks.append("")
-
-    chunks.append(emit_music_registry(patterns))
-    chunks.append("")
-
+def emit_pattern(pattern: PackedMusic) -> str:
+    chunks = [
+        emit_instruments(pattern),
+        "",
+        emit_notes(pattern),
+        "",
+    ]
     return "\n".join(chunks)
 
 
-def load_patterns(input_dir: Path) -> list[MusicPattern]:
-    paths = sorted(input_dir.glob("*.music.json"))
-    patterns = [parse_music_file(path) for path in paths]
+def emit_registry(patterns: list[PackedMusic]) -> str:
+    lines = ["const PackedMusicDefinition PACKED_MUSIC_DEFINITIONS[] = {"]
+    for pattern in patterns:
+        instruments_name = f"{pattern.symbol}_MUSIC_INSTRUMENTS"
+        notes_name = f"{pattern.symbol}_MUSIC_NOTES"
+        loop_enabled = 1 if pattern.loop.enabled else 0
 
+        lines.extend(
+            [
+                "    {",
+                f"        .id = {music_id_symbol(pattern.music_id)},",
+                f"        .bpm = {pattern.bpm},",
+                f"        .ticks_per_beat = {pattern.ticks_per_beat},",
+                f"        .length_ticks = {pattern.length_ticks},",
+                "        .loop = {",
+                f"            .enabled = {loop_enabled},",
+                f"            .start_tick = {pattern.loop.start_tick},",
+                f"            .end_tick = {pattern.loop.end_tick},",
+                "        },",
+                f"        .instruments = {instruments_name},",
+                f"        .instrument_count = {c_array_count(instruments_name)},",
+                f"        .notes = {notes_name},",
+                f"        .note_count = {c_array_count(notes_name)},",
+                "    },",
+            ]
+        )
+    lines.append("};")
+    lines.append("")
+    lines.append("const size_t PACKED_MUSIC_COUNT = sizeof(PACKED_MUSIC_DEFINITIONS) / sizeof(PACKED_MUSIC_DEFINITIONS[0]);")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def emit_music_c(patterns: list[PackedMusic]) -> str:
+    chunks = [emit_generated_header()]
+    for pattern in patterns:
+        chunks.append(emit_pattern(pattern))
+    chunks.append(emit_registry(patterns))
+    return "\n".join(chunks)
+
+
+def load_patterns(input_dir: Path) -> list[PackedMusic]:
+    paths = sorted(input_dir.glob("*.music.json"))
+    patterns = [pack_music(path) for path in paths]
     used_ids: set[str] = set()
 
     for pattern in patterns:
         if pattern.music_id in used_ids:
             raise ValueError(f"Duplicate music id: {pattern.music_id}")
-
         used_ids.add(pattern.music_id)
 
     patterns.sort(key=lambda item: item.music_id)
     return patterns
+
+
+def print_stats(patterns: list[PackedMusic]) -> None:
+    total_old = 0
+    total_new = 0
+    for pattern in patterns:
+        total_old += pattern.stats.original_note_bytes
+        total_new += pattern.stats.packed_bytes
+        saved = pattern.stats.original_note_bytes - pattern.stats.packed_bytes
+        ratio = (pattern.stats.packed_bytes / pattern.stats.original_note_bytes) if pattern.stats.original_note_bytes else 0
+        print(
+            f"{pattern.music_id}: notes={pattern.stats.note_count}, "
+            f"old_notes={pattern.stats.original_note_bytes} B, "
+            f"packed≈{pattern.stats.packed_bytes} B, "
+            f"saved≈{saved} B, ratio≈{ratio:.2f}"
+        )
+    if total_old:
+        print(f"Total: old_notes={total_old} B, packed≈{total_new} B, ratio≈{total_new / total_old:.2f}")
 
 
 def convert_all(input_dir: Path, output_file: Path) -> None:
@@ -337,7 +479,6 @@ def convert_all(input_dir: Path, output_file: Path) -> None:
         raise FileNotFoundError(f"Input directory does not exist: {input_dir}")
 
     patterns = load_patterns(input_dir)
-
     if not patterns:
         print(f"No *.music.json files found in {input_dir}")
         return
@@ -347,27 +488,13 @@ def convert_all(input_dir: Path, output_file: Path) -> None:
 
     print(f"Generated {output_file}")
     print(f"Packed {len(patterns)} music pattern(s)")
+    print_stats(patterns)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Pack Little One music JSON files into one C source file."
-    )
-
-    parser.add_argument(
-        "--input-dir",
-        type=Path,
-        default=DEFAULT_INPUT_DIR,
-        help="Directory with *.music.json files.",
-    )
-
-    parser.add_argument(
-        "--output",
-        type=Path,
-        default=DEFAULT_OUTPUT_FILE,
-        help="Generated C output file.",
-    )
-
+    parser = argparse.ArgumentParser(description="Pack Little One music JSON files into compressed C source.")
+    parser.add_argument("--input-dir", type=Path, default=DEFAULT_INPUT_DIR, help="Directory with *.music.json files.")
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_FILE, help="Generated C output file.")
     args = parser.parse_args()
 
     try:

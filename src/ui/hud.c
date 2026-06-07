@@ -63,7 +63,6 @@ static const HudLayout HUD_LAYOUT = {
 typedef struct
 {
     const GeneratedSprite *background;
-    const GeneratedSprite *cat_face;
     const GeneratedSprite *heart_full;
     const GeneratedSprite *heart_empty;
     const GeneratedSprite *star;
@@ -76,7 +75,6 @@ static HudResources HUD_RESOURCES;
 void hud_initialize(void)
 {
     HUD_RESOURCES.background = generated_sprite_get_by_id("hud_bg");
-    HUD_RESOURCES.cat_face = generated_sprite_get_by_id("cat_face");
     HUD_RESOURCES.heart_full = generated_sprite_get_by_id("heart_full");
     HUD_RESOURCES.heart_empty = generated_sprite_get_by_id("heart_empty");
     HUD_RESOURCES.star = generated_sprite_get_by_id("star");
@@ -91,7 +89,7 @@ static const HudResources *hud_resources_get(void)
         hud_initialize();
     }
 
-    if (HUD_RESOURCES.background == 0 || HUD_RESOURCES.cat_face == 0 || HUD_RESOURCES.heart_full == 0 || HUD_RESOURCES.heart_empty == 0 || HUD_RESOURCES.star == 0 || HUD_RESOURCES.score_font == 0)
+    if (HUD_RESOURCES.background == 0 || HUD_RESOURCES.heart_full == 0 || HUD_RESOURCES.heart_empty == 0 || HUD_RESOURCES.star == 0 || HUD_RESOURCES.score_font == 0)
     {
         return 0;
     }
@@ -169,9 +167,8 @@ static void hud_draw_background(
         slice);
 }
 
-static void hud_draw_current_cat_face(
+static void hud_draw_current_cat_sprite(
     Framebuffer *framebuffer,
-    const HudResources *resources,
     const GameState *game,
     int x,
     int y,
@@ -182,7 +179,6 @@ static void hud_draw_current_cat_face(
 
     if (sprite == 0)
     {
-        hud_draw_sprite(framebuffer, resources->cat_face, x, y, width, height);
         return;
     }
 
@@ -329,9 +325,8 @@ void hud_render(Framebuffer *framebuffer, const GameState *game)
     cat_x = bg_x + HUD_LAYOUT.padding_x;
     cat_y = bg_y + (HUD_LAYOUT.bg_height - HUD_LAYOUT.cat_size) / 2;
 
-    hud_draw_current_cat_face(
+    hud_draw_current_cat_sprite(
         framebuffer,
-        resources,
         game,
         cat_x,
         cat_y,

@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "id": "arrow_left",
+  "width": 110,
+  "height": 92,
+  "pivotX": 55,
+  "pivotY": 46,
+  "primitives": [
+    {
+      "kind": "rect",
+      "x": 55,
+      "y": 46,
+      "w": 110,
+      "h": 92,
+      "rotation": 0,
+      "color": "101722ee"
+    },
+    {
+      "kind": "rect",
+      "x": 55,
+      "y": 2,
+      "w": 110,
+      "h": 4,
+      "rotation": 0,
+      "color": "81b29aff"
+    },
+    {
+      "kind": "rect",
+      "x": 55,
+      "y": 90,
+      "w": 110,
+      "h": 4,
+      "rotation": 0,
+      "color": "81b29aff"
+    },
+    {
+      "kind": "rect",
+      "x": 2,
+      "y": 46,
+      "w": 4,
+      "h": 92,
+      "rotation": 0,
+      "color": "81b29aff"
+    },
+    {
+      "kind": "rect",
+      "x": 108,
+      "y": 46,
+      "w": 4,
+      "h": 92,
+      "rotation": 0,
+      "color": "81b29aff"
+    },
+    {
+      "kind": "triangle",
+      "x": 59,
+      "y": 50,
+      "w": 43,
+      "h": 58,
+      "rotation": -90,
+      "color": "000000ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 53,
+      "y": 46,
+      "w": 43,
+      "h": 58,
+      "rotation": -90,
+      "color": "f5eddbff"
+    },
+    {
+      "kind": "triangle",
+      "x": 62,
+      "y": 46,
+      "w": 24,
+      "h": 35,
+      "rotation": -90,
+      "color": "81b29aff"
+    }
+  ]
+}

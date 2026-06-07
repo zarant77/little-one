@@ -2,3083 +2,3655 @@
   "type": "music",
   "id": "robocat",
   "bpm": 129,
-  "ticksPerBeat": 4,
-  "lengthTicks": 260,
+  "ticksPerBeat": 96,
+  "lengthTicks": 6239,
+  "loop": {
+    "enabled": false,
+    "startTick": 0,
+    "endTick": 6239
+  },
   "instruments": [
     {
       "id": "lead",
-      "wave": "square",
-      "volume": 76,
-      "attackMs": 5,
-      "decayMs": 70
+      "wave": "triangle",
+      "volume": 34,
+      "attackMs": 8,
+      "decayMs": 140
     },
     {
       "id": "bass",
       "wave": "triangle",
-      "volume": 82,
-      "attackMs": 3,
-      "decayMs": 95
-    },
-    {
-      "id": "pulse",
-      "wave": "square",
-      "volume": 34,
-      "attackMs": 2,
-      "decayMs": 28
+      "volume": 42,
+      "attackMs": 10,
+      "decayMs": 180
     },
     {
       "id": "harmony",
-      "wave": "triangle",
-      "volume": 48,
+      "wave": "sine",
+      "volume": 28,
+      "attackMs": 16,
+      "decayMs": 240
+    },
+    {
+      "id": "soft_lead",
+      "wave": "sine",
+      "volume": 32,
       "attackMs": 10,
-      "decayMs": 140
+      "decayMs": 160
     },
     {
       "id": "spark",
-      "wave": "square",
-      "volume": 30,
-      "attackMs": 2,
-      "decayMs": 35
+      "wave": "triangle",
+      "volume": 22,
+      "attackMs": 6,
+      "decayMs": 100
+    },
+    {
+      "id": "lead_6",
+      "wave": "triangle",
+      "volume": 34,
+      "attackMs": 8,
+      "decayMs": 140
+    },
+    {
+      "id": "bass_7",
+      "wave": "triangle",
+      "volume": 42,
+      "attackMs": 10,
+      "decayMs": 180
+    },
+    {
+      "id": "harmony_8",
+      "wave": "sine",
+      "volume": 28,
+      "attackMs": 16,
+      "decayMs": 240
     }
   ],
   "notes": [
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 0,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1,
+      "durationTicks": 85,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 63,
-      "startTick": 0,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1,
+      "durationTicks": 94,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 0,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1,
+      "durationTicks": 94,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 0,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1,
+      "durationTicks": 85,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 48,
-      "startTick": 0,
-      "durationTicks": 16,
-      "volume": 43
+      "startTick": 1,
+      "durationTicks": 379,
+      "volume": 47
     },
     {
       "instrument": 4,
       "note": 60,
-      "startTick": 0,
-      "durationTicks": 4,
-      "volume": 48
+      "startTick": 1,
+      "durationTicks": 85,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 63,
-      "startTick": 0,
-      "durationTicks": 4,
-      "volume": 48
+      "startTick": 1,
+      "durationTicks": 94,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 67,
-      "startTick": 0,
-      "durationTicks": 4,
-      "volume": 48
+      "startTick": 1,
+      "durationTicks": 94,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 72,
-      "startTick": 0,
-      "durationTicks": 4,
-      "volume": 48
+      "startTick": 1,
+      "durationTicks": 85,
+      "volume": 50
     },
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 4,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 96,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 4,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 96,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 4,
       "note": 60,
-      "startTick": 4,
-      "durationTicks": 1,
-      "volume": 48
+      "startTick": 96,
+      "durationTicks": 23,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 72,
-      "startTick": 4,
-      "durationTicks": 1,
-      "volume": 48
+      "startTick": 96,
+      "durationTicks": 23,
+      "volume": 50
     },
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 6,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 144,
+      "durationTicks": 190,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 63,
-      "startTick": 6,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 144,
+      "durationTicks": 190,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 6,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 144,
+      "durationTicks": 190,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 6,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 144,
+      "durationTicks": 190,
+      "volume": 60
     },
     {
       "instrument": 4,
       "note": 60,
-      "startTick": 6,
-      "durationTicks": 8,
-      "volume": 48
+      "startTick": 144,
+      "durationTicks": 190,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 63,
-      "startTick": 6,
-      "durationTicks": 8,
-      "volume": 48
+      "startTick": 144,
+      "durationTicks": 190,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 67,
-      "startTick": 6,
-      "durationTicks": 8,
-      "volume": 48
+      "startTick": 144,
+      "durationTicks": 190,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 72,
-      "startTick": 6,
-      "durationTicks": 8,
-      "volume": 48
+      "startTick": 144,
+      "durationTicks": 190,
+      "volume": 50
     },
     {
       "instrument": 1,
       "note": 48,
-      "startTick": 8,
-      "durationTicks": 8,
-      "volume": 43
+      "startTick": 192,
+      "durationTicks": 190,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 12,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 288,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 75,
-      "startTick": 13,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 312,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 75,
-      "startTick": 14,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 336,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 72,
-      "startTick": 15,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 360,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 16,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 384,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 62,
-      "startTick": 16,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 384,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 65,
-      "startTick": 16,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 384,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 16,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 384,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 46,
-      "startTick": 16,
-      "durationTicks": 8,
-      "volume": 43
+      "startTick": 384,
+      "durationTicks": 191,
+      "volume": 47
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 20,
-      "durationTicks": 2,
-      "volume": 70
+      "startTick": 480,
+      "durationTicks": 47,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 20,
-      "durationTicks": 2,
-      "volume": 70
+      "startTick": 480,
+      "durationTicks": 47,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 22,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 528,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 62,
-      "startTick": 22,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 528,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 65,
-      "startTick": 22,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 528,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 22,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 528,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 46,
-      "startTick": 24,
-      "durationTicks": 8,
-      "volume": 43
+      "startTick": 576,
+      "durationTicks": 191,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 70,
-      "startTick": 28,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 672,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 70,
-      "startTick": 29,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 696,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 70,
-      "startTick": 30,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 720,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 70,
-      "startTick": 31,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 744,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 32,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 768,
+      "durationTicks": 86,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 63,
-      "startTick": 32,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 768,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 32,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 768,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 32,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 768,
+      "durationTicks": 86,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 48,
-      "startTick": 32,
-      "durationTicks": 8,
-      "volume": 43
+      "startTick": 768,
+      "durationTicks": 190,
+      "volume": 47
     },
     {
       "instrument": 4,
       "note": 60,
-      "startTick": 32,
-      "durationTicks": 4,
-      "volume": 48
+      "startTick": 768,
+      "durationTicks": 86,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 63,
-      "startTick": 32,
-      "durationTicks": 4,
-      "volume": 48
+      "startTick": 768,
+      "durationTicks": 95,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 67,
-      "startTick": 32,
-      "durationTicks": 4,
-      "volume": 48
+      "startTick": 768,
+      "durationTicks": 95,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 72,
-      "startTick": 32,
-      "durationTicks": 4,
-      "volume": 48
+      "startTick": 768,
+      "durationTicks": 86,
+      "volume": 50
     },
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 36,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 864,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 36,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 864,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 4,
       "note": 60,
-      "startTick": 36,
-      "durationTicks": 1,
-      "volume": 48
+      "startTick": 864,
+      "durationTicks": 23,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 72,
-      "startTick": 36,
-      "durationTicks": 1,
-      "volume": 48
+      "startTick": 864,
+      "durationTicks": 23,
+      "volume": 50
     },
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 38,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 912,
+      "durationTicks": 190,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 63,
-      "startTick": 38,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 912,
+      "durationTicks": 190,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 38,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 912,
+      "durationTicks": 190,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 38,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 912,
+      "durationTicks": 190,
+      "volume": 60
     },
     {
       "instrument": 4,
       "note": 60,
-      "startTick": 38,
-      "durationTicks": 8,
-      "volume": 48
+      "startTick": 912,
+      "durationTicks": 190,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 63,
-      "startTick": 38,
-      "durationTicks": 8,
-      "volume": 48
+      "startTick": 912,
+      "durationTicks": 190,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 67,
-      "startTick": 38,
-      "durationTicks": 8,
-      "volume": 48
+      "startTick": 912,
+      "durationTicks": 190,
+      "volume": 50
     },
     {
       "instrument": 4,
       "note": 72,
-      "startTick": 38,
-      "durationTicks": 8,
-      "volume": 48
+      "startTick": 912,
+      "durationTicks": 190,
+      "volume": 50
     },
     {
       "instrument": 1,
       "note": 48,
-      "startTick": 40,
-      "durationTicks": 8,
-      "volume": 43
+      "startTick": 960,
+      "durationTicks": 190,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 72,
-      "startTick": 42,
-      "durationTicks": 2,
-      "volume": 60
+      "startTick": 1008,
+      "durationTicks": 47,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 72,
-      "startTick": 44,
-      "durationTicks": 2,
-      "volume": 60
+      "startTick": 1056,
+      "durationTicks": 47,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 67,
-      "startTick": 46,
-      "durationTicks": 2,
-      "volume": 60
+      "startTick": 1104,
+      "durationTicks": 47,
+      "volume": 56
     },
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 48,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1152,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 63,
-      "startTick": 48,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1152,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 68,
-      "startTick": 48,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1152,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 48,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1152,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 44,
-      "startTick": 48,
-      "durationTicks": 8,
-      "volume": 43
+      "startTick": 1152,
+      "durationTicks": 191,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 68,
-      "startTick": 48,
-      "durationTicks": 2,
+      "startTick": 1152,
+      "durationTicks": 47,
+      "volume": 56
+    },
+    {
+      "instrument": 0,
+      "note": 60,
+      "startTick": 1248,
+      "durationTicks": 47,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 1248,
+      "durationTicks": 47,
       "volume": 60
     },
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 52,
-      "durationTicks": 2,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 72,
-      "startTick": 52,
-      "durationTicks": 2,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 60,
-      "startTick": 54,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 1296,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 63,
-      "startTick": 54,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 1296,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 68,
-      "startTick": 54,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 1296,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 54,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 1296,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 44,
-      "startTick": 56,
-      "durationTicks": 8,
-      "volume": 43
+      "startTick": 1344,
+      "durationTicks": 191,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 72,
-      "startTick": 56,
-      "durationTicks": 2,
-      "volume": 60
+      "startTick": 1344,
+      "durationTicks": 47,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 65,
-      "startTick": 58,
-      "durationTicks": 2,
-      "volume": 60
+      "startTick": 1392,
+      "durationTicks": 47,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 63,
-      "startTick": 60,
-      "durationTicks": 2,
-      "volume": 60
+      "startTick": 1440,
+      "durationTicks": 47,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 62,
-      "startTick": 62,
-      "durationTicks": 2,
+      "startTick": 1488,
+      "durationTicks": 47,
+      "volume": 56
+    },
+    {
+      "instrument": 0,
+      "note": 60,
+      "startTick": 1536,
+      "durationTicks": 86,
       "volume": 60
     },
     {
       "instrument": 0,
-      "note": 60,
-      "startTick": 64,
-      "durationTicks": 4,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
       "note": 63,
-      "startTick": 64,
-      "durationTicks": 4,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 67,
-      "startTick": 64,
-      "durationTicks": 4,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 72,
-      "startTick": 64,
-      "durationTicks": 4,
-      "volume": 70
-    },
-    {
-      "instrument": 1,
-      "note": 48,
-      "startTick": 64,
-      "durationTicks": 16,
-      "volume": 43
-    },
-    {
-      "instrument": 4,
-      "note": 60,
-      "startTick": 64,
-      "durationTicks": 4,
-      "volume": 48
-    },
-    {
-      "instrument": 4,
-      "note": 63,
-      "startTick": 64,
-      "durationTicks": 4,
-      "volume": 48
-    },
-    {
-      "instrument": 4,
-      "note": 67,
-      "startTick": 64,
-      "durationTicks": 4,
-      "volume": 48
-    },
-    {
-      "instrument": 4,
-      "note": 72,
-      "startTick": 64,
-      "durationTicks": 4,
-      "volume": 48
-    },
-    {
-      "instrument": 0,
-      "note": 60,
-      "startTick": 68,
-      "durationTicks": 1,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 72,
-      "startTick": 68,
-      "durationTicks": 1,
-      "volume": 70
-    },
-    {
-      "instrument": 2,
-      "note": 79,
-      "startTick": 68,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 4,
-      "note": 60,
-      "startTick": 68,
-      "durationTicks": 1,
-      "volume": 48
-    },
-    {
-      "instrument": 4,
-      "note": 72,
-      "startTick": 68,
-      "durationTicks": 1,
-      "volume": 48
-    },
-    {
-      "instrument": 2,
-      "note": 79,
-      "startTick": 69,
-      "durationTicks": 1,
+      "startTick": 1536,
+      "durationTicks": 95,
       "volume": 60
     },
     {
       "instrument": 0,
-      "note": 60,
-      "startTick": 70,
-      "durationTicks": 8,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 63,
-      "startTick": 70,
-      "durationTicks": 8,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
       "note": 67,
-      "startTick": 70,
-      "durationTicks": 8,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 72,
-      "startTick": 70,
-      "durationTicks": 8,
-      "volume": 70
-    },
-    {
-      "instrument": 2,
-      "note": 79,
-      "startTick": 70,
-      "durationTicks": 1,
+      "startTick": 1536,
+      "durationTicks": 95,
       "volume": 60
     },
     {
-      "instrument": 4,
-      "note": 60,
-      "startTick": 70,
-      "durationTicks": 8,
-      "volume": 48
-    },
-    {
-      "instrument": 4,
-      "note": 63,
-      "startTick": 70,
-      "durationTicks": 8,
-      "volume": 48
-    },
-    {
-      "instrument": 4,
-      "note": 67,
-      "startTick": 70,
-      "durationTicks": 8,
-      "volume": 48
-    },
-    {
-      "instrument": 4,
+      "instrument": 0,
       "note": 72,
-      "startTick": 70,
-      "durationTicks": 8,
-      "volume": 48
-    },
-    {
-      "instrument": 2,
-      "note": 79,
-      "startTick": 71,
-      "durationTicks": 1,
+      "startTick": 1536,
+      "durationTicks": 86,
       "volume": 60
     },
     {
       "instrument": 1,
       "note": 48,
-      "startTick": 72,
-      "durationTicks": 8,
-      "volume": 43
+      "startTick": 1536,
+      "durationTicks": 380,
+      "volume": 47
     },
     {
-      "instrument": 2,
-      "note": 75,
-      "startTick": 72,
-      "durationTicks": 1,
-      "volume": 60
+      "instrument": 4,
+      "note": 60,
+      "startTick": 1536,
+      "durationTicks": 86,
+      "volume": 50
     },
     {
-      "instrument": 2,
-      "note": 75,
-      "startTick": 73,
-      "durationTicks": 1,
-      "volume": 60
+      "instrument": 4,
+      "note": 63,
+      "startTick": 1536,
+      "durationTicks": 95,
+      "volume": 50
     },
     {
-      "instrument": 2,
-      "note": 75,
-      "startTick": 74,
-      "durationTicks": 1,
-      "volume": 60
+      "instrument": 4,
+      "note": 67,
+      "startTick": 1536,
+      "durationTicks": 95,
+      "volume": 50
     },
     {
-      "instrument": 2,
-      "note": 75,
-      "startTick": 75,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 2,
+      "instrument": 4,
       "note": 72,
-      "startTick": 76,
-      "durationTicks": 1,
+      "startTick": 1536,
+      "durationTicks": 86,
+      "volume": 50
+    },
+    {
+      "instrument": 0,
+      "note": 60,
+      "startTick": 1632,
+      "durationTicks": 23,
       "volume": 60
     },
     {
-      "instrument": 2,
+      "instrument": 0,
       "note": 72,
-      "startTick": 78,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 0,
-      "note": 58,
-      "startTick": 80,
-      "durationTicks": 4,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 62,
-      "startTick": 80,
-      "durationTicks": 4,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 65,
-      "startTick": 80,
-      "durationTicks": 4,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 70,
-      "startTick": 80,
-      "durationTicks": 4,
-      "volume": 70
-    },
-    {
-      "instrument": 1,
-      "note": 46,
-      "startTick": 80,
-      "durationTicks": 8,
-      "volume": 43
-    },
-    {
-      "instrument": 0,
-      "note": 58,
-      "startTick": 84,
-      "durationTicks": 2,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 70,
-      "startTick": 84,
-      "durationTicks": 2,
-      "volume": 70
-    },
-    {
-      "instrument": 2,
-      "note": 77,
-      "startTick": 84,
-      "durationTicks": 1,
+      "startTick": 1632,
+      "durationTicks": 23,
       "volume": 60
     },
     {
       "instrument": 2,
-      "note": 77,
-      "startTick": 85,
-      "durationTicks": 1,
+      "note": 79,
+      "startTick": 1632,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 4,
+      "note": 60,
+      "startTick": 1632,
+      "durationTicks": 23,
+      "volume": 50
+    },
+    {
+      "instrument": 4,
+      "note": 72,
+      "startTick": 1632,
+      "durationTicks": 23,
+      "volume": 50
+    },
+    {
+      "instrument": 2,
+      "note": 79,
+      "startTick": 1656,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 0,
+      "note": 60,
+      "startTick": 1680,
+      "durationTicks": 190,
       "volume": 60
     },
     {
       "instrument": 0,
-      "note": 58,
-      "startTick": 86,
-      "durationTicks": 8,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 62,
-      "startTick": 86,
-      "durationTicks": 8,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 65,
-      "startTick": 86,
-      "durationTicks": 8,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 70,
-      "startTick": 86,
-      "durationTicks": 8,
-      "volume": 70
-    },
-    {
-      "instrument": 2,
-      "note": 77,
-      "startTick": 86,
-      "durationTicks": 1,
+      "note": 63,
+      "startTick": 1680,
+      "durationTicks": 190,
       "volume": 60
-    },
-    {
-      "instrument": 2,
-      "note": 77,
-      "startTick": 87,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 1,
-      "note": 46,
-      "startTick": 88,
-      "durationTicks": 8,
-      "volume": 43
-    },
-    {
-      "instrument": 2,
-      "note": 74,
-      "startTick": 88,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 2,
-      "note": 74,
-      "startTick": 89,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 2,
-      "note": 74,
-      "startTick": 90,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 2,
-      "note": 74,
-      "startTick": 91,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 2,
-      "note": 70,
-      "startTick": 92,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 2,
-      "note": 70,
-      "startTick": 94,
-      "durationTicks": 1,
-      "volume": 60
-    },
-    {
-      "instrument": 0,
-      "note": 58,
-      "startTick": 96,
-      "durationTicks": 4,
-      "volume": 70
-    },
-    {
-      "instrument": 0,
-      "note": 62,
-      "startTick": 96,
-      "durationTicks": 4,
-      "volume": 70
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 96,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1680,
+      "durationTicks": 190,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 1680,
+      "durationTicks": 190,
+      "volume": 60
+    },
+    {
+      "instrument": 2,
+      "note": 79,
+      "startTick": 1680,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 4,
+      "note": 60,
+      "startTick": 1680,
+      "durationTicks": 190,
+      "volume": 50
+    },
+    {
+      "instrument": 4,
+      "note": 63,
+      "startTick": 1680,
+      "durationTicks": 190,
+      "volume": 50
+    },
+    {
+      "instrument": 4,
+      "note": 67,
+      "startTick": 1680,
+      "durationTicks": 190,
+      "volume": 50
+    },
+    {
+      "instrument": 4,
+      "note": 72,
+      "startTick": 1680,
+      "durationTicks": 190,
+      "volume": 50
+    },
+    {
+      "instrument": 2,
+      "note": 79,
+      "startTick": 1704,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 1,
+      "note": 48,
+      "startTick": 1728,
+      "durationTicks": 190,
+      "volume": 47
+    },
+    {
+      "instrument": 2,
+      "note": 75,
+      "startTick": 1728,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 75,
+      "startTick": 1752,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 75,
+      "startTick": 1776,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 75,
+      "startTick": 1800,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 72,
+      "startTick": 1824,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 72,
+      "startTick": 1872,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 0,
+      "note": 58,
+      "startTick": 1920,
+      "durationTicks": 95,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 62,
+      "startTick": 1920,
+      "durationTicks": 95,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 65,
+      "startTick": 1920,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 96,
-      "durationTicks": 4,
-      "volume": 70
+      "startTick": 1920,
+      "durationTicks": 95,
+      "volume": 60
+    },
+    {
+      "instrument": 1,
+      "note": 46,
+      "startTick": 1920,
+      "durationTicks": 191,
+      "volume": 47
+    },
+    {
+      "instrument": 0,
+      "note": 58,
+      "startTick": 2016,
+      "durationTicks": 47,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 70,
+      "startTick": 2016,
+      "durationTicks": 47,
+      "volume": 60
+    },
+    {
+      "instrument": 2,
+      "note": 77,
+      "startTick": 2016,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 77,
+      "startTick": 2040,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 0,
+      "note": 58,
+      "startTick": 2064,
+      "durationTicks": 191,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 62,
+      "startTick": 2064,
+      "durationTicks": 191,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 65,
+      "startTick": 2064,
+      "durationTicks": 191,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 70,
+      "startTick": 2064,
+      "durationTicks": 191,
+      "volume": 60
+    },
+    {
+      "instrument": 2,
+      "note": 77,
+      "startTick": 2064,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 77,
+      "startTick": 2088,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 1,
+      "note": 46,
+      "startTick": 2112,
+      "durationTicks": 191,
+      "volume": 47
+    },
+    {
+      "instrument": 2,
+      "note": 74,
+      "startTick": 2112,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 74,
+      "startTick": 2136,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 74,
+      "startTick": 2160,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 74,
+      "startTick": 2184,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 70,
+      "startTick": 2208,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 2,
+      "note": 70,
+      "startTick": 2256,
+      "durationTicks": 23,
+      "volume": 56
+    },
+    {
+      "instrument": 0,
+      "note": 58,
+      "startTick": 2304,
+      "durationTicks": 95,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 62,
+      "startTick": 2304,
+      "durationTicks": 95,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 2304,
+      "durationTicks": 95,
+      "volume": 60
+    },
+    {
+      "instrument": 0,
+      "note": 70,
+      "startTick": 2304,
+      "durationTicks": 95,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 96,
-      "durationTicks": 8,
-      "volume": 43
+      "startTick": 2304,
+      "durationTicks": 191,
+      "volume": 47
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 100,
-      "durationTicks": 2,
-      "volume": 70
+      "startTick": 2400,
+      "durationTicks": 47,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 100,
-      "durationTicks": 2,
-      "volume": 70
+      "startTick": 2400,
+      "durationTicks": 47,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 50,
-      "startTick": 100,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 2400,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 102,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 2448,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 62,
-      "startTick": 102,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 2448,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 102,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 2448,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 102,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 2448,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 43,
-      "startTick": 106,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 2544,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 106,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 2544,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 43,
-      "startTick": 108,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 2592,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 108,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 2592,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 41,
-      "startTick": 110,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 2640,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 53,
-      "startTick": 110,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 2640,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 112,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2688,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 62,
-      "startTick": 112,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2688,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 112,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2688,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 112,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2688,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 112,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 2688,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 114,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2736,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 62,
-      "startTick": 114,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2736,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 114,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2736,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 114,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2736,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 2,
       "note": 57,
-      "startTick": 114,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2736,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 59,
-      "startTick": 115,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2760,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 116,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2784,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 62,
-      "startTick": 116,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2784,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 116,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2784,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 116,
-      "durationTicks": 1,
-      "volume": 70
+      "startTick": 2784,
+      "durationTicks": 23,
+      "volume": 60
     },
     {
       "instrument": 1,
       "note": 50,
-      "startTick": 116,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 2784,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 62,
-      "startTick": 116,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2784,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 64,
-      "startTick": 117,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2808,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 118,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 2832,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 62,
-      "startTick": 118,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 2832,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 118,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 2832,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 118,
-      "durationTicks": 8,
-      "volume": 70
+      "startTick": 2832,
+      "durationTicks": 191,
+      "volume": 60
     },
     {
       "instrument": 2,
       "note": 65,
-      "startTick": 118,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2832,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 67,
-      "startTick": 119,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2856,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 1,
       "note": 43,
-      "startTick": 120,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 2880,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 120,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 2880,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 69,
-      "startTick": 120,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2880,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 71,
-      "startTick": 121,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2904,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 1,
       "note": 41,
-      "startTick": 122,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 2928,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 53,
-      "startTick": 122,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 2928,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 72,
-      "startTick": 122,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2928,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 74,
-      "startTick": 123,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2952,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 1,
       "note": 39,
-      "startTick": 124,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 2976,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 51,
-      "startTick": 124,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 2976,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 63,
-      "startTick": 124,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 2976,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 76,
-      "startTick": 124,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 2976,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 76,
-      "startTick": 125,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 3000,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 1,
       "note": 38,
-      "startTick": 126,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 3024,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 50,
-      "startTick": 126,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 3024,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 1,
       "note": 62,
-      "startTick": 126,
-      "durationTicks": 2,
-      "volume": 43
+      "startTick": 3024,
+      "durationTicks": 47,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 75,
-      "startTick": 126,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 3024,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 74,
-      "startTick": 127,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 3048,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 1,
       "note": 60,
-      "startTick": 128,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3072,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 72,
-      "startTick": 128,
-      "durationTicks": 1,
-      "volume": 60
+      "startTick": 3072,
+      "durationTicks": 23,
+      "volume": 56
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 128,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 3072,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 4,
       "note": 48,
-      "startTick": 128,
-      "durationTicks": 8,
-      "volume": 39
+      "startTick": 3072,
+      "durationTicks": 191,
+      "volume": 45
     },
     {
       "instrument": 2,
       "note": 77,
-      "startTick": 129,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 3096,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 2,
       "note": 75,
-      "startTick": 130,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 3120,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 130,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3120,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 130,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3120,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 84,
-      "startTick": 130,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 3120,
+      "durationTicks": 95,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 3120,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 3120,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 84,
+      "startTick": 3120,
+      "durationTicks": 95,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 132,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3168,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 63,
-      "startTick": 132,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3168,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 75,
-      "startTick": 132,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3168,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 132,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 3168,
+      "durationTicks": 95,
+      "volume": 45
+    },
+    {
+      "instrument": 5,
+      "note": 63,
+      "startTick": 3168,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 75,
+      "startTick": 3168,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 134,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3216,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 134,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3216,
+      "durationTicks": 47,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 3216,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 3216,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 58,
-      "startTick": 136,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3264,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 62,
-      "startTick": 136,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 3264,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 74,
-      "startTick": 136,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 3264,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 46,
-      "startTick": 136,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 3264,
+      "durationTicks": 95,
+      "volume": 45
+    },
+    {
+      "instrument": 5,
+      "note": 62,
+      "startTick": 3264,
+      "durationTicks": 95,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 74,
+      "startTick": 3264,
+      "durationTicks": 95,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 140,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3360,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 65,
-      "startTick": 140,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 3360,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 77,
-      "startTick": 140,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 3360,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 140,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 3360,
+      "durationTicks": 95,
+      "volume": 45
+    },
+    {
+      "instrument": 5,
+      "note": 65,
+      "startTick": 3360,
+      "durationTicks": 95,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 77,
+      "startTick": 3360,
+      "durationTicks": 95,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 60,
-      "startTick": 144,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3456,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 144,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 3456,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 4,
       "note": 48,
-      "startTick": 144,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 3456,
+      "durationTicks": 95,
+      "volume": 45
     },
     {
       "instrument": 2,
       "note": 77,
-      "startTick": 145,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 3480,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 2,
       "note": 75,
-      "startTick": 146,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 3504,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 146,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3504,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 146,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3504,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 84,
-      "startTick": 146,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3504,
+      "durationTicks": 47,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 3504,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 3504,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 84,
+      "startTick": 3504,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 148,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3552,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 63,
-      "startTick": 148,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3552,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 75,
-      "startTick": 148,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3552,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 148,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 3552,
+      "durationTicks": 95,
+      "volume": 45
+    },
+    {
+      "instrument": 5,
+      "note": 63,
+      "startTick": 3552,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 75,
+      "startTick": 3552,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 150,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3600,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 150,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3600,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 84,
-      "startTick": 150,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3600,
+      "durationTicks": 47,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 3600,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 3600,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 84,
+      "startTick": 3600,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 56,
-      "startTick": 152,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3648,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 56,
-      "startTick": 152,
-      "durationTicks": 8,
-      "volume": 94
+      "startTick": 3648,
+      "durationTicks": 191,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 68,
-      "startTick": 152,
-      "durationTicks": 8,
-      "volume": 94
+      "startTick": 3648,
+      "durationTicks": 191,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 55,
-      "startTick": 152,
-      "durationTicks": 2,
-      "volume": 39
+      "startTick": 3648,
+      "durationTicks": 47,
+      "volume": 45
+    },
+    {
+      "instrument": 5,
+      "note": 56,
+      "startTick": 3648,
+      "durationTicks": 191,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 68,
+      "startTick": 3648,
+      "durationTicks": 191,
+      "volume": 72
     },
     {
       "instrument": 4,
       "note": 51,
-      "startTick": 154,
-      "durationTicks": 2,
-      "volume": 39
+      "startTick": 3696,
+      "durationTicks": 47,
+      "volume": 45
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 156,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3744,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 4,
       "note": 48,
-      "startTick": 156,
-      "durationTicks": 2,
-      "volume": 39
+      "startTick": 3744,
+      "durationTicks": 47,
+      "volume": 45
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 158,
-      "durationTicks": 2,
-      "volume": 39
+      "startTick": 3792,
+      "durationTicks": 47,
+      "volume": 45
     },
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 160,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 3840,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 60,
-      "startTick": 160,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3840,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 160,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 3840,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 4,
       "note": 48,
-      "startTick": 160,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 3840,
+      "durationTicks": 95,
+      "volume": 45
     },
     {
       "instrument": 2,
       "note": 77,
-      "startTick": 161,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 3864,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 2,
       "note": 75,
-      "startTick": 162,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 3888,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 162,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3888,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 162,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3888,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 84,
-      "startTick": 162,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 3888,
+      "durationTicks": 95,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 3888,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 3888,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 84,
+      "startTick": 3888,
+      "durationTicks": 95,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 164,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 3936,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 63,
-      "startTick": 164,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3936,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 75,
-      "startTick": 164,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3936,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 164,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 3936,
+      "durationTicks": 95,
+      "volume": 45
+    },
+    {
+      "instrument": 5,
+      "note": 63,
+      "startTick": 3936,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 75,
+      "startTick": 3936,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 166,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3984,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 166,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 3984,
+      "durationTicks": 47,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 3984,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 3984,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 168,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4032,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 58,
-      "startTick": 168,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 4032,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 62,
-      "startTick": 168,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 4032,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 74,
-      "startTick": 168,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 4032,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 46,
-      "startTick": 168,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 4032,
+      "durationTicks": 95,
+      "volume": 45
+    },
+    {
+      "instrument": 5,
+      "note": 62,
+      "startTick": 4032,
+      "durationTicks": 95,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 74,
+      "startTick": 4032,
+      "durationTicks": 95,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 58,
-      "startTick": 172,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 4128,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 65,
-      "startTick": 172,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 4128,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 77,
-      "startTick": 172,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 4128,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 41,
-      "startTick": 172,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 4128,
+      "durationTicks": 95,
+      "volume": 45
+    },
+    {
+      "instrument": 5,
+      "note": 65,
+      "startTick": 4128,
+      "durationTicks": 95,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 77,
+      "startTick": 4128,
+      "durationTicks": 95,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 176,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4224,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 70,
-      "startTick": 176,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4224,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 74,
-      "startTick": 176,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4224,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 79,
-      "startTick": 176,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4224,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 82,
-      "startTick": 176,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4224,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 176,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 4224,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 3,
       "note": 58,
-      "startTick": 176,
-      "durationTicks": 8,
-      "volume": 94
+      "startTick": 4224,
+      "durationTicks": 191,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 70,
-      "startTick": 176,
-      "durationTicks": 8,
-      "volume": 94
+      "startTick": 4224,
+      "durationTicks": 191,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 176,
-      "durationTicks": 4,
-      "volume": 39
+      "startTick": 4224,
+      "durationTicks": 95,
+      "volume": 45
+    },
+    {
+      "instrument": 5,
+      "note": 58,
+      "startTick": 4224,
+      "durationTicks": 191,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 70,
+      "startTick": 4224,
+      "durationTicks": 191,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 50,
-      "startTick": 180,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 4320,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 180,
-      "durationTicks": 10,
-      "volume": 75
+      "startTick": 4320,
+      "durationTicks": 235,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 55,
-      "startTick": 180,
-      "durationTicks": 10,
-      "volume": 75
+      "startTick": 4320,
+      "durationTicks": 235,
+      "volume": 62
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 184,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4416,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 71,
-      "startTick": 184,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4416,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 74,
-      "startTick": 184,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4416,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 79,
-      "startTick": 184,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4416,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 83,
-      "startTick": 184,
-      "durationTicks": 7,
-      "volume": 100
+      "startTick": 4416,
+      "durationTicks": 172,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 184,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 4416,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 53,
-      "startTick": 186,
-      "durationTicks": 2,
-      "volume": 78
+      "startTick": 4464,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 51,
-      "startTick": 188,
-      "durationTicks": 2,
-      "volume": 78
+      "startTick": 4512,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 188,
-      "durationTicks": 3,
-      "volume": 75
+      "startTick": 4512,
+      "durationTicks": 67,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 55,
-      "startTick": 188,
-      "durationTicks": 3,
-      "volume": 75
+      "startTick": 4512,
+      "durationTicks": 67,
+      "volume": 62
     },
     {
       "instrument": 1,
       "note": 50,
-      "startTick": 190,
-      "durationTicks": 2,
-      "volume": 78
+      "startTick": 4560,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 62,
-      "startTick": 190,
-      "durationTicks": 2,
-      "volume": 78
+      "startTick": 4560,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 0,
       "note": 63,
-      "startTick": 192,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 4608,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 67,
-      "startTick": 192,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 4608,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 192,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 4608,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 84,
-      "startTick": 192,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 4608,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 87,
-      "startTick": 192,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 4608,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 48,
-      "startTick": 192,
-      "durationTicks": 2,
-      "volume": 78
+      "startTick": 4608,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 60,
-      "startTick": 192,
-      "durationTicks": 2,
-      "volume": 78
+      "startTick": 4608,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 60,
-      "startTick": 192,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 4608,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 192,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 4608,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 4,
       "note": 36,
-      "startTick": 192,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 4608,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 48,
-      "startTick": 192,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 4608,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 60,
-      "startTick": 192,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 4608,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 2,
       "note": 77,
-      "startTick": 193,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 4632,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 2,
       "note": 75,
-      "startTick": 194,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 4656,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 194,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 4656,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 194,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 4656,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 84,
-      "startTick": 194,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 4656,
+      "durationTicks": 95,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 4656,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 4656,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 84,
+      "startTick": 4656,
+      "durationTicks": 95,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 43,
-      "startTick": 196,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 4704,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 196,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 4704,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 63,
-      "startTick": 196,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 4704,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 75,
-      "startTick": 196,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 4704,
+      "durationTicks": 47,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 63,
+      "startTick": 4704,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 75,
+      "startTick": 4704,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 198,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 4752,
+      "durationTicks": 47,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 198,
-      "durationTicks": 2,
-      "volume": 94
+      "startTick": 4752,
+      "durationTicks": 47,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 4752,
+      "durationTicks": 47,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 4752,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 46,
-      "startTick": 200,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 4800,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 58,
-      "startTick": 200,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 4800,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 62,
-      "startTick": 200,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 4800,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 74,
-      "startTick": 200,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 4800,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 4,
       "note": 34,
-      "startTick": 200,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 4800,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 46,
-      "startTick": 200,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 4800,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 58,
-      "startTick": 200,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 4800,
+      "durationTicks": 172,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 62,
+      "startTick": 4800,
+      "durationTicks": 95,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 74,
+      "startTick": 4800,
+      "durationTicks": 95,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 41,
-      "startTick": 204,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 4896,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 53,
-      "startTick": 204,
-      "durationTicks": 4,
-      "volume": 43
+      "startTick": 4896,
+      "durationTicks": 95,
+      "volume": 47
     },
     {
       "instrument": 3,
       "note": 65,
-      "startTick": 204,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 4896,
+      "durationTicks": 95,
+      "volume": 70
     },
     {
       "instrument": 3,
       "note": 77,
-      "startTick": 204,
-      "durationTicks": 4,
-      "volume": 94
+      "startTick": 4896,
+      "durationTicks": 95,
+      "volume": 70
+    },
+    {
+      "instrument": 5,
+      "note": 65,
+      "startTick": 4896,
+      "durationTicks": 95,
+      "volume": 72
+    },
+    {
+      "instrument": 5,
+      "note": 77,
+      "startTick": 4896,
+      "durationTicks": 95,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 43,
-      "startTick": 208,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 4992,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 208,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 4992,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 77,
-      "startTick": 208,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 4992,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 208,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 4992,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 55,
-      "startTick": 208,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 4992,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 2,
       "note": 75,
-      "startTick": 209,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5016,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 2,
       "note": 74,
-      "startTick": 210,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 5040,
+      "durationTicks": 47,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 65,
-      "startTick": 210,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5040,
+      "durationTicks": 43,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 77,
-      "startTick": 210,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5040,
+      "durationTicks": 43,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 65,
+      "startTick": 5040,
+      "durationTicks": 43,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 77,
+      "startTick": 5040,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 46,
-      "startTick": 212,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 5088,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 58,
-      "startTick": 212,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 5088,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 3,
       "note": 68,
-      "startTick": 212,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5088,
+      "durationTicks": 43,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 80,
-      "startTick": 212,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5088,
+      "durationTicks": 43,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 46,
-      "startTick": 212,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5088,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 58,
-      "startTick": 212,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5088,
+      "durationTicks": 86,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 65,
+      "startTick": 5088,
+      "durationTicks": 43,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 80,
+      "startTick": 5088,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 3,
       "note": 65,
-      "startTick": 214,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5136,
+      "durationTicks": 43,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 77,
-      "startTick": 214,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5136,
+      "durationTicks": 43,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 65,
+      "startTick": 5136,
+      "durationTicks": 43,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 77,
+      "startTick": 5136,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 55,
-      "startTick": 216,
-      "durationTicks": 1,
-      "volume": 78
+      "startTick": 5184,
+      "durationTicks": 21,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 75,
-      "startTick": 216,
-      "durationTicks": 4,
-      "volume": 100
+      "startTick": 5184,
+      "durationTicks": 86,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 216,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5184,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 216,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5184,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 75,
-      "startTick": 216,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5184,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 84,
-      "startTick": 216,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5184,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 48,
-      "startTick": 216,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5184,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 60,
-      "startTick": 216,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5184,
+      "durationTicks": 86,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 5184,
+      "durationTicks": 172,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 5184,
+      "durationTicks": 172,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 84,
+      "startTick": 5184,
+      "durationTicks": 172,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 53,
-      "startTick": 217,
-      "durationTicks": 1,
-      "volume": 78
+      "startTick": 5208,
+      "durationTicks": 21,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 51,
-      "startTick": 218,
-      "durationTicks": 1,
-      "volume": 78
+      "startTick": 5232,
+      "durationTicks": 21,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 50,
-      "startTick": 219,
-      "durationTicks": 1,
-      "volume": 78
+      "startTick": 5256,
+      "durationTicks": 21,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 48,
-      "startTick": 220,
-      "durationTicks": 1,
-      "volume": 78
+      "startTick": 5280,
+      "durationTicks": 21,
+      "volume": 64
     },
     {
       "instrument": 3,
       "note": 70,
-      "startTick": 220,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5280,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 82,
-      "startTick": 220,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5280,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 43,
-      "startTick": 220,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5280,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 55,
-      "startTick": 220,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5280,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 1,
       "note": 46,
-      "startTick": 221,
-      "durationTicks": 1,
-      "volume": 78
+      "startTick": 5304,
+      "durationTicks": 21,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 44,
-      "startTick": 222,
-      "durationTicks": 1,
-      "volume": 78
+      "startTick": 5328,
+      "durationTicks": 21,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 43,
-      "startTick": 223,
-      "durationTicks": 1,
-      "volume": 78
+      "startTick": 5352,
+      "durationTicks": 21,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 44,
-      "startTick": 224,
-      "durationTicks": 7,
-      "volume": 78
+      "startTick": 5376,
+      "durationTicks": 172,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 224,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5376,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 68,
-      "startTick": 224,
-      "durationTicks": 1,
-      "volume": 74
+      "startTick": 5376,
+      "durationTicks": 21,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 80,
-      "startTick": 224,
-      "durationTicks": 1,
-      "volume": 74
+      "startTick": 5376,
+      "durationTicks": 21,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 44,
-      "startTick": 224,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5376,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 56,
-      "startTick": 224,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5376,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 226,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 5424,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 84,
-      "startTick": 226,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 5424,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 226,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5424,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 226,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5424,
+      "durationTicks": 43,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 84,
-      "startTick": 226,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5424,
+      "durationTicks": 43,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 5424,
+      "durationTicks": 21,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 5424,
+      "durationTicks": 21,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 5448,
+      "durationTicks": 21,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 5448,
+      "durationTicks": 21,
+      "volume": 64
     },
     {
       "instrument": 0,
       "note": 75,
-      "startTick": 228,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 5472,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 87,
-      "startTick": 228,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 5472,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 75,
-      "startTick": 228,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5472,
+      "durationTicks": 43,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 87,
-      "startTick": 228,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5472,
+      "durationTicks": 43,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 44,
-      "startTick": 228,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5472,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 56,
-      "startTick": 228,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5472,
+      "durationTicks": 86,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 63,
+      "startTick": 5472,
+      "durationTicks": 43,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 75,
+      "startTick": 5472,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 229,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5496,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 230,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 5520,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 84,
-      "startTick": 230,
-      "durationTicks": 2,
-      "volume": 100
+      "startTick": 5520,
+      "durationTicks": 43,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 72,
-      "startTick": 230,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5520,
+      "durationTicks": 43,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 84,
-      "startTick": 230,
-      "durationTicks": 2,
-      "volume": 74
+      "startTick": 5520,
+      "durationTicks": 43,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 60,
+      "startTick": 5520,
+      "durationTicks": 43,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 72,
+      "startTick": 5520,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 0,
       "note": 79,
-      "startTick": 232,
-      "durationTicks": 4,
-      "volume": 100
+      "startTick": 5568,
+      "durationTicks": 86,
+      "volume": 72
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 232,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5568,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 79,
-      "startTick": 232,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5568,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 91,
-      "startTick": 232,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5568,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 44,
-      "startTick": 232,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5568,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 56,
-      "startTick": 232,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5568,
+      "durationTicks": 86,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 67,
+      "startTick": 5568,
+      "durationTicks": 86,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 79,
+      "startTick": 5568,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 234,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5616,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 75,
-      "startTick": 236,
-      "durationTicks": 4,
-      "volume": 100
+      "startTick": 5664,
+      "durationTicks": 86,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 87,
-      "startTick": 236,
-      "durationTicks": 4,
-      "volume": 100
+      "startTick": 5664,
+      "durationTicks": 86,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 75,
-      "startTick": 236,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5664,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 87,
-      "startTick": 236,
-      "durationTicks": 4,
-      "volume": 74
+      "startTick": 5664,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 44,
-      "startTick": 236,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5664,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 56,
-      "startTick": 236,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5664,
+      "durationTicks": 86,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 63,
+      "startTick": 5664,
+      "durationTicks": 86,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 75,
+      "startTick": 5664,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 79,
-      "startTick": 237,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5688,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 58,
-      "startTick": 240,
-      "durationTicks": 14,
-      "volume": 100
+      "startTick": 5760,
+      "durationTicks": 345,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 74,
-      "startTick": 240,
-      "durationTicks": 14,
-      "volume": 100
+      "startTick": 5760,
+      "durationTicks": 345,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 77,
-      "startTick": 240,
-      "durationTicks": 14,
-      "volume": 100
+      "startTick": 5760,
+      "durationTicks": 345,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 46,
-      "startTick": 240,
-      "durationTicks": 7,
-      "volume": 78
+      "startTick": 5760,
+      "durationTicks": 172,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 77,
-      "startTick": 240,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5760,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 65,
-      "startTick": 240,
-      "durationTicks": 7,
-      "volume": 74
+      "startTick": 5760,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 3,
       "note": 77,
-      "startTick": 240,
-      "durationTicks": 7,
-      "volume": 74
+      "startTick": 5760,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 46,
-      "startTick": 240,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5760,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 50,
-      "startTick": 240,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 5760,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 53,
-      "startTick": 240,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 5760,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 58,
-      "startTick": 240,
-      "durationTicks": 14,
-      "volume": 75
+      "startTick": 5760,
+      "durationTicks": 345,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 65,
+      "startTick": 5760,
+      "durationTicks": 345,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 77,
+      "startTick": 5760,
+      "durationTicks": 345,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 77,
-      "startTick": 242,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5808,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 41,
-      "startTick": 244,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 5856,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 4,
       "note": 46,
-      "startTick": 244,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5856,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 50,
-      "startTick": 247,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 5928,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 53,
-      "startTick": 247,
-      "durationTicks": 7,
-      "volume": 75
+      "startTick": 5928,
+      "durationTicks": 172,
+      "volume": 62
     },
     {
       "instrument": 1,
       "note": 46,
-      "startTick": 248,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 5952,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 70,
-      "startTick": 248,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 5952,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 4,
       "note": 46,
-      "startTick": 248,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 5952,
+      "durationTicks": 86,
+      "volume": 62
+    },
+    {
+      "instrument": 5,
+      "note": 65,
+      "startTick": 5952,
+      "durationTicks": 172,
+      "volume": 64
+    },
+    {
+      "instrument": 5,
+      "note": 77,
+      "startTick": 5952,
+      "durationTicks": 172,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 46,
-      "startTick": 252,
-      "durationTicks": 4,
-      "volume": 78
+      "startTick": 6048,
+      "durationTicks": 86,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 70,
-      "startTick": 252,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 6048,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 82,
-      "startTick": 252,
-      "durationTicks": 1,
-      "volume": 74
+      "startTick": 6048,
+      "durationTicks": 21,
+      "volume": 62
     },
     {
       "instrument": 4,
       "note": 46,
-      "startTick": 252,
-      "durationTicks": 4,
-      "volume": 75
+      "startTick": 6048,
+      "durationTicks": 86,
+      "volume": 62
     },
     {
       "instrument": 2,
       "note": 69,
-      "startTick": 253,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 6072,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 1,
       "note": 47,
-      "startTick": 254,
-      "durationTicks": 2,
-      "volume": 78
+      "startTick": 6096,
+      "durationTicks": 43,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 70,
-      "startTick": 254,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 6096,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 83,
-      "startTick": 254,
-      "durationTicks": 1,
-      "volume": 74
+      "startTick": 6096,
+      "durationTicks": 21,
+      "volume": 62
     },
     {
       "instrument": 2,
       "note": 71,
-      "startTick": 255,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 6120,
+      "durationTicks": 21,
+      "volume": 72
     },
     {
       "instrument": 0,
       "note": 60,
-      "startTick": 256,
-      "durationTicks": 1,
-      "volume": 79
+      "startTick": 6144,
+      "durationTicks": 23,
+      "volume": 64
     },
     {
       "instrument": 0,
       "note": 72,
-      "startTick": 256,
-      "durationTicks": 1,
-      "volume": 79
+      "startTick": 6144,
+      "durationTicks": 23,
+      "volume": 64
     },
     {
       "instrument": 0,
       "note": 84,
-      "startTick": 256,
-      "durationTicks": 1,
-      "volume": 79
+      "startTick": 6144,
+      "durationTicks": 23,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 36,
-      "startTick": 256,
-      "durationTicks": 1,
-      "volume": 79
+      "startTick": 6144,
+      "durationTicks": 23,
+      "volume": 64
     },
     {
       "instrument": 1,
       "note": 48,
-      "startTick": 256,
-      "durationTicks": 1,
-      "volume": 79
+      "startTick": 6144,
+      "durationTicks": 23,
+      "volume": 64
     },
     {
       "instrument": 2,
       "note": 72,
-      "startTick": 256,
-      "durationTicks": 1,
-      "volume": 100
+      "startTick": 6144,
+      "durationTicks": 23,
+      "volume": 72
     },
     {
       "instrument": 3,
       "note": 60,
-      "startTick": 256,
-      "durationTicks": 1,
-      "volume": 79
+      "startTick": 6144,
+      "durationTicks": 23,
+      "volume": 64
     },
     {
       "instrument": 3,
       "note": 84,
-      "startTick": 256,
-      "durationTicks": 1,
-      "volume": 79
+      "startTick": 6144,
+      "durationTicks": 23,
+      "volume": 64
+    },
+    {
+      "instrument": 6,
+      "note": 60,
+      "startTick": 6144,
+      "durationTicks": 95,
+      "volume": 64
+    },
+    {
+      "instrument": 6,
+      "note": 72,
+      "startTick": 6144,
+      "durationTicks": 95,
+      "volume": 64
+    },
+    {
+      "instrument": 6,
+      "note": 84,
+      "startTick": 6144,
+      "durationTicks": 95,
+      "volume": 64
+    },
+    {
+      "instrument": 7,
+      "note": 36,
+      "startTick": 6144,
+      "durationTicks": 95,
+      "volume": 64
+    },
+    {
+      "instrument": 7,
+      "note": 48,
+      "startTick": 6144,
+      "durationTicks": 95,
+      "volume": 64
+    },
+    {
+      "instrument": 7,
+      "note": 60,
+      "startTick": 6144,
+      "durationTicks": 95,
+      "volume": 64
+    },
+    {
+      "instrument": 7,
+      "note": 72,
+      "startTick": 6144,
+      "durationTicks": 95,
+      "volume": 64
+    },
+    {
+      "instrument": 7,
+      "note": 84,
+      "startTick": 6144,
+      "durationTicks": 95,
+      "volume": 64
     }
   ]
 }

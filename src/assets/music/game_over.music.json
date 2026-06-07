@@ -31,7 +31,7 @@
       "wave": "triangle",
       "volume": 34,
       "attackMs": 24,
-      "decayMs": 260
+      "decayMs": 255
     }
   ],
   "notes": [

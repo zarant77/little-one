@@ -1,0 +1,27 @@
+{
+  "type": "sfx",
+  "id": "cat_unlock",
+  "commands": [
+    {
+      "wave": "triangle",
+      "frequencyStart": 660,
+      "frequencyEnd": 990,
+      "durationMs": 90,
+      "volume": 70
+    },
+    {
+      "wave": "sine",
+      "frequencyStart": 990,
+      "frequencyEnd": 1320,
+      "durationMs": 110,
+      "volume": 58
+    },
+    {
+      "wave": "square",
+      "frequencyStart": 1320,
+      "frequencyEnd": 1760,
+      "durationMs": 80,
+      "volume": 34
+    }
+  ]
+}

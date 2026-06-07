@@ -104,7 +104,12 @@ static void audio_fill_mix_buffer(int buffer_index)
         {
             mixed += (audio_music->samples[audio_music_cursor] * audio_music_volume) / 100;
             audio_music_cursor += 1;
-            if (audio_music_cursor >= audio_music->sample_count)
+            if (audio_music->loop_enabled
+                    && audio_music_cursor >= audio_music->loop_end_sample)
+            {
+                audio_music_cursor = audio_music->loop_start_sample;
+            }
+            else if (audio_music_cursor >= audio_music->sample_count)
             {
                 audio_music_cursor = 0;
             }
