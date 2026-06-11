@@ -4,6 +4,15 @@
   "bpm": 92,
   "ticksPerBeat": 4,
   "lengthTicks": 128,
+  "volume": 0.7,
+  "normalizeVolume": false,
+  "targetAverageVolume": 80,
+  "maxVolumeGain": 3,
+  "loop": {
+    "enabled": false,
+    "startTick": 0,
+    "endTick": 128
+  },
   "instruments": [
     {
       "id": "lead",

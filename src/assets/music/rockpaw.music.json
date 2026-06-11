@@ -4,6 +4,10 @@
   "bpm": 109,
   "ticksPerBeat": 96,
   "lengthTicks": 41088,
+  "volume": 1,
+  "normalizeVolume": true,
+  "targetAverageVolume": 80,
+  "maxVolumeGain": 3,
   "loop": {
     "enabled": false,
     "startTick": 0,

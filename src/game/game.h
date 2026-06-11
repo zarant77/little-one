@@ -81,6 +81,7 @@ typedef struct {
     GameUiState uiState;
     GameSettings settings;
     int settingsInitialized;
+    int settingsDirty;
     ProgressionState progress;
     int progressInitialized;
     int progressDirty;

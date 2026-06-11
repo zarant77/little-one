@@ -922,6 +922,7 @@ void game_init(GameState* game) {
     int best_score;
     GameSettings settings;
     int settings_initialized;
+    int settings_dirty;
     ProgressionState progress;
     int progress_initialized;
     int progress_dirty;
@@ -933,6 +934,7 @@ void game_init(GameState* game) {
     best_score = game->bestScore;
     settings = game->settings;
     settings_initialized = game->settingsInitialized;
+    settings_dirty = game->settingsDirty;
     progress = game->progress;
     progress_initialized = game->progressInitialized;
     progress_dirty = game->progressDirty;
@@ -994,6 +996,7 @@ void game_init(GameState* game) {
     }
     game->settings = settings;
     game->settingsInitialized = settings_initialized;
+    game->settingsDirty = settings_dirty;
     game->progress = progress;
     game->progressInitialized = progress_initialized;
     game->progressDirty = progress_dirty;

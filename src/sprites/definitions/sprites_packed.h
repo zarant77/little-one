@@ -25,6 +25,9 @@ typedef struct {
     uint16_t width;
     uint16_t height;
 
+    uint16_t pivot_x;
+    uint16_t pivot_y;
+
     const PackedSpriteCommand *commands;
     uint16_t command_count;
 } PackedSpriteDefinition;

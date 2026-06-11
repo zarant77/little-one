@@ -45,6 +45,7 @@ typedef struct AndroidPlatform {
     int reset_frame_time;
     int buffer_format_logged;
     char progress_path[512];
+    char settings_path[512];
     int finish_requested;
 } AndroidPlatform;
 
@@ -93,6 +94,27 @@ static void platform_set_progress_path(AndroidPlatform* platform, ANativeActivit
     );
 }
 
+static void platform_set_settings_path(AndroidPlatform* platform, ANativeActivity* activity) {
+    const char* data_path;
+
+    if (platform == NULL || activity == NULL) {
+        return;
+    }
+
+    data_path = activity->internalDataPath;
+    if (data_path == NULL || data_path[0] == 0) {
+        platform->settings_path[0] = 0;
+        return;
+    }
+
+    snprintf(
+            platform->settings_path,
+            sizeof(platform->settings_path),
+            "%s/little_one_settings.txt",
+            data_path
+    );
+}
+
 static void platform_load_progress(AndroidPlatform* platform) {
     ProgressionState progress;
 
@@ -116,6 +138,32 @@ static void platform_save_progress(AndroidPlatform* platform) {
 
     if (progression_save_to_path(platform->progress_path, &platform->game.progress)) {
         platform->game.progressDirty = 0;
+    }
+}
+
+static void platform_load_settings(AndroidPlatform* platform) {
+    GameSettings settings;
+
+    if (platform == NULL || platform->settings_path[0] == 0) {
+        return;
+    }
+
+    if (game_settings_load_from_path(platform->settings_path, &settings)) {
+        platform->game.settings = settings;
+        platform->game.settingsInitialized = 1;
+        platform->game.settingsDirty = 0;
+    }
+}
+
+static void platform_save_settings(AndroidPlatform* platform) {
+    if (platform == NULL
+            || platform->settings_path[0] == 0
+            || !platform->game.settingsDirty) {
+        return;
+    }
+
+    if (game_settings_save_to_path(platform->settings_path, &platform->game.settings)) {
+        platform->game.settingsDirty = 0;
     }
 }
 
@@ -460,6 +508,7 @@ static int platform_draw(AndroidPlatform* platform, float dt) {
     }
     game_update(&platform->game, &platform->input, dt);
     platform_save_progress(platform);
+    platform_save_settings(platform);
     input_end_frame(&platform->input);
     renderer_draw_frame(&buffer, &platform->game);
     ANativeWindow_unlockAndPost(window);
@@ -519,6 +568,7 @@ static void platform_handle_exit_requested(AndroidPlatform* platform) {
 
     platform->finish_requested = 1;
     platform_save_progress(platform);
+    platform_save_settings(platform);
     if (platform->activity != NULL) {
         ANativeActivity_finish(platform->activity);
     }
@@ -678,6 +728,7 @@ static void platform_on_pause(ANativeActivity* activity) {
 
     LOGI("Native activity paused");
     platform_save_progress(platform);
+    platform_save_settings(platform);
     audio_pause();
 
     pthread_mutex_lock(&platform->input_queue_mutex);
@@ -708,6 +759,7 @@ static void platform_on_destroy(ANativeActivity* activity) {
     LOGI("Native activity destroyed");
     platform_stop_game_loop(platform);
     platform_save_progress(platform);
+    platform_save_settings(platform);
     pthread_mutex_lock(&platform->window_mutex);
     platform->window = NULL;
     pthread_mutex_unlock(&platform->window_mutex);
@@ -752,6 +804,7 @@ void platform_android_on_create(
     platform->null_window_logged = 0;
     platform->reset_frame_time = 1;
     platform_set_progress_path(platform, activity);
+    platform_set_settings_path(platform, activity);
     game_settings_init_with_locale(&platform->game.settings, platform_detect_locale(activity));
     platform->game.settingsInitialized = 1;
     generated_sprite_initialize_all();
@@ -760,6 +813,7 @@ void platform_android_on_create(
     sound_registry_initialize_all();
     music_registry_initialize_all();
     audio_init();
+    platform_load_settings(platform);
     platform_load_progress(platform);
     game_init(&platform->game);
     input_init(&platform->input);

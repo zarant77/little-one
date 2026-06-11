@@ -849,15 +849,25 @@ static void menu_update_slider(GameState* game, MenuDragTarget target, UiRect re
 
     if (target == MENU_DRAG_MUSIC)
     {
+        int previous_value = game->settings.music_volume;
         game_settings_set_music_volume(&game->settings, value);
         audio_set_music_volume(game->settings.music_volume);
+        if (game->settings.music_volume != previous_value)
+        {
+            game->settingsDirty = 1;
+        }
         return;
     }
 
     if (target == MENU_DRAG_SFX)
     {
+        int previous_value = game->settings.sfx_volume;
         game_settings_set_sfx_volume(&game->settings, value);
         audio_set_sfx_volume(game->settings.sfx_volume);
+        if (game->settings.sfx_volume != previous_value)
+        {
+            game->settingsDirty = 1;
+        }
     }
 }
 
@@ -1133,13 +1143,23 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
 
         if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&layout.language_en_button, x, y))
         {
+            GameLocale previous_locale = game_settings_normalize_locale(game->settings.locale);
             game_settings_set_locale(&game->settings, GAME_LOCALE_ENGLISH);
+            if (game_settings_normalize_locale(game->settings.locale) != previous_locale)
+            {
+                game->settingsDirty = 1;
+            }
             return 1;
         }
 
         if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&layout.language_uk_button, x, y))
         {
+            GameLocale previous_locale = game_settings_normalize_locale(game->settings.locale);
             game_settings_set_locale(&game->settings, GAME_LOCALE_UKRAINIAN);
+            if (game_settings_normalize_locale(game->settings.locale) != previous_locale)
+            {
+                game->settingsDirty = 1;
+            }
             return 1;
         }
 

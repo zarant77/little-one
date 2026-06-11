@@ -20,5 +20,7 @@ void game_settings_set_music_volume(GameSettings* settings, int value);
 void game_settings_set_sfx_volume(GameSettings* settings, int value);
 void game_settings_set_locale(GameSettings* settings, GameLocale locale);
 void game_settings_toggle_locale(GameSettings* settings);
+int game_settings_load_from_path(const char* path, GameSettings* settings);
+int game_settings_save_to_path(const char* path, const GameSettings* settings);
 
 #endif

@@ -15,7 +15,7 @@ android {
         applicationId = "com.catemup.littleone"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         ndk {
@@ -23,10 +23,43 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val storeFilePath = providers.gradleProperty("LITTLE_ONE_STORE_FILE").orNull
+            val storePass = providers.gradleProperty("LITTLE_ONE_STORE_PASSWORD").orNull
+            val alias = providers.gradleProperty("LITTLE_ONE_KEY_ALIAS").orNull
+            val keyPass = providers.gradleProperty("LITTLE_ONE_KEY_PASSWORD").orNull
+
+            if (
+                storeFilePath != null &&
+                storePass != null &&
+                alias != null &&
+                keyPass != null
+            ) {
+                storeFile = file(storeFilePath)
+                storePassword = storePass
+                keyAlias = alias
+                keyPassword = keyPass
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
+
             isMinifyEnabled = true
             isShrinkResources = true
+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 

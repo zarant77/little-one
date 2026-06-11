@@ -1,5 +1,9 @@
 #include "game_settings.h"
 
+#include <stdio.h>
+
+#define GAME_SETTINGS_SAVE_VERSION 1
+
 int game_settings_clamp_volume(int value)
 {
     if (value < 0)
@@ -86,4 +90,75 @@ void game_settings_toggle_locale(GameSettings* settings)
     }
 
     settings->locale = GAME_LOCALE_UKRAINIAN;
+}
+
+int game_settings_load_from_path(const char* path, GameSettings* settings)
+{
+    FILE* file;
+    int version;
+    GameSettings loaded;
+
+    if (path == 0 || settings == 0)
+    {
+        return 0;
+    }
+
+    file = fopen(path, "r");
+    if (file == 0)
+    {
+        return 0;
+    }
+
+    game_settings_init(&loaded);
+    if (fscanf(
+            file,
+            "little_one_settings %d\nmusic %d\nsfx %d\nlocale %d\n",
+            &version,
+            &loaded.music_volume,
+            &loaded.sfx_volume,
+            &loaded.locale) != 4)
+    {
+        fclose(file);
+        return 0;
+    }
+
+    fclose(file);
+    if (version != GAME_SETTINGS_SAVE_VERSION)
+    {
+        return 0;
+    }
+
+    loaded.music_volume = game_settings_clamp_volume(loaded.music_volume);
+    loaded.sfx_volume = game_settings_clamp_volume(loaded.sfx_volume);
+    loaded.locale = game_settings_normalize_locale(loaded.locale);
+    *settings = loaded;
+    return 1;
+}
+
+int game_settings_save_to_path(const char* path, const GameSettings* settings)
+{
+    FILE* file;
+    int result;
+
+    if (path == 0 || settings == 0)
+    {
+        return 0;
+    }
+
+    file = fopen(path, "w");
+    if (file == 0)
+    {
+        return 0;
+    }
+
+    result = fprintf(
+            file,
+            "little_one_settings %d\nmusic %d\nsfx %d\nlocale %d\n",
+            GAME_SETTINGS_SAVE_VERSION,
+            game_settings_clamp_volume(settings->music_volume),
+            game_settings_clamp_volume(settings->sfx_volume),
+            game_settings_normalize_locale(settings->locale));
+
+    fclose(file);
+    return result > 0;
 }
