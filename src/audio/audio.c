@@ -27,7 +27,7 @@ static const GeneratedSound* audio_sound = 0;
 static int audio_sound_cursor = 0;
 static int audio_next_mix_buffer = 0;
 static int audio_music_volume = 70;
-static int audio_sfx_volume = 80;
+static int audio_sfx_volume = 70;
 
 enum {
     AUDIO_MIX_BUFFER_SAMPLES = 512,
@@ -102,7 +102,10 @@ static void audio_fill_mix_buffer(int buffer_index)
                 && audio_music->samples != 0
                 && audio_music->sample_count > 0)
         {
-            mixed += (audio_music->samples[audio_music_cursor] * audio_music_volume) / 100;
+            int track_volume = audio_clamp_volume(audio_music->volume);
+            mixed += (audio_music->samples[audio_music_cursor]
+                    * audio_music_volume
+                    * track_volume) / 10000;
             audio_music_cursor += 1;
             if (audio_music->loop_enabled
                     && audio_music_cursor >= audio_music->loop_end_sample)

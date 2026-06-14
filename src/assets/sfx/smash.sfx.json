@@ -7,14 +7,14 @@
       "frequencyStart": 180,
       "frequencyEnd": 70,
       "durationMs": 120,
-      "volume": 86
+      "volume": 11
     },
     {
       "wave": "noise",
       "frequencyStart": 120,
       "frequencyEnd": 40,
       "durationMs": 50,
-      "volume": 10
+      "volume": 2
     }
   ]
 }

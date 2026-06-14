@@ -73,6 +73,7 @@ typedef struct {
     uint16_t bpm;
     uint16_t ticks_per_beat;
     uint16_t length_ticks;
+    uint8_t volume;
     MusicLoop loop;
 
     const PackedMusicInstrument* instruments;

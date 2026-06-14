@@ -6,7 +6,8 @@
 
 #include "music_definition.h"
 
-typedef enum {
+typedef enum
+{
     MUSIC_ID_NONE = -1,
     MUSIC_ID_AGENT00CAT = 0,
     MUSIC_ID_CARRAMBACAT,
@@ -45,14 +46,16 @@ typedef enum {
 #define MUSIC_SCARCAT MUSIC_ID_SCARCAT
 #define MUSIC_TERMICATOR MUSIC_ID_TERMICATOR
 
-typedef struct {
-    const char* id;
+typedef struct
+{
+    const char *id;
     int32_t sample_rate;
     int32_t sample_count;
     int32_t loop_enabled;
     int32_t loop_start_sample;
     int32_t loop_end_sample;
-    int16_t* samples;
+    int32_t volume;
+    int16_t *samples;
 } GeneratedMusic;
 
 extern const PackedMusicDefinition PACKED_MUSIC_DEFINITIONS[];

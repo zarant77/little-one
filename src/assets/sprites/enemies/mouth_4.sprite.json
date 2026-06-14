@@ -1,0 +1,64 @@
+{
+  "version": 2,
+  "id": "mouth_4",
+  "width": 202,
+  "height": 36,
+  "pivotX": 101,
+  "pivotY": 18,
+  "nodes": [
+    {
+      "type": "primitive",
+      "id": "primitive-mqdhjtac-jfn1et",
+      "name": "Primitive 1",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "path",
+        "points": [
+          [
+            4,
+            31
+          ],
+          [
+            29,
+            5
+          ],
+          [
+            53,
+            30
+          ],
+          [
+            76,
+            5
+          ],
+          [
+            101,
+            31
+          ],
+          [
+            126,
+            5
+          ],
+          [
+            150,
+            31
+          ],
+          [
+            174,
+            5
+          ],
+          [
+            198,
+            31
+          ]
+        ],
+        "thickness": 8,
+        "cap": "butt",
+        "join": "round",
+        "smoothing": "none",
+        "segments": 8,
+        "color": "000000ff"
+      }
+    }
+  ]
+}

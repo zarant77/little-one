@@ -7,14 +7,14 @@
       "frequencyStart": 520,
       "frequencyEnd": 180,
       "durationMs": 180,
-      "volume": 76
+      "volume": 18
     },
     {
       "wave": "square",
       "frequencyStart": 220,
       "frequencyEnd": 80,
       "durationMs": 120,
-      "volume": 54
+      "volume": 8
     }
   ]
 }

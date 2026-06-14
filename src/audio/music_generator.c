@@ -747,6 +747,7 @@ void music_generator_release(GeneratedMusic* music)
     music->loop_enabled = 0;
     music->loop_start_sample = 0;
     music->loop_end_sample = 0;
+    music->volume = 100;
     music->samples = 0;
 }
 
@@ -799,6 +800,7 @@ int music_generator_generate(const MusicDefinition* definition, GeneratedMusic* 
     music->loop_enabled = 0;
     music->loop_start_sample = 0;
     music->loop_end_sample = 0;
+    music->volume = 100;
     music->samples = samples;
     return 1;
 }
@@ -853,6 +855,7 @@ int music_generator_generate_from_packed(const PackedMusicDefinition* definition
     music->sample_rate = SOUND_GENERATOR_SAMPLE_RATE;
     music->sample_count = sample_count;
     music->loop_enabled = definition->loop.enabled != 0 ? 1 : 0;
+    music->volume = music_clamp_int(definition->volume, 0, 100);
     if (music->loop_enabled)
     {
         music->loop_start_sample = music_tick_to_sample(

@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "id": "horns_4",
+  "width": 200,
+  "height": 112,
+  "pivotX": 100,
+  "pivotY": 56,
+  "nodes": [
+    {
+      "type": "primitive",
+      "id": "primitive-mqdigrzj-kxx1zm",
+      "name": "Primitive 1",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "path",
+        "points": [
+          [
+            55,
+            106
+          ],
+          [
+            53,
+            67
+          ],
+          [
+            34,
+            41
+          ]
+        ],
+        "thickness": 10,
+        "cap": "round",
+        "join": "round",
+        "smoothing": "quadratic",
+        "segments": 8,
+        "color": "000000ff"
+      }
+    },
+    {
+      "type": "primitive",
+      "id": "primitive-mqdihdq4-910t1b",
+      "name": "Primitive 2",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "circle",
+        "x": 24,
+        "y": 24,
+        "w": 47,
+        "h": 48,
+        "rotation": 0,
+        "color": "000000ff"
+      }
+    },
+    {
+      "type": "primitive",
+      "id": "primitive-mqdihr90-t834d8",
+      "name": "Primitive 2",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "circle",
+        "x": 24,
+        "y": 24,
+        "w": 40,
+        "h": 41,
+        "rotation": 0,
+        "color": "ff0002ff"
+      }
+    },
+    {
+      "type": "primitive",
+      "id": "primitive-mqdiiach-cidtam",
+      "name": "Primitive 1",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "path",
+        "points": [
+          [
+            145,
+            106
+          ],
+          [
+            147,
+            67
+          ],
+          [
+            166,
+            41
+          ]
+        ],
+        "thickness": 10,
+        "cap": "round",
+        "join": "round",
+        "smoothing": "quadratic",
+        "segments": 8,
+        "color": "000000ff"
+      }
+    },
+    {
+      "type": "primitive",
+      "id": "primitive-mqdiiach-2tn28i",
+      "name": "Primitive 2",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "circle",
+        "x": 176,
+        "y": 24,
+        "w": 47,
+        "h": 48,
+        "rotation": 0,
+        "color": "000000ff"
+      }
+    },
+    {
+      "type": "primitive",
+      "id": "primitive-mqdiiach-2vi5ju",
+      "name": "Primitive 2",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "circle",
+        "x": 176,
+        "y": 24,
+        "w": 40,
+        "h": 41,
+        "rotation": 0,
+        "color": "ff0002ff"
+      }
+    }
+  ]
+}

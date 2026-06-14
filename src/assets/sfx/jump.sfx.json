@@ -7,14 +7,14 @@
       "frequencyStart": 520,
       "frequencyEnd": 880,
       "durationMs": 90,
-      "volume": 62
+      "volume": 9
     },
     {
       "wave": "triangle",
       "frequencyStart": 760,
       "frequencyEnd": 980,
       "durationMs": 45,
-      "volume": 42
+      "volume": 3
     }
   ]
 }

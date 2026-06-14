@@ -8,14 +8,14 @@ static const SoundCommand JUMP_SOUND_COMMANDS[] = {
         .frequency_start = 520,
         .frequency_end = 880,
         .duration_ms = 90,
-        .volume = 62,
+        .volume = 9,
     },
     {
         .wave = SOUND_WAVE_TRIANGLE,
         .frequency_start = 760,
         .frequency_end = 980,
         .duration_ms = 45,
-        .volume = 42,
+        .volume = 3,
     },
 };
 
@@ -26,14 +26,14 @@ static const SoundCommand SMASH_SOUND_COMMANDS[] = {
         .frequency_start = 180,
         .frequency_end = 70,
         .duration_ms = 120,
-        .volume = 86,
+        .volume = 11,
     },
     {
         .wave = SOUND_WAVE_NOISE,
         .frequency_start = 120,
         .frequency_end = 40,
         .duration_ms = 50,
-        .volume = 10,
+        .volume = 2,
     },
 };
 
@@ -44,14 +44,14 @@ static const SoundCommand DAMAGE_SOUND_COMMANDS[] = {
         .frequency_start = 920,
         .frequency_end = 540,
         .duration_ms = 55,
-        .volume = 74,
+        .volume = 17,
     },
     {
         .wave = SOUND_WAVE_NOISE,
         .frequency_start = 300,
         .frequency_end = 120,
         .duration_ms = 45,
-        .volume = 48,
+        .volume = 7,
     },
 };
 
@@ -62,14 +62,14 @@ static const SoundCommand DEATH_SOUND_COMMANDS[] = {
         .frequency_start = 520,
         .frequency_end = 180,
         .duration_ms = 180,
-        .volume = 76,
+        .volume = 18,
     },
     {
         .wave = SOUND_WAVE_SQUARE,
         .frequency_start = 220,
         .frequency_end = 80,
         .duration_ms = 120,
-        .volume = 54,
+        .volume = 8,
     },
 };
 
@@ -80,21 +80,21 @@ static const SoundCommand ORK_DEATH_SOUND_COMMANDS[] = {
         .frequency_start = 160,
         .frequency_end = 55,
         .duration_ms = 260,
-        .volume = 88,
+        .volume = 12,
     },
     {
         .wave = SOUND_WAVE_TRIANGLE,
         .frequency_start = 110,
         .frequency_end = 45,
         .duration_ms = 220,
-        .volume = 76,
+        .volume = 5,
     },
     {
         .wave = SOUND_WAVE_NOISE,
         .frequency_start = 80,
         .frequency_end = 25,
         .duration_ms = 160,
-        .volume = 58,
+        .volume = 7,
     },
 };
 
@@ -105,14 +105,14 @@ static const SoundCommand BOAR_DEATH_SOUND_COMMANDS[] = {
         .frequency_start = 260,
         .frequency_end = 95,
         .duration_ms = 210,
-        .volume = 82,
+        .volume = 31,
     },
     {
         .wave = SOUND_WAVE_SQUARE,
         .frequency_start = 140,
         .frequency_end = 60,
         .duration_ms = 170,
-        .volume = 70,
+        .volume = 7,
     },
 };
 
@@ -123,21 +123,21 @@ static const SoundCommand RAT_DEATH_SOUND_COMMANDS[] = {
         .frequency_start = 1180,
         .frequency_end = 760,
         .duration_ms = 45,
-        .volume = 70,
+        .volume = 19,
     },
     {
         .wave = SOUND_WAVE_SQUARE,
         .frequency_start = 880,
         .frequency_end = 1320,
         .duration_ms = 35,
-        .volume = 58,
+        .volume = 7,
     },
     {
         .wave = SOUND_WAVE_NOISE,
         .frequency_start = 420,
         .frequency_end = 160,
         .duration_ms = 35,
-        .volume = 32,
+        .volume = 2,
     },
 };
 
@@ -148,21 +148,21 @@ static const SoundCommand CAT_UNLOCK_SOUND_COMMANDS[] = {
         .frequency_start = 660,
         .frequency_end = 990,
         .duration_ms = 90,
-        .volume = 70,
+        .volume = 39,
     },
     {
         .wave = SOUND_WAVE_SINE,
         .frequency_start = 990,
         .frequency_end = 1320,
         .duration_ms = 110,
-        .volume = 58,
+        .volume = 45,
     },
     {
         .wave = SOUND_WAVE_SQUARE,
         .frequency_start = 1320,
         .frequency_end = 1760,
         .duration_ms = 80,
-        .volume = 34,
+        .volume = 13,
     },
 };
 

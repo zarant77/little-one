@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "id": "mouth_3",
+  "width": 120,
+  "height": 12,
+  "pivotX": 60,
+  "pivotY": 6,
+  "nodes": [
+    {
+      "type": "primitive",
+      "id": "primitive-mqdhi18w-zpdptw",
+      "name": "Primitive 1",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "rect",
+        "x": 60,
+        "y": 6,
+        "w": 120,
+        "h": 12,
+        "rotation": 0,
+        "color": "000000ff"
+      }
+    }
+  ]
+}

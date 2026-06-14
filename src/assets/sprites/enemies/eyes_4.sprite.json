@@ -1,0 +1,58 @@
+{
+  "version": 2,
+  "id": "eyes_4",
+  "width": 134,
+  "height": 136,
+  "pivotX": 67,
+  "pivotY": 68,
+  "nodes": [
+    {
+      "type": "primitive",
+      "id": "primitive-mqdh37ap-kzxsdy",
+      "name": "Primitive 1",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "circle",
+        "x": 67,
+        "y": 68,
+        "w": 132,
+        "h": 135,
+        "rotation": 0,
+        "color": "000000ff"
+      }
+    },
+    {
+      "type": "primitive",
+      "id": "primitive-mqdh3ox1-ew89vd",
+      "name": "Primitive 1",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "circle",
+        "x": 67,
+        "y": 68,
+        "w": 126,
+        "h": 130,
+        "rotation": 0,
+        "color": "ffffffff"
+      }
+    },
+    {
+      "type": "primitive",
+      "id": "primitive-mqdh493y-un7e1e",
+      "name": "Primitive 1",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "circle",
+        "x": 68,
+        "y": 68,
+        "w": 78,
+        "h": 78,
+        "rotation": 0,
+        "color": "000000ff"
+      }
+    }
+  ]
+}

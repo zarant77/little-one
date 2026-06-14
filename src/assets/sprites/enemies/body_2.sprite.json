@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "id": "body_2",
+  "width": 246,
+  "height": 166,
+  "pivotX": 123,
+  "pivotY": 83,
+  "nodes": [
+    {
+      "type": "primitive",
+      "id": "primitive-mqdf4xzl-dqkbep",
+      "name": "Primitive 1",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "circle",
+        "x": 123,
+        "y": 83,
+        "w": 245,
+        "h": 164,
+        "rotation": 0,
+        "color": "000000ff"
+      }
+    },
+    {
+      "type": "primitive",
+      "id": "primitive-mqdf5cqw-alhvew",
+      "name": "Primitive 1",
+      "visible": true,
+      "locked": false,
+      "primitive": {
+        "kind": "circle",
+        "x": 123,
+        "y": 83,
+        "w": 236,
+        "h": 156,
+        "rotation": 0,
+        "color": "ff0000ff"
+      }
+    }
+  ]
+}
