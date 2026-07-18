@@ -5,64 +5,34 @@
 #include "../config/player_config.h"
 #include "../fonts/font_renderer.h"
 #include "../sprites/generated_sprite.h"
-#include "ui_controls.h"
 
 #define HUD_FONT_ID "vector_16_basic"
-#define HUD_SCORE_COLOR 0xffffffff
-#define HUD_SCORE_SHADOW_COLOR 0x00000099
-#define HUD_BG_SLICE_LEFT 180
-#define HUD_BG_SLICE_TOP 24
-#define HUD_BG_SLICE_RIGHT 32
-#define HUD_BG_SLICE_BOTTOM 24
+#define HUD_SCORE_COLOR 0x111111ff
+#define HUD_SCORE_SHADOW_COLOR 0xffffff99
 
 typedef struct
 {
-    int bg_width;
-    int bg_height;
-
-    int player_size;
     int heart_size;
     int star_size;
-
-    int margin_x;
     int margin_y;
-
-    int padding_x;
-    int padding_y;
-
-    int player_content_gap;
     int heart_gap;
     int row_gap;
     int star_score_gap;
-
     int score_scale;
 } HudLayout;
 
 static const HudLayout HUD_LAYOUT = {
-    .bg_width = 440,
-    .bg_height = 176,
-
-    .player_size = 128,
-    .heart_size = 56,
-    .star_size = 56,
-
-    .margin_x = 30,
-    .margin_y = 30,
-
-    .padding_x = 30,
-    .padding_y = 20,
-
-    .player_content_gap = 50,
-    .heart_gap = 8,
-    .row_gap = 12,
-    .star_score_gap = 12,
-
-    .score_scale = 2,
+    .heart_size = 102,
+    .star_size = 102,
+    .margin_y = 48,
+    .heart_gap = 15,
+    .row_gap = 21,
+    .star_score_gap = 18,
+    .score_scale = 5,
 };
 
 typedef struct
 {
-    const GeneratedSprite *background;
     const GeneratedSprite *heart_full;
     const GeneratedSprite *heart_empty;
     const GeneratedSprite *star;
@@ -74,7 +44,6 @@ static HudResources HUD_RESOURCES;
 
 void hud_initialize(void)
 {
-    HUD_RESOURCES.background = generated_sprite_get_by_id("hud_bg");
     HUD_RESOURCES.heart_full = generated_sprite_get_by_id("heart_full");
     HUD_RESOURCES.heart_empty = generated_sprite_get_by_id("heart_empty");
     HUD_RESOURCES.star = generated_sprite_get_by_id("star");
@@ -89,7 +58,7 @@ static const HudResources *hud_resources_get(void)
         hud_initialize();
     }
 
-    if (HUD_RESOURCES.background == 0 || HUD_RESOURCES.heart_full == 0 || HUD_RESOURCES.heart_empty == 0 || HUD_RESOURCES.star == 0 || HUD_RESOURCES.score_font == 0)
+    if (HUD_RESOURCES.heart_full == 0 || HUD_RESOURCES.heart_empty == 0 || HUD_RESOURCES.star == 0 || HUD_RESOURCES.score_font == 0)
     {
         return 0;
     }
@@ -112,16 +81,6 @@ static int hud_clamp_int(int value, int min_value, int max_value)
     return value;
 }
 
-static int hud_max_int(int a, int b)
-{
-    return a > b ? a : b;
-}
-
-static int hud_min_int(int a, int b)
-{
-    return a < b ? a : b;
-}
-
 static void hud_draw_sprite(
     Framebuffer *framebuffer,
     const GeneratedSprite *sprite,
@@ -138,61 +97,6 @@ static void hud_draw_sprite(
         width,
         height,
         SPRITE_FIT_CONTAIN);
-}
-
-static void hud_draw_background(
-    Framebuffer *framebuffer,
-    const GeneratedSprite *sprite,
-    int x,
-    int y,
-    int width)
-{
-    UiRect rect;
-    UiNineSlice slice;
-
-    rect.x = x;
-    rect.y = y;
-    rect.width = width;
-    rect.height = HUD_LAYOUT.bg_height;
-
-    slice.left = HUD_BG_SLICE_LEFT;
-    slice.top = HUD_BG_SLICE_TOP;
-    slice.right = HUD_BG_SLICE_RIGHT;
-    slice.bottom = HUD_BG_SLICE_BOTTOM;
-
-    ui_draw_nine_slice_panel(
-        framebuffer,
-        sprite,
-        rect,
-        slice);
-}
-
-static void hud_draw_player_sprite(
-    Framebuffer *framebuffer,
-    const GameState *game,
-    int x,
-    int y,
-    int width,
-    int height)
-{
-    const GeneratedSprite *sprite = generated_sprite_get(game_player_config(game)->visual.sprite_id);
-
-    if (sprite == 0)
-    {
-        return;
-    }
-
-    renderer_draw_generated_sprite_region_scaled(
-        framebuffer,
-        sprite,
-        sprite->width / 2,
-        0,
-        sprite->width - sprite->width / 2,
-        sprite->height,
-        x,
-        y,
-        width,
-        height);
 }
 
 static void hud_draw_score(
@@ -259,34 +163,21 @@ static void hud_draw_hearts(
 void hud_render(Framebuffer *framebuffer, const GameState *game)
 {
     const HudResources *resources;
-    int bg_x;
-    int bg_y;
-    int bg_width;
-
-    int player_x;
-    int player_y;
-
-    int right_x;
-
-    int score_text_height;
-    int bottom_row_height;
-    int right_content_height;
-    int right_content_y;
-
-    int hearts_y;
-    int bottom_y;
-    int star_y;
-    int score_y;
-
     int max_hp;
     int current_hp;
     int heart_row_width;
-    int score_width;
-    int bottom_row_width;
-    int right_content_width;
+    int heart_row_x;
+    int score_row_width;
+    int score_row_x;
+    int score_y;
     char score_text[16];
 
     if (framebuffer == 0 || game == 0)
+    {
+        return;
+    }
+
+    if (game->uiState != GAME_UI_PLAYING || game->gameOver)
     {
         return;
     }
@@ -297,79 +188,46 @@ void hud_render(Framebuffer *framebuffer, const GameState *game)
         return;
     }
 
-    bg_x = HUD_LAYOUT.margin_x;
-    bg_y = HUD_LAYOUT.margin_y;
-
     max_hp = game_player_config(game)->hp;
     if (max_hp < 0)
     {
         max_hp = 0;
     }
 
+    current_hp = hud_clamp_int(game->playerHp, 0, max_hp);
     heart_row_width = max_hp > 0
         ? max_hp * HUD_LAYOUT.heart_size + (max_hp - 1) * HUD_LAYOUT.heart_gap
         : 0;
+    heart_row_x = (framebuffer->width - heart_row_width) / 2;
+
     snprintf(score_text, sizeof(score_text), "%d", game->score < 0 ? 0 : game->score);
-    score_width = font_measure_text(resources->score_font, HUD_LAYOUT.score_scale, score_text);
-    bottom_row_width = HUD_LAYOUT.star_size + HUD_LAYOUT.star_score_gap + score_width;
-    right_content_width = hud_max_int(heart_row_width, bottom_row_width);
-    bg_width = HUD_LAYOUT.padding_x * 2
-        + HUD_LAYOUT.player_size
-        + HUD_LAYOUT.player_content_gap
-        + right_content_width;
-    bg_width = hud_max_int(bg_width, HUD_LAYOUT.bg_width);
-    bg_width = hud_min_int(bg_width, framebuffer->width - HUD_LAYOUT.margin_x * 2);
-
-    hud_draw_background(framebuffer, resources->background, bg_x, bg_y, bg_width);
-
-    player_x = bg_x + HUD_LAYOUT.padding_x;
-    player_y = bg_y + (HUD_LAYOUT.bg_height - HUD_LAYOUT.player_size) / 2;
-
-    hud_draw_player_sprite(
-        framebuffer,
-        game,
-        player_x,
-        player_y,
-        HUD_LAYOUT.player_size,
-        HUD_LAYOUT.player_size);
-
-    right_x = player_x + HUD_LAYOUT.player_size + HUD_LAYOUT.player_content_gap;
-
-    score_text_height = resources->score_font->grid_size * HUD_LAYOUT.score_scale;
-    bottom_row_height = hud_max_int(HUD_LAYOUT.star_size, score_text_height);
-
-    right_content_height = HUD_LAYOUT.heart_size + HUD_LAYOUT.row_gap + bottom_row_height;
-
-    right_content_y = bg_y + (HUD_LAYOUT.bg_height - right_content_height) / 2;
-
-    hearts_y = right_content_y;
-    bottom_y = hearts_y + HUD_LAYOUT.heart_size + HUD_LAYOUT.row_gap;
-
-    star_y = bottom_y + (bottom_row_height - HUD_LAYOUT.star_size) / 2;
-    score_y = bottom_y + (bottom_row_height - score_text_height) / 2;
-
-    current_hp = hud_clamp_int(game->playerHp, 0, max_hp);
+    score_row_width = HUD_LAYOUT.star_size
+        + HUD_LAYOUT.star_score_gap
+        + font_measure_text(resources->score_font, HUD_LAYOUT.score_scale, score_text);
+    score_row_x = (framebuffer->width - score_row_width) / 2;
+    score_y = HUD_LAYOUT.margin_y + HUD_LAYOUT.heart_size + HUD_LAYOUT.row_gap;
 
     hud_draw_hearts(
         framebuffer,
         resources,
-        right_x,
-        hearts_y,
+        heart_row_x,
+        HUD_LAYOUT.margin_y,
         current_hp,
         max_hp);
 
     hud_draw_sprite(
         framebuffer,
         resources->star,
-        right_x,
-        star_y,
+        score_row_x,
+        score_y,
         HUD_LAYOUT.star_size,
         HUD_LAYOUT.star_size);
 
     hud_draw_score(
         framebuffer,
         resources->score_font,
-        right_x + HUD_LAYOUT.star_size + HUD_LAYOUT.star_score_gap,
-        score_y,
+        score_row_x + HUD_LAYOUT.star_size + HUD_LAYOUT.star_score_gap,
+        score_y
+            + (HUD_LAYOUT.star_size - resources->score_font->grid_size * HUD_LAYOUT.score_scale) / 2,
         game->score);
 }

@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "id": "obstacle_attack",
+  "durationMs": 220,
+  "loop": false,
+  "tracks": [
+    { "property": "scale_x", "keys": [
+      { "timeMs": 0, "value": 1000, "easing": "ease_in" },
+      { "timeMs": 80, "value": 1140, "easing": "ease_out" },
+      { "timeMs": 220, "value": 1000, "easing": "ease_in" }
+    ]},
+    { "property": "scale_y", "keys": [
+      { "timeMs": 0, "value": 1000, "easing": "ease_in" },
+      { "timeMs": 80, "value": 880, "easing": "ease_out" },
+      { "timeMs": 220, "value": 1000, "easing": "ease_in" }
+    ]}
+  ]
+}

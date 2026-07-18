@@ -1694,12 +1694,9 @@ static void renderer_draw_entities(
             continue;
         }
 
-        if (entity->type == ENTITY_ENEMY && entity->enemyConfig != 0) {
-            color = entity->enemyConfig->visual.color;
-            sprite_id = entity->enemyConfig->visual.sprite_id;
-        } else if (entity->type == ENTITY_OBSTACLE && entity->obstacleConfig != 0) {
-            color = entity->obstacleConfig->visual.color;
-            sprite_id = entity->obstacleConfig->visual.sprite_id;
+        if (entity->config != 0) {
+            color = entity->config->visual.color;
+            sprite_id = entity->config->visual.sprite_id;
         }
 
         entity_width = entity_get_width(entity);
@@ -1791,8 +1788,8 @@ static void renderer_draw_bird_camera_hit_crack(
 
         if (!entity->active
                 || !entity->dead
-                || entity->enemyConfig == 0
-                || entity->enemyConfig->visual.sprite_id != SPRITE_BIRD
+                || entity->config == 0
+                || entity->config->visual.sprite_id != SPRITE_BIRD
                 || entity->animation.time_ms < BIRD_CAMERA_HIT_IMPACT_MS
                 || entity->animation.time_ms >= BIRD_CAMERA_HIT_IMPACT_MS
                         + BIRD_CAMERA_HIT_CRACK_DURATION_MS) {
@@ -2011,7 +2008,7 @@ static void renderer_draw_entity_wireframes(
             continue;
         }
 
-        if (entity->type != ENTITY_ENEMY && entity->type != ENTITY_OBSTACLE) {
+        if (entity->type != ENTITY_THREAT) {
             continue;
         }
 

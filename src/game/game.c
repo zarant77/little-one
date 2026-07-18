@@ -5,9 +5,8 @@
 
 #include "../audio/audio.h"
 #include "../config.h"
-#include "../config/enemy_config.h"
+#include "../config/threat_config.h"
 #include "../config/foreground_decoration_config.h"
-#include "../config/obstacle_config.h"
 #include "../config/player_config.h"
 #include "../feedback/game_feedback.h"
 #include "../sprites/animations/animation_evaluate.h"
@@ -97,25 +96,34 @@ static EntityAnimSlot game_player_animation_slot(const GameState* game) {
         return game->playerVelocityY < 0.0f ? ENTITY_ANIM_JUMP : ENTITY_ANIM_FALL;
     }
 
-    if (game->playerVelocityX != 0.0f) {
-        return ENTITY_ANIM_WALK;
-    }
-
-    return ENTITY_ANIM_IDLE;
+    return ENTITY_ANIM_WALK;
 }
 
 static void game_update_player_animation(GameState* game, int32_t elapsed_ms) {
+    EntityAnimSlot slot;
+    int32_t animation_elapsed_ms = elapsed_ms;
+
     if (game->gameOver) {
         entity_animation_update(&game->playerAnimation, elapsed_ms);
         return;
     }
 
+    slot = game_player_animation_slot(game);
+
+    if (slot == ENTITY_ANIM_WALK) {
+        if (game->playerVelocityX < 0.0f) {
+            animation_elapsed_ms = 0;
+        } else if (game->playerVelocityX > 0.0f) {
+            animation_elapsed_ms *= 2;
+        }
+    }
+
     entity_animation_set(
             &game->playerAnimation,
             entity_animation_player_config(),
-            game_player_animation_slot(game)
+            slot
     );
-    entity_animation_update(&game->playerAnimation, elapsed_ms);
+    entity_animation_update(&game->playerAnimation, animation_elapsed_ms);
 }
 
 static void game_clamp_player_x(GameState* game) {
@@ -334,36 +342,16 @@ static void game_spawn_entity(GameState* game) {
         return;
     }
 
-    if (game_random_01() < 0.5f) {
-        int enemy_count = 0;
-        int enemy_index;
-        const EnemyConfig* enemy_config;
-
-        enemy_config_get_all(&enemy_count);
-        enemy_index = game_random_index(enemy_count);
-        enemy_config = enemy_config_get(enemy_index);
-        if (enemy_config == 0) {
-            return;
-        }
-
-        y_offset = enemy_config->spawnYmin
-                + game_random_01() * (enemy_config->spawnYmax - enemy_config->spawnYmin);
-        y = game_ground_y(game) + y_offset - (float)enemy_config->visual.height;
-        entity_spawn_enemy(entity, enemy_config, x, y);
-    } else {
-        int obstacle_count = 0;
-        int obstacle_index;
-        const ObstacleConfig* obstacle_config;
-
-        obstacle_config_get_all(&obstacle_count);
-        obstacle_index = game_random_index(obstacle_count);
-        obstacle_config = obstacle_config_get(obstacle_index);
-        if (obstacle_config == 0) {
-            return;
-        }
-
-        y = game_ground_y(game) - (float)obstacle_config->visual.height;
-        entity_spawn_obstacle(entity, obstacle_config, x, y);
+    {
+        int threat_count = 0;
+        const ThreatConfig* config;
+        threat_config_get_all(&threat_count);
+        config = threat_config_get(game_random_index(threat_count));
+        if (config == 0) return;
+        y_offset = config->spawnYmin
+                + game_random_01() * (config->spawnYmax - config->spawnYmin);
+        y = game_ground_y(game) + y_offset - (float)config->visual.height;
+        entity_spawn(entity, config, x, y);
     }
 }
 
@@ -693,7 +681,8 @@ static int game_player_overlaps_entity_hurt_zone(const GameState* game, const En
 }
 
 static int game_player_boundary_overlaps_enemy_hurt_zone(const GameState* game, const Entity* enemy) {
-    if (enemy == 0 || enemy->type != ENTITY_ENEMY) {
+    if (enemy == 0 || enemy->config == 0
+            || enemy->config->type == THREAT_STATIC_OBSTACLE) {
         return 0;
     }
 
@@ -712,13 +701,13 @@ static int game_player_boundary_overlaps_enemy_hurt_zone(const GameState* game, 
 static const char* game_enemy_death_sound_id(const Entity* entity) {
     const char* id;
 
-    if (entity == 0 || entity->enemyConfig == 0 || entity->enemyConfig->id == 0) {
+    if (entity == 0 || entity->config == 0 || entity->config->id == 0) {
         return "death";
     }
 
-    id = entity->enemyConfig->id;
-    if (id[0] == 'e' && id[1] == 'n' && id[2] == 'e' && id[3] == 'm' && id[4] == 'y' && id[5] == '.') {
-        id += 6;
+    id = entity->config->id;
+    if (id[0] == 't' && id[1] == 'h' && id[2] == 'r' && id[3] == 'e' && id[4] == 'a' && id[5] == 't' && id[6] == '.') {
+        id += 7;
 
         if (id[0] == 'o' && id[1] == 'r' && id[2] == 'k' && id[3] == 0) {
             return "ork_death";
@@ -747,9 +736,9 @@ static void game_award_score(GameState* game, int score)
 }
 
 static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
-    if (entity->enemyConfig != 0) {
+    if (entity->config != 0) {
         char score_text[12];
-        int score_value = entity->enemyConfig->scoreValue;
+        int score_value = entity->config->scoreValue;
 
         snprintf(score_text, sizeof(score_text), "+%d", score_value);
         game_spawn_floating_text(
@@ -759,7 +748,7 @@ static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
                 FLOATING_TEXT_SCORE_COLOR,
                 score_text
         );
-        game_award_score(game, entity->enemyConfig->scoreValue);
+        game_award_score(game, entity->config->scoreValue);
     }
     audio_play_sound(game_enemy_death_sound_id(entity));
     entity_kill(entity);
@@ -798,6 +787,7 @@ static void game_enter_game_over(GameState* game) {
     }
     audio_play_sound("death");
     game_feedback_player_death(&game->screenShake);
+    game->newRecord = game->score > game->progress.best_score;
     progression_apply_run(&game->progress, game->score);
     game->bestScore = game->progress.best_score;
     game->progressDirty = 1;
@@ -808,9 +798,9 @@ static void game_enter_game_over(GameState* game) {
     #endif
 }
 
-static void game_damage_player(GameState* game) {
+static int game_damage_player(GameState* game) {
     if (game->playerInvulnerableMs > 0 || game->playerHp <= 0) {
-        return;
+        return 0;
     }
 
     game->playerHp -= 1;
@@ -823,7 +813,7 @@ static void game_damage_player(GameState* game) {
     );
     if (game->playerHp <= 0) {
         game_enter_game_over(game);
-        return;
+        return 1;
     }
 
     game->playerInvulnerableMs = PLAYER_HIT_INVULNERABLE_MS;
@@ -833,6 +823,7 @@ static void game_damage_player(GameState* game) {
             ENTITY_ANIM_DAMAGE
     );
     audio_play_sound("damage");
+    return 1;
 }
 
 static void game_handle_collisions(GameState* game, int player_was_smashing) {
@@ -843,7 +834,8 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
             continue;
         }
 
-        if (entity->type == ENTITY_ENEMY
+        if (entity->config != 0
+                && entity->config->type != THREAT_STATIC_OBSTACLE
                 && player_was_smashing
                 && game_player_boundary_overlaps_enemy_hurt_zone(game, entity)) {
             game_kill_enemy_by_smash(game, entity);
@@ -857,8 +849,10 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
             continue;
         }
 
-        game_damage_player(game);
-        return;
+        if (game_damage_player(game)) {
+            entity_attack(entity);
+            return;
+        }
     }
 }
 
@@ -925,11 +919,13 @@ void game_init(GameState* game) {
     game->gameOverInputArmed = 0;
     game->score = 0;
     game->bestScore = progress.best_score;
+    game->newRecord = 0;
     game->runTimeMs = 0;
     game->fps = 0;
     game->averageFrameMs = 0;
     game->activeEntityCount = 0;
     game->exitRequested = 0;
+    game->runStarted = 0;
     screen_shake_start(&game->screenShake, 0, 0, 1u);
     game_effects_init();
     game->uiState = GAME_UI_MENU;
@@ -960,6 +956,7 @@ void game_restart_run(GameState* game) {
     screen_height = game->screenHeight;
     game_init(game);
     game_set_screen_size(game, (float)screen_width, (float)screen_height);
+    game->runStarted = 1;
     game->uiState = GAME_UI_PLAYING;
     game_set_music("game_loop");
 
@@ -992,6 +989,10 @@ int game_start_run(GameState* game) {
 void game_show_menu(GameState* game) {
     if (game == 0) {
         return;
+    }
+
+    if (game->gameOver) {
+        game->runStarted = 0;
     }
 
     game->uiState = GAME_UI_MENU;

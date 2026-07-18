@@ -19,8 +19,8 @@
 #define MENU_PANEL_PADDING 44
 #define MENU_GAP 28
 #define MENU_BUTTON_HEIGHT 92
-#define MENU_PAUSE_BUTTON_SIZE 120
-#define MENU_PAUSE_BUTTON_MARGIN 50
+#define MENU_PAUSE_BUTTON_SIZE 180
+#define MENU_PAUSE_BUTTON_MARGIN 70
 #define MENU_NO_POINTER -1
 
 typedef enum {
@@ -145,17 +145,11 @@ static void menu_render_main(Framebuffer* framebuffer, const GameState* game)
     MenuLayout layout = menu_layout(game, 530);
     menu_draw_base(framebuffer, layout.panel);
     menu_title(framebuffer, layout.panel, "LITTLE ONE");
-    ui_draw_button(framebuffer, menu_font, layout.first, menu_text(game, LOCALIZED_TEXT_START));
-    ui_draw_button(framebuffer, menu_font, layout.second, menu_text(game, LOCALIZED_TEXT_SETTINGS));
-    ui_draw_button_colored(framebuffer, menu_font, layout.third, menu_text(game, LOCALIZED_TEXT_EXIT), MENU_EXIT_COLOR, MENU_EXIT_BORDER_COLOR);
-}
-
-static void menu_render_pause(Framebuffer* framebuffer, const GameState* game)
-{
-    MenuLayout layout = menu_layout(game, 530);
-    menu_draw_base(framebuffer, layout.panel);
-    menu_title(framebuffer, layout.panel, menu_text(game, LOCALIZED_TEXT_PAUSED));
-    ui_draw_button(framebuffer, menu_font, layout.first, menu_text(game, LOCALIZED_TEXT_RESUME));
+    ui_draw_button(
+            framebuffer,
+            menu_font,
+            layout.first,
+            menu_text(game, game->runStarted ? LOCALIZED_TEXT_RESUME : LOCALIZED_TEXT_START));
     ui_draw_button(framebuffer, menu_font, layout.second, menu_text(game, LOCALIZED_TEXT_SETTINGS));
     ui_draw_button_colored(framebuffer, menu_font, layout.third, menu_text(game, LOCALIZED_TEXT_EXIT), MENU_EXIT_COLOR, MENU_EXIT_BORDER_COLOR);
 }
@@ -182,21 +176,31 @@ static void menu_render_settings(Framebuffer* framebuffer, const GameState* game
 static void menu_render_game_over(Framebuffer* framebuffer, const GameState* game)
 {
     MenuLayout layout = menu_layout(game, 620);
+    UiRect screen = {0, 0, framebuffer->width, framebuffer->height};
     char score[32];
     char best[32];
 
     snprintf(score, sizeof(score), "%s %d", menu_text(game, LOCALIZED_TEXT_SCORE), game->score);
     snprintf(best, sizeof(best), "%s %d", menu_text(game, LOCALIZED_TEXT_BEST), game->bestScore);
-    layout.first.y += 70;
+    layout.first.y += 214;
     layout.second = layout.first;
     layout.second.y += MENU_BUTTON_HEIGHT + MENU_GAP;
 
     menu_draw_base(framebuffer, layout.panel);
-    menu_title(framebuffer, layout.panel, menu_text(game, LOCALIZED_TEXT_GAME_OVER));
-    menu_centered_label(framebuffer, layout.panel, layout.panel.y + 130, 2, score);
-    menu_centered_label(framebuffer, layout.panel, layout.panel.y + 180, 2, best);
+    if (game->newRecord) {
+        int pulse_scale = ((game->gameOverElapsedMs / 250) % 2) == 0 ? 5 : 4;
+        menu_centered_label(
+                framebuffer,
+                screen,
+                48,
+                pulse_scale,
+                menu_text(game, LOCALIZED_TEXT_NEW_RECORD));
+    }
+    menu_centered_label(framebuffer, layout.panel, layout.panel.y + MENU_PANEL_PADDING + 24, 3, menu_text(game, LOCALIZED_TEXT_GAME_OVER));
+    menu_centered_label(framebuffer, layout.panel, layout.panel.y + 169, 2, score);
+    menu_centered_label(framebuffer, layout.panel, layout.panel.y + 234, 2, best);
     ui_draw_button(framebuffer, menu_font, layout.first, menu_text(game, LOCALIZED_TEXT_RETRY));
-    ui_draw_button(framebuffer, menu_font, layout.second, menu_text(game, LOCALIZED_TEXT_BACK));
+    ui_draw_button_colored(framebuffer, menu_font, layout.second, menu_text(game, LOCALIZED_TEXT_EXIT), MENU_EXIT_COLOR, MENU_EXIT_BORDER_COLOR);
 }
 
 static void menu_update_slider(GameState* game, MenuDragTarget target, UiRect rect, int x)
@@ -220,7 +224,7 @@ void menu_initialize(void)
 
 void menu_pause(GameState* game)
 {
-    if (game != 0 && game->uiState == GAME_UI_PLAYING && !game->gameOver) game->uiState = GAME_UI_PAUSED;
+    if (game != 0 && game->uiState == GAME_UI_PLAYING && !game->gameOver) game->uiState = GAME_UI_MENU;
 }
 
 void menu_render(Framebuffer* framebuffer, const GameState* game)
@@ -228,7 +232,6 @@ void menu_render(Framebuffer* framebuffer, const GameState* game)
     if (framebuffer == 0 || game == 0 || menu_font == 0) return;
     if (game->gameOver) { menu_render_game_over(framebuffer, game); return; }
     if (game->uiState == GAME_UI_MENU) { menu_render_main(framebuffer, game); return; }
-    if (game->uiState == GAME_UI_PAUSED) { menu_render_pause(framebuffer, game); return; }
     if (game->uiState == GAME_UI_SETTINGS) { menu_render_settings(framebuffer, game); return; }
     if (game->uiState == GAME_UI_PLAYING && pause_sprite != 0) {
         UiRect rect = menu_pause_button_rect(game);
@@ -248,11 +251,11 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
     if (game->gameOver) {
         if (action_type != INPUT_TOUCH_DOWN) return 1;
         layout = menu_layout(game, 620);
-        layout.first.y += 70;
+        layout.first.y += 214;
         layout.second = layout.first;
         layout.second.y += MENU_BUTTON_HEIGHT + MENU_GAP;
         if (ui_rect_contains(&layout.first, x, y)) game_try_restart_after_game_over(game);
-        else if (ui_rect_contains(&layout.second, x, y)) game_show_menu(game);
+        else if (ui_rect_contains(&layout.second, x, y)) game->exitRequested = 1;
         return 1;
     }
     if (game->uiState == GAME_UI_PLAYING) {
@@ -263,17 +266,12 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
     if (game->uiState == GAME_UI_MENU) {
         if (action_type != INPUT_TOUCH_DOWN) return 1;
         layout = menu_layout(game, 530);
-        if (ui_rect_contains(&layout.first, x, y)) game_start_run(game);
+        if (ui_rect_contains(&layout.first, x, y)) {
+            if (game->runStarted) game->uiState = GAME_UI_PLAYING;
+            else game_start_run(game);
+        }
         else if (ui_rect_contains(&layout.second, x, y)) game->uiState = GAME_UI_SETTINGS;
         else if (ui_rect_contains(&layout.third, x, y)) game->exitRequested = 1;
-        return 1;
-    }
-    if (game->uiState == GAME_UI_PAUSED) {
-        if (action_type != INPUT_TOUCH_DOWN) return 1;
-        layout = menu_layout(game, 530);
-        if (ui_rect_contains(&layout.first, x, y)) game->uiState = GAME_UI_PLAYING;
-        else if (ui_rect_contains(&layout.second, x, y)) game->uiState = GAME_UI_SETTINGS;
-        else if (ui_rect_contains(&layout.third, x, y)) game_show_menu(game);
         return 1;
     }
     if (game->uiState == GAME_UI_SETTINGS) {

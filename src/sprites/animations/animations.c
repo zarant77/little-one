@@ -511,6 +511,32 @@ static const AnimTrack DEATH_TRACKS[] = {
     },
 };
 
+// Source: src/assets/animations/enemy_attack.anim.json
+static const AnimKey ENEMY_ATTACK_OFFSET_X_KEYS[] = {
+    { 0, 0, ANIM_EASE_IN },
+    { 110, -34, ANIM_EASE_OUT },
+    { 260, 0, ANIM_EASE_IN },
+};
+
+static const AnimKey ENEMY_ATTACK_SCALE_X_KEYS[] = {
+    { 0, 1000, ANIM_EASE_LINEAR },
+    { 110, 1120, ANIM_EASE_OUT },
+    { 260, 1000, ANIM_EASE_IN },
+};
+
+static const AnimTrack ENEMY_ATTACK_TRACKS[] = {
+    {
+        .property = ANIM_PROP_OFFSET_X,
+        .keys = ENEMY_ATTACK_OFFSET_X_KEYS,
+        .key_count = sizeof(ENEMY_ATTACK_OFFSET_X_KEYS) / sizeof(ENEMY_ATTACK_OFFSET_X_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_SCALE_X,
+        .keys = ENEMY_ATTACK_SCALE_X_KEYS,
+        .key_count = sizeof(ENEMY_ATTACK_SCALE_X_KEYS) / sizeof(ENEMY_ATTACK_SCALE_X_KEYS[0]),
+    },
+};
+
 // Source: src/assets/animations/fall.anim.json
 static const AnimKey FALL_OFFSET_Y_KEYS[] = {
     { 0, 0, ANIM_EASE_LINEAR },
@@ -595,6 +621,43 @@ static const AnimTrack FLY_TRACKS[] = {
         .property = ANIM_PROP_ROTATION,
         .keys = FLY_ROTATION_KEYS,
         .key_count = sizeof(FLY_ROTATION_KEYS) / sizeof(FLY_ROTATION_KEYS[0]),
+    },
+};
+
+// Source: src/assets/animations/flying_attack.anim.json
+static const AnimKey FLYING_ATTACK_OFFSET_X_KEYS[] = {
+    { 0, 0, ANIM_EASE_IN },
+    { 130, -46, ANIM_EASE_OUT },
+    { 320, 0, ANIM_EASE_IN },
+};
+
+static const AnimKey FLYING_ATTACK_OFFSET_Y_KEYS[] = {
+    { 0, 0, ANIM_EASE_IN },
+    { 130, 28, ANIM_EASE_OUT },
+    { 320, 0, ANIM_EASE_IN },
+};
+
+static const AnimKey FLYING_ATTACK_ROTATION_KEYS[] = {
+    { 0, 0, ANIM_EASE_LINEAR },
+    { 130, -90, ANIM_EASE_OUT },
+    { 320, 0, ANIM_EASE_IN },
+};
+
+static const AnimTrack FLYING_ATTACK_TRACKS[] = {
+    {
+        .property = ANIM_PROP_OFFSET_X,
+        .keys = FLYING_ATTACK_OFFSET_X_KEYS,
+        .key_count = sizeof(FLYING_ATTACK_OFFSET_X_KEYS) / sizeof(FLYING_ATTACK_OFFSET_X_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_OFFSET_Y,
+        .keys = FLYING_ATTACK_OFFSET_Y_KEYS,
+        .key_count = sizeof(FLYING_ATTACK_OFFSET_Y_KEYS) / sizeof(FLYING_ATTACK_OFFSET_Y_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_ROTATION,
+        .keys = FLYING_ATTACK_ROTATION_KEYS,
+        .key_count = sizeof(FLYING_ATTACK_ROTATION_KEYS) / sizeof(FLYING_ATTACK_ROTATION_KEYS[0]),
     },
 };
 
@@ -780,6 +843,32 @@ static const AnimTrack LAND_TRACKS[] = {
         .property = ANIM_PROP_SCALE_Y,
         .keys = LAND_SCALE_Y_KEYS,
         .key_count = sizeof(LAND_SCALE_Y_KEYS) / sizeof(LAND_SCALE_Y_KEYS[0]),
+    },
+};
+
+// Source: src/assets/animations/obstacle_attack.anim.json
+static const AnimKey OBSTACLE_ATTACK_SCALE_X_KEYS[] = {
+    { 0, 1000, ANIM_EASE_IN },
+    { 80, 1140, ANIM_EASE_OUT },
+    { 220, 1000, ANIM_EASE_IN },
+};
+
+static const AnimKey OBSTACLE_ATTACK_SCALE_Y_KEYS[] = {
+    { 0, 1000, ANIM_EASE_IN },
+    { 80, 880, ANIM_EASE_OUT },
+    { 220, 1000, ANIM_EASE_IN },
+};
+
+static const AnimTrack OBSTACLE_ATTACK_TRACKS[] = {
+    {
+        .property = ANIM_PROP_SCALE_X,
+        .keys = OBSTACLE_ATTACK_SCALE_X_KEYS,
+        .key_count = sizeof(OBSTACLE_ATTACK_SCALE_X_KEYS) / sizeof(OBSTACLE_ATTACK_SCALE_X_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_SCALE_Y,
+        .keys = OBSTACLE_ATTACK_SCALE_Y_KEYS,
+        .key_count = sizeof(OBSTACLE_ATTACK_SCALE_Y_KEYS) / sizeof(OBSTACLE_ATTACK_SCALE_Y_KEYS[0]),
     },
 };
 
@@ -1485,6 +1574,13 @@ const AnimationClip ANIMATION_CLIPS[] = {
         .track_count = sizeof(DEATH_TRACKS) / sizeof(DEATH_TRACKS[0]),
     },
     {
+        .id = "enemy_attack",
+        .duration_ms = 260,
+        .loop = false,
+        .tracks = ENEMY_ATTACK_TRACKS,
+        .track_count = sizeof(ENEMY_ATTACK_TRACKS) / sizeof(ENEMY_ATTACK_TRACKS[0]),
+    },
+    {
         .id = "fall",
         .duration_ms = 180,
         .loop = false,
@@ -1497,6 +1593,13 @@ const AnimationClip ANIMATION_CLIPS[] = {
         .loop = true,
         .tracks = FLY_TRACKS,
         .track_count = sizeof(FLY_TRACKS) / sizeof(FLY_TRACKS[0]),
+    },
+    {
+        .id = "flying_attack",
+        .duration_ms = 320,
+        .loop = false,
+        .tracks = FLYING_ATTACK_TRACKS,
+        .track_count = sizeof(FLYING_ATTACK_TRACKS) / sizeof(FLYING_ATTACK_TRACKS[0]),
     },
     {
         .id = "flying_death",
@@ -1525,6 +1628,13 @@ const AnimationClip ANIMATION_CLIPS[] = {
         .loop = false,
         .tracks = LAND_TRACKS,
         .track_count = sizeof(LAND_TRACKS) / sizeof(LAND_TRACKS[0]),
+    },
+    {
+        .id = "obstacle_attack",
+        .duration_ms = 220,
+        .loop = false,
+        .tracks = OBSTACLE_ATTACK_TRACKS,
+        .track_count = sizeof(OBSTACLE_ATTACK_TRACKS) / sizeof(OBSTACLE_ATTACK_TRACKS[0]),
     },
     {
         .id = "obstacle_break",

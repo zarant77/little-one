@@ -15,6 +15,7 @@ static const LocalizedText LOCALIZED_TEXTS[] = {
     [LOCALIZED_TEXT_LANGUAGE_ENGLISH] = {"EN", "АНГЛ"},
     [LOCALIZED_TEXT_LANGUAGE_UKRAINIAN] = {"UK", "УКР"},
     [LOCALIZED_TEXT_MUSIC] = {"MUSIC", "МУЗИКА"},
+    [LOCALIZED_TEXT_NEW_RECORD] = {"NEW RECORD!", "НОВИЙ РЕКОРД!"},
     [LOCALIZED_TEXT_PAUSED] = {"PAUSED", "ПАУЗА"},
     [LOCALIZED_TEXT_RESUME] = {"RESUME", "ПРОДОВЖИТИ"},
     [LOCALIZED_TEXT_RETRY] = {"RETRY", "ЩЕ РАЗ"},

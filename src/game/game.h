@@ -39,9 +39,8 @@ typedef struct {
 
 typedef enum {
     GAME_UI_PLAYING = 0,
-    GAME_UI_PAUSED = 1,
-    GAME_UI_SETTINGS = 2,
-    GAME_UI_MENU = 3
+    GAME_UI_SETTINGS = 1,
+    GAME_UI_MENU = 2
 } GameUiState;
 
 typedef struct {
@@ -70,11 +69,13 @@ typedef struct {
     int gameOverInputArmed;
     int score;
     int bestScore;
+    int newRecord;
     int runTimeMs;
     int fps;
     int averageFrameMs;
     int activeEntityCount;
     int exitRequested;
+    int runStarted;
     ScreenShake screenShake;
     GameUiState uiState;
     GameSettings settings;

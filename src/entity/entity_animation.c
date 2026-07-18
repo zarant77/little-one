@@ -10,6 +10,7 @@ static const char *ENTITY_ANIM_GENERIC_CLIPS[ENTITY_ANIM_COUNT] = {
         [ENTITY_ANIM_SMASH] = "smash",
         [ENTITY_ANIM_LAND] = "land",
         [ENTITY_ANIM_DAMAGE] = "damage",
+        [ENTITY_ANIM_ATTACK] = "enemy_attack",
         [ENTITY_ANIM_DEATH] = "death",
 };
 

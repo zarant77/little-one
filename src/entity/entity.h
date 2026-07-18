@@ -1,14 +1,12 @@
 #ifndef LITTLE_ONE_ENTITY_H
 #define LITTLE_ONE_ENTITY_H
 
-#include "../config/enemy_config.h"
-#include "../config/obstacle_config.h"
+#include "../config/threat_config.h"
 #include "entity_animation.h"
 
 typedef enum {
     ENTITY_NONE,
-    ENTITY_ENEMY,
-    ENTITY_OBSTACLE
+    ENTITY_THREAT
 } EntityType;
 
 typedef struct {
@@ -20,14 +18,13 @@ typedef struct {
     int active;
     int dead;
 
-    const EnemyConfig* enemyConfig;
-    const ObstacleConfig* obstacleConfig;
+    const ThreatConfig* config;
     EntityAnimationState animation;
 } Entity;
 
 void entity_clear(Entity* entity);
-void entity_spawn_enemy(Entity* entity, const EnemyConfig* config, float x, float y);
-void entity_spawn_obstacle(Entity* entity, const ObstacleConfig* config, float x, float y);
+void entity_spawn(Entity* entity, const ThreatConfig* config, float x, float y);
+void entity_attack(Entity* entity);
 void entity_kill(Entity* entity);
 void entity_update(Entity* entity, float world_speed, float dt);
 int entity_get_width(const Entity* entity);

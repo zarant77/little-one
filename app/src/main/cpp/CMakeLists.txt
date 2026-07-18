@@ -54,9 +54,8 @@ add_library(littleone SHARED
     ../../../../src/audio/sound_generator.c
     ../../../../src/audio/sound_registry.c
     ../../../../src/config/background_config.c
-    ../../../../src/config/enemy_config.c
     ../../../../src/config/foreground_decoration_config.c
-    ../../../../src/config/obstacle_config.c
+    ../../../../src/config/threat_config.c
     ../../../../src/config/player_config.c
     ../../../../src/entity/entity.c
     ../../../../src/entity/entity_animation.c

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "id": "flying_attack",
+  "durationMs": 320,
+  "loop": false,
+  "tracks": [
+    { "property": "offset_x", "keys": [
+      { "timeMs": 0, "value": 0, "easing": "ease_in" },
+      { "timeMs": 130, "value": -46, "easing": "ease_out" },
+      { "timeMs": 320, "value": 0, "easing": "ease_in" }
+    ]},
+    { "property": "offset_y", "keys": [
+      { "timeMs": 0, "value": 0, "easing": "ease_in" },
+      { "timeMs": 130, "value": 28, "easing": "ease_out" },
+      { "timeMs": 320, "value": 0, "easing": "ease_in" }
+    ]},
+    { "property": "rotation", "keys": [
+      { "timeMs": 0, "value": 0, "easing": "linear" },
+      { "timeMs": 130, "value": -90, "easing": "ease_out" },
+      { "timeMs": 320, "value": 0, "easing": "ease_in" }
+    ]}
+  ]
+}

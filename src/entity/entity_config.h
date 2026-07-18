@@ -25,6 +25,7 @@ typedef struct {
     SpriteId sprite_id;
     const char* animationId;
     const char* deathAnimationId;
+    const char* attackAnimationId;
 } EntityVisualConfig;
 
 static inline int32_t hurt_zone_world_x(

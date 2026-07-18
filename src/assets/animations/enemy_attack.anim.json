@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "id": "enemy_attack",
+  "durationMs": 260,
+  "loop": false,
+  "tracks": [
+    { "property": "offset_x", "keys": [
+      { "timeMs": 0, "value": 0, "easing": "ease_in" },
+      { "timeMs": 110, "value": -34, "easing": "ease_out" },
+      { "timeMs": 260, "value": 0, "easing": "ease_in" }
+    ]},
+    { "property": "scale_x", "keys": [
+      { "timeMs": 0, "value": 1000, "easing": "linear" },
+      { "timeMs": 110, "value": 1120, "easing": "ease_out" },
+      { "timeMs": 260, "value": 1000, "easing": "ease_in" }
+    ]}
+  ]
+}
