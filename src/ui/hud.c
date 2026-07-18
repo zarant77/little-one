@@ -20,7 +20,7 @@ typedef struct
     int bg_width;
     int bg_height;
 
-    int cat_size;
+    int player_size;
     int heart_size;
     int star_size;
 
@@ -30,7 +30,7 @@ typedef struct
     int padding_x;
     int padding_y;
 
-    int cat_content_gap;
+    int player_content_gap;
     int heart_gap;
     int row_gap;
     int star_score_gap;
@@ -42,7 +42,7 @@ static const HudLayout HUD_LAYOUT = {
     .bg_width = 440,
     .bg_height = 176,
 
-    .cat_size = 128,
+    .player_size = 128,
     .heart_size = 56,
     .star_size = 56,
 
@@ -52,7 +52,7 @@ static const HudLayout HUD_LAYOUT = {
     .padding_x = 30,
     .padding_y = 20,
 
-    .cat_content_gap = 50,
+    .player_content_gap = 50,
     .heart_gap = 8,
     .row_gap = 12,
     .star_score_gap = 12,
@@ -167,7 +167,7 @@ static void hud_draw_background(
         slice);
 }
 
-static void hud_draw_current_cat_sprite(
+static void hud_draw_player_sprite(
     Framebuffer *framebuffer,
     const GameState *game,
     int x,
@@ -263,8 +263,8 @@ void hud_render(Framebuffer *framebuffer, const GameState *game)
     int bg_y;
     int bg_width;
 
-    int cat_x;
-    int cat_y;
+    int player_x;
+    int player_y;
 
     int right_x;
 
@@ -314,26 +314,26 @@ void hud_render(Framebuffer *framebuffer, const GameState *game)
     bottom_row_width = HUD_LAYOUT.star_size + HUD_LAYOUT.star_score_gap + score_width;
     right_content_width = hud_max_int(heart_row_width, bottom_row_width);
     bg_width = HUD_LAYOUT.padding_x * 2
-        + HUD_LAYOUT.cat_size
-        + HUD_LAYOUT.cat_content_gap
+        + HUD_LAYOUT.player_size
+        + HUD_LAYOUT.player_content_gap
         + right_content_width;
     bg_width = hud_max_int(bg_width, HUD_LAYOUT.bg_width);
     bg_width = hud_min_int(bg_width, framebuffer->width - HUD_LAYOUT.margin_x * 2);
 
     hud_draw_background(framebuffer, resources->background, bg_x, bg_y, bg_width);
 
-    cat_x = bg_x + HUD_LAYOUT.padding_x;
-    cat_y = bg_y + (HUD_LAYOUT.bg_height - HUD_LAYOUT.cat_size) / 2;
+    player_x = bg_x + HUD_LAYOUT.padding_x;
+    player_y = bg_y + (HUD_LAYOUT.bg_height - HUD_LAYOUT.player_size) / 2;
 
-    hud_draw_current_cat_sprite(
+    hud_draw_player_sprite(
         framebuffer,
         game,
-        cat_x,
-        cat_y,
-        HUD_LAYOUT.cat_size,
-        HUD_LAYOUT.cat_size);
+        player_x,
+        player_y,
+        HUD_LAYOUT.player_size,
+        HUD_LAYOUT.player_size);
 
-    right_x = cat_x + HUD_LAYOUT.cat_size + HUD_LAYOUT.cat_content_gap;
+    right_x = player_x + HUD_LAYOUT.player_size + HUD_LAYOUT.player_content_gap;
 
     score_text_height = resources->score_font->grid_size * HUD_LAYOUT.score_scale;
     bottom_row_height = hud_max_int(HUD_LAYOUT.star_size, score_text_height);

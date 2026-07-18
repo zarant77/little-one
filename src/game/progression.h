@@ -5,7 +5,6 @@ typedef struct {
     int best_score;
     int total_score;
     int total_runs;
-    int selected_cat_index;
 } ProgressionState;
 
 void progression_init(ProgressionState* progress);

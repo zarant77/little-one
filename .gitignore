@@ -14,3 +14,13 @@
 .cxx
 local.properties
 color_report.txt
+
+# Local Android signing material
+keystore.properties
+signing.properties
+keystore/
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key

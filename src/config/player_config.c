@@ -20,7 +20,7 @@ static const PlayerConfig PLAYER_CONFIG = {
         .width = 250,          // Render width
         .height = 160,         // Render height
         .color = 0xffffffff,   // Fallback rectangle color
-        .sprite_id = SPRITE_PINKPAWTHER, // Generated sprite identifier
+        .sprite_id = SPRITE_PLAYER, // Generated sprite identifier
         .animationId = "idle", // Future default animation
         .deathAnimationId = "player_death_fall",
     },

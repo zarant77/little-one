@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#define PROGRESSION_SAVE_VERSION 1
+#define PROGRESSION_SAVE_VERSION 2
 
 void progression_init(ProgressionState* progress)
 {
@@ -14,7 +14,6 @@ void progression_init(ProgressionState* progress)
     progress->best_score = 0;
     progress->total_score = 0;
     progress->total_runs = 0;
-    progress->selected_cat_index = 0;
 }
 
 void progression_apply_run(ProgressionState* progress, int score)
@@ -72,19 +71,18 @@ int progression_load_from_path(const char* path, ProgressionState* progress)
     progression_init(&loaded);
     if (fscanf(
             file,
-            "little_one_progress %d\nbest %d\ntotal %d\nruns %d\ncat %d\n",
+            "little_one_progress %d\nbest %d\ntotal %d\nruns %d\n",
             &version,
             &loaded.best_score,
             &loaded.total_score,
-            &loaded.total_runs,
-            &loaded.selected_cat_index) != 5)
+            &loaded.total_runs) != 4)
     {
         fclose(file);
         return 0;
     }
 
     fclose(file);
-    if (version != PROGRESSION_SAVE_VERSION)
+    if (version != 1 && version != PROGRESSION_SAVE_VERSION)
     {
         return 0;
     }
@@ -124,12 +122,11 @@ int progression_save_to_path(const char* path, const ProgressionState* progress)
 
     result = fprintf(
             file,
-            "little_one_progress %d\nbest %d\ntotal %d\nruns %d\ncat %d\n",
+            "little_one_progress %d\nbest %d\ntotal %d\nruns %d\n",
             PROGRESSION_SAVE_VERSION,
             progress->best_score,
             progress->total_score,
-            progress->total_runs,
-            progress->selected_cat_index);
+            progress->total_runs);
 
     fclose(file);
     return result > 0;

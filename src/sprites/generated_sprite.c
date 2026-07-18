@@ -32,20 +32,7 @@ static size_t GENERATED_SPRITE_COUNT = 0;
 static int generated_sprites_initialized = 0;
 
 static const char *SPRITE_ID_NAMES[SPRITE_ID_COUNT] = {
-    "agent00cat",
-    "carrambacat",
-    "catbuster",
-    "darthcat",
-    "doomcat",
-    "harrypurrter",
-    "impawsiblecat",
-    "indicat",
-    "jawscat",
-    "pinkpawther",
-    "robocat",
-    "rockpaw",
-    "scarcat",
-    "termicator",
+    "player",
     "boar",
     "ork",
     "rat",
@@ -54,10 +41,6 @@ static const char *SPRITE_ID_NAMES[SPRITE_ID_COUNT] = {
     "rock",
     "cactus",
     "stump",
-    "bg_mountains",
-    "bg_forest",
-    "fg_bushes",
-    "ground_grass",
 };
 
 static int sprite_alpha(uint32_t color)

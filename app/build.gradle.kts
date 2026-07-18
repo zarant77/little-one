@@ -1,5 +1,22 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
+}
+
+val keystorePropertiesFile = file("/Users/zar/Dropbox/Keys/catemup-keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use(::load)
+}
+val releaseSigningConfigured = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+    .all { !keystoreProperties.getProperty(it).isNullOrBlank() }
+val releaseKeystoreFile = keystoreProperties.getProperty("storeFile")
+    ?.takeIf { it.isNotBlank() }
+    ?.let(rootProject::file)
+val releaseSigningError = when {
+    !releaseSigningConfigured -> "Missing CatEmUp signing configuration: configure ${keystorePropertiesFile.path}"
+    releaseKeystoreFile?.isFile != true -> "Missing CatEmUp signing configuration: keystore not found at ${releaseKeystoreFile?.path}"
+    else -> null
 }
 
 android {
@@ -24,29 +41,21 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            val storeFilePath = providers.gradleProperty("LITTLE_ONE_STORE_FILE").orNull
-            val storePass = providers.gradleProperty("LITTLE_ONE_STORE_PASSWORD").orNull
-            val alias = providers.gradleProperty("LITTLE_ONE_KEY_ALIAS").orNull
-            val keyPass = providers.gradleProperty("LITTLE_ONE_KEY_PASSWORD").orNull
-
-            if (
-                storeFilePath != null &&
-                storePass != null &&
-                alias != null &&
-                keyPass != null
-            ) {
-                storeFile = file(storeFilePath)
-                storePassword = storePass
-                keyAlias = alias
-                keyPassword = keyPass
+        if (releaseSigningError == null) {
+            create("release") {
+                storeFile = releaseKeystoreFile
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
             }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            if (releaseSigningError == null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
 
             isMinifyEnabled = true
             isShrinkResources = true
@@ -78,5 +87,14 @@ android {
             path = file("src/main/cpp/CMakeLists.txt")
             version = "3.22.1"
         }
+    }
+}
+
+gradle.taskGraph.whenReady {
+    val releaseRequested = allTasks.any {
+        it.path.startsWith(":app:") && it.name.contains("Release", ignoreCase = true)
+    }
+    if (releaseRequested && releaseSigningError != null) {
+        throw GradleException(releaseSigningError)
     }
 }

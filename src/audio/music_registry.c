@@ -19,22 +19,8 @@ static const char* music_registry_id_name(MusicId music_id)
 {
     switch (music_id)
     {
-        case MUSIC_ID_AGENT00CAT: return "agent00cat";
-        case MUSIC_ID_CARRAMBACAT: return "carrambacat";
-        case MUSIC_ID_CATBUSTER: return "catbuster";
-        case MUSIC_ID_DARTHCAT: return "darthcat";
-        case MUSIC_ID_DOOMCAT: return "doomcat";
+        case MUSIC_ID_GAME_LOOP: return "game_loop";
         case MUSIC_ID_GAME_OVER: return "game_over";
-        case MUSIC_ID_HARRYPURRTER: return "harrypurrter";
-        case MUSIC_ID_IMPAWSIBLECAT: return "impawsiblecat";
-        case MUSIC_ID_INDICAT: return "indicat";
-        case MUSIC_ID_JAWSCAT: return "jawscat";
-        case MUSIC_ID_MAIN_THEME: return "main_theme";
-        case MUSIC_ID_PINKPAWTHER: return "pinkpawther";
-        case MUSIC_ID_ROBOCAT: return "robocat";
-        case MUSIC_ID_ROCKPAW: return "rockpaw";
-        case MUSIC_ID_SCARCAT: return "scarcat";
-        case MUSIC_ID_TERMICATOR: return "termicator";
         default: return 0;
     }
 }

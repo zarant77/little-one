@@ -4,7 +4,6 @@ set -euo pipefail
 
 APP_ID="com.catemup.littleone"
 
-SOURCE_APK_UNSIGNED="app/build/outputs/apk/release/app-release-unsigned.apk"
 SOURCE_APK_SIGNED="app/build/outputs/apk/release/app-release.apk"
 SOURCE_AAB="app/build/outputs/bundle/release/app-release.aab"
 
@@ -13,9 +12,10 @@ OUTPUT_APK="$BUILD_DIR/little-one.apk"
 OUTPUT_AAB="$BUILD_DIR/little-one.aab"
 
 SDK="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
+export ANDROID_HOME="$SDK"
 BUILD_TOOLS_DIR="$(ls -d "$SDK"/build-tools/* | sort -V | tail -n 1)"
 APKSIGNER="$BUILD_TOOLS_DIR/apksigner"
-KEYSTORE="$HOME/.android/debug.keystore"
+ADB="$SDK/platform-tools/adb"
 
 ensure_tools() {
     if [ ! -x "$APKSIGNER" ]; then
@@ -24,24 +24,11 @@ ensure_tools() {
     fi
 }
 
-ensure_keystore() {
-    if [ -f "$KEYSTORE" ]; then
-        return
+ensure_adb() {
+    if [ ! -x "$ADB" ]; then
+        echo "ERROR: adb not found: $ADB"
+        exit 1
     fi
-    
-    echo "Creating debug keystore..."
-    mkdir -p "$HOME/.android"
-    
-    keytool -genkeypair \
-    -v \
-    -keystore "$KEYSTORE" \
-    -storepass android \
-    -alias androiddebugkey \
-    -keypass android \
-    -keyalg RSA \
-    -keysize 2048 \
-    -validity 10000 \
-    -dname "CN=Android Debug,O=Android,C=US"
 }
 
 show_logo() {
@@ -92,42 +79,10 @@ get_release_apk() {
         return
     fi
     
-    if [ -f "$SOURCE_APK_UNSIGNED" ]; then
-        echo "$SOURCE_APK_UNSIGNED"
-        return
-    fi
-    
     echo "ERROR: Release APK not found." >&2
-    echo "Expected one of:" >&2
-    echo "  $SOURCE_APK_SIGNED" >&2
-    echo "  $SOURCE_APK_UNSIGNED" >&2
+    echo "Expected: $SOURCE_APK_SIGNED" >&2
     show_build_outputs >&2
     exit 1
-}
-
-sign_apk_if_needed() {
-    if [ -f "$SOURCE_APK_SIGNED" ]; then
-        echo "APK already signed by Gradle:"
-        echo "$SOURCE_APK_SIGNED"
-        return
-    fi
-    
-    if [ ! -f "$SOURCE_APK_UNSIGNED" ]; then
-        echo "ERROR: Unsigned APK not found:"
-        echo "$SOURCE_APK_UNSIGNED"
-        show_build_outputs
-        exit 1
-    fi
-    
-    echo
-    echo "Signing APK with debug keystore..."
-    
-    "$APKSIGNER" sign \
-    --ks "$KEYSTORE" \
-    --ks-key-alias androiddebugkey \
-    --ks-pass pass:android \
-    --key-pass pass:android \
-    "$SOURCE_APK_UNSIGNED"
 }
 
 verify_apk() {
@@ -158,7 +113,6 @@ verify_aab() {
 
 build_apk() {
     ensure_tools
-    ensure_keystore
     
     pack_assets
     
@@ -170,7 +124,6 @@ build_apk() {
     
     ./gradlew clean :app:assembleRelease
     
-    sign_apk_if_needed
     verify_apk
     
     mkdir -p "$BUILD_DIR"
@@ -205,7 +158,6 @@ build_aab() {
 
 build_release() {
     ensure_tools
-    ensure_keystore
     
     pack_assets
     
@@ -217,7 +169,6 @@ build_release() {
     
     ./gradlew clean :app:assembleRelease :app:bundleRelease
     
-    sign_apk_if_needed
     verify_apk
     verify_aab
     
@@ -237,21 +188,23 @@ build_release() {
 }
 
 install_apk() {
+    ensure_adb
     if [ ! -f "$OUTPUT_APK" ]; then
         echo "ERROR: APK not found. Build first."
         exit 1
     fi
     
-    adb install -r -d "$OUTPUT_APK"
+    "$ADB" install -r -d "$OUTPUT_APK"
 }
 
 launch_app() {
-    adb shell monkey -p "$APP_ID" 1
+    "$ADB" shell monkey -p "$APP_ID" 1
 }
 
 show_logs() {
-    adb logcat -c
-    adb logcat | grep LittleOne
+    ensure_adb
+    "$ADB" logcat -c
+    "$ADB" logcat | grep LittleOne
 }
 
 clean_project() {
@@ -290,10 +243,13 @@ show_aab_size() {
 }
 
 show_devices() {
-    adb devices
+    ensure_adb
+    "$ADB" devices
 }
 
-clear
+if [ -t 1 ]; then
+    clear
+fi
 show_logo
 
 echo

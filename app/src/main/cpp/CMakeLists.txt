@@ -64,7 +64,6 @@ add_library(littleone SHARED
     ../../../../src/feedback/screen_shake.c
     ../../../../src/fonts/font_renderer.c
     ../../../../src/fonts/fonts_packed.c
-    ../../../../src/game/cat_profile.c
     ../../../../src/game/game.c
     ../../../../src/game/game_effects.c
     ../../../../src/game/progression.c
@@ -84,6 +83,12 @@ add_library(littleone SHARED
 )
 
 add_dependencies(littleone pack_fonts pack_sprites)
+
+# The app is almost entirely native. Keep debug packaging and debuggability,
+# but optimize the game loop so the development APK has release-like FPS.
+target_compile_options(littleone PRIVATE
+    $<$<CONFIG:Debug>:-O2>
+)
 
 target_include_directories(littleone PRIVATE
     ../../../../src

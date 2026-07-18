@@ -15,7 +15,6 @@ typedef enum {
     SOUND_ORK_DEATH,
     SOUND_BOAR_DEATH,
     SOUND_RAT_DEATH,
-    SOUND_CAT_UNLOCK,
     SOUND_ID_COUNT
 } SoundId;
 

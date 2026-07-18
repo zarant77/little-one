@@ -11,7 +11,6 @@
 #include "../config/player_config.h"
 #include "../feedback/game_feedback.h"
 #include "../sprites/animations/animation_evaluate.h"
-#include "cat_profile.h"
 #include "game_effects.h"
 #include "game_settings.h"
 
@@ -40,42 +39,8 @@ static void game_set_music(const char* music_id) {
 }
 
 static const PlayerConfig* game_active_player_config(const GameState* game) {
-    if (game == 0 || !game->progressInitialized) {
-        return &cat_profile_default()->config;
-    }
-
-    return &cat_profile_get(game->progress.selected_cat_index)->config;
-}
-
-static const char* game_active_cat_music_id(const GameState* game) {
-    const CatProfile* profile;
-
-    if (game == 0 || !game->progressInitialized) {
-        profile = cat_profile_default();
-    } else {
-        profile = cat_profile_get(game->progress.selected_cat_index);
-    }
-
-    if (profile == 0 || profile->music_id == 0) {
-        return "main_theme";
-    }
-
-    return profile->music_id;
-}
-
-static void game_play_active_cat_music(const GameState* game) {
-    game_set_music(game_active_cat_music_id(game));
-}
-
-static void game_present_unlocked_cat(GameState* game) {
-    if (game == 0) {
-        return;
-    }
-
-    audio_stop_music();
-    audio_play_sound("cat_unlock");
-    game_play_active_cat_music(game);
-    game->catUnlockPresentationMs = 0;
+    (void)game;
+    return player_config_get();
 }
 
 static float game_player_width(const GameState* game) {
@@ -771,35 +736,14 @@ static const char* game_enemy_death_sound_id(const Entity* entity) {
 
 static void game_award_score(GameState* game, int score)
 {
-    ProgressionState progress_before;
-    int unlocked_cat_index;
-
     if (game == 0 || score <= 0)
     {
         return;
     }
 
-    progress_before = game->progress;
     game->score += score;
     progression_apply_score(&game->progress, score);
     game->progressDirty = 1;
-
-    if (game->uiState == GAME_UI_PLAYING)
-    {
-        unlocked_cat_index = cat_profile_first_new_unlock(&progress_before, &game->progress);
-        if (unlocked_cat_index >= 0)
-        {
-            const CatProfile* unlocked_profile = cat_profile_get(unlocked_cat_index);
-
-            game->progress.selected_cat_index = unlocked_cat_index;
-            game->playerHp = unlocked_profile->config.hp;
-            game->unlockedCatIndex = unlocked_cat_index;
-            game->uiState = unlocked_cat_index == cat_profile_count() - 1
-                    ? GAME_UI_CATS_COMPLETE
-                    : GAME_UI_CAT_UNLOCKED;
-            game_present_unlocked_cat(game);
-        }
-    }
 }
 
 static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
@@ -942,7 +886,6 @@ void game_init(GameState* game) {
         progression_init(&progress);
         progress_initialized = 1;
     }
-    progress.selected_cat_index = cat_profile_clamp_index(progress.selected_cat_index);
     if (best_score > progress.best_score) {
         progress.best_score = best_score;
         progress_dirty = 1;
@@ -955,7 +898,7 @@ void game_init(GameState* game) {
     game->playerGrounded = 0;
     game->playerSmashing = 0;
     game->playerCanSmash = 0;
-    game->playerHp = cat_profile_get(progress.selected_cat_index)->config.hp;
+    game->playerHp = player_config_get()->hp;
     game->playerInvulnerableMs = 0;
     game->hitstopMs = 0;
     game->playerAnimation.slot = ENTITY_ANIM_IDLE;
@@ -989,7 +932,7 @@ void game_init(GameState* game) {
     game->exitRequested = 0;
     screen_shake_start(&game->screenShake, 0, 0, 1u);
     game_effects_init();
-    game->uiState = GAME_UI_CAT_SELECT;
+    game->uiState = GAME_UI_MENU;
     if (!settings_initialized) {
         game_settings_init(&settings);
         settings_initialized = 1;
@@ -1000,11 +943,9 @@ void game_init(GameState* game) {
     game->progress = progress;
     game->progressInitialized = progress_initialized;
     game->progressDirty = progress_dirty;
-    game->unlockedCatIndex = -1;
-    game->catUnlockPresentationMs = 0;
     audio_set_music_volume(game->settings.music_volume);
     audio_set_sfx_volume(game->settings.sfx_volume);
-    game_set_music("main_theme");
+    game_set_music("game_loop");
 }
 
 void game_restart_run(GameState* game) {
@@ -1020,7 +961,7 @@ void game_restart_run(GameState* game) {
     game_init(game);
     game_set_screen_size(game, (float)screen_width, (float)screen_height);
     game->uiState = GAME_UI_PLAYING;
-    game_play_active_cat_music(game);
+    game_set_music("game_loop");
 
     #if LITTLE_ONE_DEBUG_GAME_STATE
     LOGI("Game run restarted");
@@ -1039,14 +980,8 @@ int game_try_restart_after_game_over(GameState* game) {
     return 1;
 }
 
-int game_start_selected_cat(GameState* game) {
+int game_start_run(GameState* game) {
     if (game == 0) {
-        return 0;
-    }
-
-    if (!cat_profile_is_unlocked(
-            cat_profile_get(game->progress.selected_cat_index),
-            &game->progress)) {
         return 0;
     }
 
@@ -1054,27 +989,16 @@ int game_start_selected_cat(GameState* game) {
     return 1;
 }
 
-void game_show_cat_select(GameState* game) {
+void game_show_menu(GameState* game) {
     if (game == 0) {
         return;
     }
 
-    game->uiState = GAME_UI_CAT_SELECT;
+    game->uiState = GAME_UI_MENU;
     game->gameOver = 0;
     game->gameOverElapsedMs = 0;
     game->gameOverInputArmed = 0;
-    game_set_music("main_theme");
-}
-
-void game_dismiss_cat_unlocked(GameState* game) {
-    if (game == 0) {
-        return;
-    }
-
-    if (game->uiState == GAME_UI_CAT_UNLOCKED || game->uiState == GAME_UI_CATS_COMPLETE) {
-        game->uiState = GAME_UI_PLAYING;
-        game_play_active_cat_music(game);
-    }
+    game_set_music("game_loop");
 }
 
 const PlayerConfig* game_player_config(const GameState* game) {
@@ -1157,10 +1081,6 @@ void game_update(GameState* game, const InputState* input, float dt) {
     elapsed_ms = (int32_t)(dt * 1000.0f);
     if (elapsed_ms < 0) {
         elapsed_ms = 0;
-    }
-
-    if (game->uiState == GAME_UI_CAT_UNLOCKED || game->uiState == GAME_UI_CATS_COMPLETE) {
-        game->catUnlockPresentationMs += elapsed_ms;
     }
 
     if (game->uiState != GAME_UI_PLAYING) {

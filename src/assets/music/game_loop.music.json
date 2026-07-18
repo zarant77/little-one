@@ -1,6 +1,6 @@
 {
   "type": "music",
-  "id": "main_theme",
+  "id": "game_loop",
   "bpm": 144,
   "ticksPerBeat": 4,
   "lengthTicks": 256,

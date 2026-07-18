@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "id": "pinkpawther",
+  "id": "player",
   "width": 256,
   "height": 170,
   "pivotX": 128,
@@ -612,52 +612,6 @@
         "h": 6,
         "rotation": 29.054604099077146,
         "color": "111111ff"
-      }
-    },
-    {
-      "type": "primitive",
-      "id": "primitive-mq99zfzb-9po70c",
-      "name": "Primitive 39",
-      "visible": true,
-      "locked": false,
-      "primitive": {
-        "kind": "path",
-        "points": [
-          [
-            89,
-            58
-          ],
-          [
-            72,
-            20
-          ],
-          [
-            103,
-            8
-          ],
-          [
-            134,
-            28
-          ],
-          [
-            170,
-            5
-          ],
-          [
-            209,
-            6
-          ],
-          [
-            199,
-            50
-          ]
-        ],
-        "thickness": 6,
-        "cap": "round",
-        "join": "round",
-        "smoothing": "quadratic",
-        "segments": 8,
-        "color": "ff0000ff"
       }
     }
   ]
