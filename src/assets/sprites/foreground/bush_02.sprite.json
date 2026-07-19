@@ -22,7 +22,7 @@
       "w": 122,
       "h": 104,
       "rotation": -8,
-      "color": "496e2cff"
+      "color": "417717ff"
     },
     {
       "kind": "circle",
@@ -40,7 +40,7 @@
       "w": 160,
       "h": 126,
       "rotation": -6,
-      "color": "5c8a35ff"
+      "color": "52951aff"
     },
     {
       "kind": "circle",
@@ -58,7 +58,7 @@
       "w": 170,
       "h": 130,
       "rotation": 4,
-      "color": "709e42ff"
+      "color": "68ab25ff"
     },
     {
       "kind": "circle",
@@ -76,7 +76,7 @@
       "w": 130,
       "h": 104,
       "rotation": 8,
-      "color": "5c8a35ff"
+      "color": "52951aff"
     },
     {
       "kind": "circle",
@@ -85,7 +85,7 @@
       "w": 52,
       "h": 52,
       "rotation": 0,
-      "color": "89bf52ff"
+      "color": "80ce30ff"
     },
     {
       "kind": "circle",
@@ -94,7 +94,7 @@
       "w": 48,
       "h": 48,
       "rotation": 0,
-      "color": "9bd45eff"
+      "color": "92e53aff"
     },
     {
       "kind": "circle",
@@ -103,7 +103,7 @@
       "w": 42,
       "h": 42,
       "rotation": 0,
-      "color": "a8de6eff"
+      "color": "a1f04dff"
     }
   ]
 }

@@ -807,7 +807,15 @@ void platform_android_on_create(
     platform_set_settings_path(platform, activity);
     game_settings_init_with_locale(&platform->game.settings, platform_detect_locale(activity));
     platform->game.settingsInitialized = 1;
-    generated_sprite_initialize_all();
+    if (!generated_sprite_initialize_all()) {
+        LOGE("Game startup aborted because sprites could not be initialized");
+        ANativeActivity_finish(activity);
+        pthread_mutex_destroy(&platform->input_queue_mutex);
+        pthread_mutex_destroy(&platform->window_mutex);
+        activity->instance = NULL;
+        free(platform);
+        return;
+    }
     hud_initialize();
     menu_initialize();
     sound_registry_initialize_all();

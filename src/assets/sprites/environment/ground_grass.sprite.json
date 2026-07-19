@@ -13,7 +13,7 @@
       "w": 300,
       "h": 40,
       "rotation": 0,
-      "color": "3f7f43ff"
+      "color": "328737ff"
     },
     {
       "kind": "circle",
@@ -22,7 +22,7 @@
       "w": 48,
       "h": 48,
       "rotation": 0,
-      "color": "54a45aff"
+      "color": "44ae4cff"
     },
     {
       "kind": "circle",
@@ -31,7 +31,7 @@
       "w": 56,
       "h": 56,
       "rotation": 0,
-      "color": "65b866ff"
+      "color": "55c356ff"
     },
     {
       "kind": "circle",
@@ -40,7 +40,7 @@
       "w": 48,
       "h": 48,
       "rotation": 0,
-      "color": "4f9c55ff"
+      "color": "3fa547ff"
     },
     {
       "kind": "circle",
@@ -49,7 +49,7 @@
       "w": 60,
       "h": 60,
       "rotation": 0,
-      "color": "6abb69ff"
+      "color": "5ac659ff"
     },
     {
       "kind": "circle",
@@ -58,7 +58,7 @@
       "w": 52,
       "h": 52,
       "rotation": 0,
-      "color": "58a95bff"
+      "color": "48b34cff"
     },
     {
       "kind": "triangle",
@@ -67,7 +67,7 @@
       "w": 12,
       "h": 28,
       "rotation": 0,
-      "color": "2e8f3dff"
+      "color": "18982cff"
     },
     {
       "kind": "triangle",
@@ -76,7 +76,7 @@
       "w": 10,
       "h": 24,
       "rotation": 0,
-      "color": "7acb6eff"
+      "color": "6bd75cff"
     },
     {
       "kind": "triangle",
@@ -85,7 +85,7 @@
       "w": 12,
       "h": 26,
       "rotation": 0,
-      "color": "2f9440ff"
+      "color": "189d2fff"
     },
     {
       "kind": "triangle",
@@ -94,7 +94,7 @@
       "w": 10,
       "h": 22,
       "rotation": 0,
-      "color": "7bd06fff"
+      "color": "6cdc5cff"
     },
     {
       "kind": "triangle",
@@ -103,7 +103,7 @@
       "w": 12,
       "h": 26,
       "rotation": 0,
-      "color": "349d45ff"
+      "color": "1da633ff"
     },
     {
       "kind": "rect",
@@ -112,7 +112,7 @@
       "w": 36,
       "h": 6,
       "rotation": 0,
-      "color": "3f2819ff"
+      "color": "432511ff"
     },
     {
       "kind": "circle",
@@ -121,7 +121,7 @@
       "w": 60,
       "h": 60,
       "rotation": 0,
-      "color": "6abb69ff"
+      "color": "5ac659ff"
     },
     {
       "kind": "triangle",
@@ -130,7 +130,7 @@
       "w": 10,
       "h": 24,
       "rotation": 0,
-      "color": "75c969ff"
+      "color": "66d556ff"
     },
     {
       "kind": "rect",
@@ -139,7 +139,7 @@
       "w": 300,
       "h": 58,
       "rotation": 0,
-      "color": "6b4a2eff"
+      "color": "714621ff"
     },
     {
       "kind": "rect",
@@ -148,7 +148,7 @@
       "w": 34,
       "h": 6,
       "rotation": 0,
-      "color": "7c5738ff"
+      "color": "83532aff"
     },
     {
       "kind": "rect",
@@ -157,7 +157,7 @@
       "w": 44,
       "h": 6,
       "rotation": 0,
-      "color": "553720ff"
+      "color": "5a3314ff"
     },
     {
       "kind": "rect",
@@ -166,7 +166,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     },
     {
       "kind": "rect",
@@ -175,7 +175,7 @@
       "w": 300,
       "h": 232,
       "rotation": 0,
-      "color": "4d321fff"
+      "color": "522e15ff"
     },
     {
       "kind": "rect",
@@ -184,7 +184,7 @@
       "w": 44,
       "h": 6,
       "rotation": 0,
-      "color": "553720ff"
+      "color": "5a3314ff"
     },
     {
       "kind": "rect",
@@ -193,7 +193,7 @@
       "w": 34,
       "h": 6,
       "rotation": 0,
-      "color": "7c5738ff"
+      "color": "83532aff"
     },
     {
       "kind": "rect",
@@ -202,7 +202,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     },
     {
       "kind": "rect",
@@ -211,7 +211,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     },
     {
       "kind": "rect",
@@ -220,7 +220,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     },
     {
       "kind": "rect",
@@ -229,7 +229,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     },
     {
       "kind": "rect",
@@ -238,7 +238,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     },
     {
       "kind": "rect",
@@ -247,7 +247,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     },
     {
       "kind": "rect",
@@ -256,7 +256,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     },
     {
       "kind": "rect",
@@ -265,7 +265,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     },
     {
       "kind": "rect",
@@ -274,7 +274,7 @@
       "w": 38,
       "h": 6,
       "rotation": 0,
-      "color": "805b3aff"
+      "color": "88572bff"
     }
   ]
 }

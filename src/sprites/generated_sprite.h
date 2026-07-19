@@ -31,7 +31,7 @@ typedef struct
     uint32_t *pixels;
 } GeneratedSprite;
 
-void generated_sprite_initialize_all(void);
+int generated_sprite_initialize_all(void);
 void generated_sprite_shutdown_all(void);
 
 const GeneratedSprite *generated_sprite_get(SpriteId sprite_id);

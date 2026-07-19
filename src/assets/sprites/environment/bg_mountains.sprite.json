@@ -13,7 +13,7 @@
       "w": 357,
       "h": 256,
       "rotation": 0,
-      "color": "6e8ba1ff"
+      "color": "668dabff"
     },
     {
       "kind": "triangle",
@@ -22,7 +22,7 @@
       "w": 281,
       "h": 203,
       "rotation": 0,
-      "color": "8da9baff"
+      "color": "87aec5ff"
     },
     {
       "kind": "triangle",
@@ -49,7 +49,7 @@
       "w": 52,
       "h": 48,
       "rotation": 0,
-      "color": "cfe1edff"
+      "color": "cfe9fbff"
     },
     {
       "kind": "triangle",
@@ -58,7 +58,7 @@
       "w": 432,
       "h": 278,
       "rotation": 0,
-      "color": "66849bff"
+      "color": "5d85a4ff"
     },
     {
       "kind": "triangle",
@@ -67,7 +67,7 @@
       "w": 334,
       "h": 222,
       "rotation": 0,
-      "color": "82a0b5ff"
+      "color": "7aa3c0ff"
     },
     {
       "kind": "triangle",
@@ -94,7 +94,7 @@
       "w": 74,
       "h": 64,
       "rotation": 0,
-      "color": "cfe1edff"
+      "color": "cfe9fbff"
     },
     {
       "kind": "triangle",
@@ -103,7 +103,7 @@
       "w": 432,
       "h": 237,
       "rotation": 0,
-      "color": "5d7b94ff"
+      "color": "537b9dff"
     },
     {
       "kind": "triangle",
@@ -112,7 +112,7 @@
       "w": 331,
       "h": 224,
       "rotation": 0,
-      "color": "7897adff"
+      "color": "6f99b7ff"
     },
     {
       "kind": "triangle",
@@ -139,7 +139,7 @@
       "w": 86,
       "h": 60,
       "rotation": 0,
-      "color": "cfe1edff"
+      "color": "cfe9fbff"
     },
     {
       "kind": "triangle",
@@ -148,7 +148,7 @@
       "w": 357,
       "h": 259,
       "rotation": 0,
-      "color": "6e8ba1ff"
+      "color": "668dabff"
     },
     {
       "kind": "triangle",
@@ -157,7 +157,7 @@
       "w": 281,
       "h": 203,
       "rotation": 0,
-      "color": "82a0b5ff"
+      "color": "7aa3c0ff"
     },
     {
       "kind": "triangle",
@@ -184,7 +184,7 @@
       "w": 54,
       "h": 50,
       "rotation": 0,
-      "color": "cfe1edff"
+      "color": "cfe9fbff"
     },
     {
       "kind": "rect",
@@ -193,7 +193,7 @@
       "w": 1020,
       "h": 101,
       "rotation": 0,
-      "color": "5d7b94ff"
+      "color": "537b9dff"
     },
     {
       "kind": "rect",
@@ -202,7 +202,7 @@
       "w": 1020,
       "h": 60,
       "rotation": 0,
-      "color": "4e6a82ff"
+      "color": "446a8aff"
     }
   ]
 }

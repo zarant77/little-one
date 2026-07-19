@@ -254,7 +254,10 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         layout.first.y += 214;
         layout.second = layout.first;
         layout.second.y += MENU_BUTTON_HEIGHT + MENU_GAP;
-        if (ui_rect_contains(&layout.first, x, y)) game_try_restart_after_game_over(game);
+        /* The retry button is only reachable from the game-over menu, so it
+         * must not inherit the debounce used by the full-screen action input.
+         * Otherwise the visible button can silently ignore an early tap. */
+        if (ui_rect_contains(&layout.first, x, y)) game_restart_run(game);
         else if (ui_rect_contains(&layout.second, x, y)) game->exitRequested = 1;
         return 1;
     }

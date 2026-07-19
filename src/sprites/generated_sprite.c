@@ -30,6 +30,7 @@ static GeneratedSprite *GENERATED_SPRITES = 0;
 static size_t GENERATED_SPRITE_COUNT = 0;
 
 static int generated_sprites_initialized = 0;
+static unsigned int generated_sprites_users = 0;
 
 static const char *SPRITE_ID_NAMES[SPRITE_ID_COUNT] = {
     "player",
@@ -731,18 +732,21 @@ static void sprite_generate(const PackedSpriteDefinition *definition, GeneratedS
     }
 }
 
-void generated_sprite_initialize_all(void)
+int generated_sprite_initialize_all(void)
 {
+    int initialization_failed = 0;
+
     if (generated_sprites_initialized)
     {
-        return;
+        generated_sprites_users += 1;
+        return 1;
     }
 
     GENERATED_SPRITE_COUNT = (size_t)PACKED_SPRITE_DEFINITION_COUNT;
     if (GENERATED_SPRITE_COUNT == 0)
     {
-        generated_sprites_initialized = 1;
-        return;
+        LOGE("Generated sprites initialization failed: no packed definitions");
+        return 0;
     }
 
     GENERATED_SPRITES = (GeneratedSprite *)calloc(GENERATED_SPRITE_COUNT, sizeof(GeneratedSprite));
@@ -750,8 +754,7 @@ void generated_sprite_initialize_all(void)
     {
         LOGE("Generated sprites allocation failed: count=%zu", GENERATED_SPRITE_COUNT);
         GENERATED_SPRITE_COUNT = 0;
-        generated_sprites_initialized = 1;
-        return;
+        return 0;
     }
 
     for (size_t sprite_index = 0; sprite_index < GENERATED_SPRITE_COUNT; ++sprite_index)
@@ -777,6 +780,7 @@ void generated_sprite_initialize_all(void)
 
         if (!packed_sprite_definition_is_valid(definition, sprite_index, &pixel_count))
         {
+            initialization_failed = 1;
             continue;
         }
 
@@ -790,7 +794,14 @@ void generated_sprite_initialize_all(void)
                 definition->id,
                 pixel_count,
                 byte_count);
-            continue;
+            for (size_t initialized_index = 0; initialized_index < GENERATED_SPRITE_COUNT; ++initialized_index)
+            {
+                generated_sprite_release(GENERATED_SPRITES + initialized_index);
+            }
+            free(GENERATED_SPRITES);
+            GENERATED_SPRITES = 0;
+            GENERATED_SPRITE_COUNT = 0;
+            return 0;
         }
 
         sprite->id = definition->id;
@@ -803,11 +814,33 @@ void generated_sprite_initialize_all(void)
         sprite_generate(definition, sprite);
     }
 
+    if (initialization_failed)
+    {
+        for (size_t sprite_index = 0; sprite_index < GENERATED_SPRITE_COUNT; ++sprite_index)
+        {
+            generated_sprite_release(GENERATED_SPRITES + sprite_index);
+        }
+        free(GENERATED_SPRITES);
+        GENERATED_SPRITES = 0;
+        GENERATED_SPRITE_COUNT = 0;
+        LOGE("Generated sprites initialization failed: invalid packed definition");
+        return 0;
+    }
+
     generated_sprites_initialized = 1;
+    generated_sprites_users = 1;
+    return 1;
 }
 
 void generated_sprite_shutdown_all(void)
 {
+    if (generated_sprites_users > 1)
+    {
+        generated_sprites_users -= 1;
+        return;
+    }
+
+    generated_sprites_users = 0;
     for (size_t sprite_index = 0; sprite_index < GENERATED_SPRITE_COUNT; ++sprite_index)
     {
         generated_sprite_release(GENERATED_SPRITES + sprite_index);

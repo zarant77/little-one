@@ -13,7 +13,7 @@
       "w": 112,
       "h": 550,
       "rotation": 0,
-      "color": "2a140bff"
+      "color": "2d0e01ff"
     },
     {
       "kind": "rect",
@@ -22,7 +22,7 @@
       "w": 90,
       "h": 532,
       "rotation": 0,
-      "color": "6b4125ff"
+      "color": "74370eff"
     },
     {
       "kind": "rect",
@@ -31,7 +31,7 @@
       "w": 12,
       "h": 250,
       "rotation": -4,
-      "color": "7b4d2dff"
+      "color": "854214ff"
     },
     {
       "kind": "rect",
@@ -40,7 +40,7 @@
       "w": 12,
       "h": 240,
       "rotation": 5,
-      "color": "7b4d2dff"
+      "color": "854214ff"
     },
     {
       "kind": "circle",
@@ -58,7 +58,7 @@
       "w": 392,
       "h": 302,
       "rotation": 0,
-      "color": "235d28ff"
+      "color": "106418ff"
     },
     {
       "kind": "circle",
@@ -76,7 +76,7 @@
       "w": 188,
       "h": 168,
       "rotation": -10,
-      "color": "2f7a35ff"
+      "color": "178420ff"
     },
     {
       "kind": "circle",
@@ -94,7 +94,7 @@
       "w": 206,
       "h": 176,
       "rotation": 10,
-      "color": "2f7a35ff"
+      "color": "178420ff"
     },
     {
       "kind": "circle",
@@ -112,7 +112,7 @@
       "w": 148,
       "h": 130,
       "rotation": -15,
-      "color": "3d9644ff"
+      "color": "21a22bff"
     },
     {
       "kind": "circle",
@@ -130,7 +130,7 @@
       "w": 158,
       "h": 138,
       "rotation": 15,
-      "color": "49aa50ff"
+      "color": "2bb835ff"
     },
     {
       "kind": "circle",
@@ -148,7 +148,7 @@
       "w": 164,
       "h": 126,
       "rotation": 0,
-      "color": "52b559ff"
+      "color": "34c33eff"
     },
     {
       "kind": "circle",
@@ -157,7 +157,7 @@
       "w": 48,
       "h": 48,
       "rotation": 0,
-      "color": "62c96aff"
+      "color": "43d94fff"
     },
     {
       "kind": "circle",
@@ -166,7 +166,7 @@
       "w": 42,
       "h": 42,
       "rotation": 0,
-      "color": "62c96aff"
+      "color": "43d94fff"
     },
     {
       "kind": "circle",
@@ -175,7 +175,7 @@
       "w": 40,
       "h": 40,
       "rotation": 0,
-      "color": "62c96aff"
+      "color": "43d94fff"
     },
     {
       "kind": "rect",
@@ -184,7 +184,7 @@
       "w": 12,
       "h": 240,
       "rotation": 5,
-      "color": "7b4d2dff"
+      "color": "854214ff"
     }
   ]
 }

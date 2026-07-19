@@ -22,7 +22,7 @@
       "w": 208,
       "h": 604,
       "rotation": 0,
-      "color": "2f8a43ff"
+      "color": "0d952bff"
     },
     {
       "kind": "rect",
@@ -40,7 +40,7 @@
       "w": 88,
       "h": 232,
       "rotation": -12,
-      "color": "2f8a43ff"
+      "color": "0d952bff"
     },
     {
       "kind": "circle",
@@ -58,7 +58,7 @@
       "w": 84,
       "h": 84,
       "rotation": 0,
-      "color": "2f8a43ff"
+      "color": "0d952bff"
     },
     {
       "kind": "rect",
@@ -76,7 +76,7 @@
       "w": 94,
       "h": 270,
       "rotation": 14,
-      "color": "2f8a43ff"
+      "color": "0d952bff"
     },
     {
       "kind": "circle",
@@ -94,7 +94,7 @@
       "w": 88,
       "h": 88,
       "rotation": 0,
-      "color": "2f8a43ff"
+      "color": "0d952bff"
     },
     {
       "kind": "circle",
@@ -112,7 +112,7 @@
       "w": 158,
       "h": 122,
       "rotation": 0,
-      "color": "2f8a43ff"
+      "color": "0d952bff"
     },
     {
       "kind": "circle",
@@ -220,7 +220,7 @@
       "w": 164,
       "h": 102,
       "rotation": 0,
-      "color": "8d1f24ff"
+      "color": "980007ff"
     },
     {
       "kind": "triangle",
@@ -274,7 +274,7 @@
       "w": 18,
       "h": 22,
       "rotation": 29.561828311098765,
-      "color": "ffd2d2ff"
+      "color": "ffbcbcff"
     },
     {
       "kind": "triangle",
@@ -283,7 +283,7 @@
       "w": 18,
       "h": 20,
       "rotation": 18.434948822922006,
-      "color": "ffd2d2ff"
+      "color": "ffbcbcff"
     },
     {
       "kind": "triangle",
@@ -292,7 +292,7 @@
       "w": 18,
       "h": 20,
       "rotation": -11.032351487169844,
-      "color": "ffd2d2ff"
+      "color": "ffbcbcff"
     },
     {
       "kind": "triangle",
@@ -301,7 +301,7 @@
       "w": 18,
       "h": 22,
       "rotation": -28.98410024248154,
-      "color": "ffd2d2ff"
+      "color": "ffbcbcff"
     },
     {
       "kind": "circle",
@@ -310,7 +310,7 @@
       "w": 66,
       "h": 150,
       "rotation": 0,
-      "color": "3fa257ff"
+      "color": "1aaf3eff"
     },
     {
       "kind": "circle",
@@ -319,7 +319,7 @@
       "w": 42,
       "h": 108,
       "rotation": -12,
-      "color": "3fa257ff"
+      "color": "1aaf3eff"
     },
     {
       "kind": "circle",
@@ -328,7 +328,7 @@
       "w": 42,
       "h": 118,
       "rotation": 14,
-      "color": "3fa257ff"
+      "color": "1aaf3eff"
     },
     {
       "kind": "triangle",
@@ -490,7 +490,7 @@
       "w": 70,
       "h": 160,
       "rotation": 0,
-      "color": "3fa257ff"
+      "color": "1aaf3eff"
     },
     {
       "kind": "triangle",
@@ -499,7 +499,7 @@
       "w": 18,
       "h": 20,
       "rotation": -1.959927259126374,
-      "color": "ffd2d2ff"
+      "color": "ffbcbcff"
     }
   ]
 }
