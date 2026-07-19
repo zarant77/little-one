@@ -3,14 +3,42 @@
 
 #include "../entity/entity_config.h"
 
+/* Visual scale only. Player collision bounds remain configured separately. */
+#define PLAYER_SPRITE_RENDER_SCALE 1.0f
+#define PLAYER_SWORD_RENDER_SCALE 1.5f
+#define PLAYER_SWORD_PIVOT_X 0.5f
+#define PLAYER_SWORD_PIVOT_Y 1.0f
+
+typedef struct {
+    /* Position of the sword pivot relative to the player's top-left corner. */
+    int offset_x;
+    int offset_y;
+    float rotation_degrees;
+} PlayerSwordPoseConfig;
+
+typedef struct {
+    PlayerSwordPoseConfig idle;
+    PlayerSwordPoseConfig jump;
+    PlayerSwordPoseConfig attack;
+} PlayerSwordConfig;
+
+typedef struct {
+    uint32_t source_color;
+    uint32_t hp_3_color;
+    uint32_t hp_2_color;
+    uint32_t hp_1_color;
+} PlayerEyeColorConfig;
+
 typedef struct {
     int hp;
     float moveSpeed;
     float jumpVelocity;
     float smashVelocity;
     HurtZone hurt_zone;
-    CollisionBoundary boundary;
+    CollisionBoundary attack_zone;
     EntityVisualConfig visual;
+    PlayerSwordConfig sword;
+    PlayerEyeColorConfig eye_colors;
 } PlayerConfig;
 
 const PlayerConfig* player_config_get(void);

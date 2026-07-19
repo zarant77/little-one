@@ -50,6 +50,7 @@ typedef struct {
     float playerVelocityY;
     int playerGrounded;
     int playerSmashing;
+    int playerAttackPoseMs;
     int playerCanSmash;
     int playerHp;
     int playerInvulnerableMs;

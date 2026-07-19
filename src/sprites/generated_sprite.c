@@ -33,6 +33,9 @@ static int generated_sprites_initialized = 0;
 
 static const char *SPRITE_ID_NAMES[SPRITE_ID_COUNT] = {
     "player",
+    "sword-1",
+    "sword-2",
+    "sword-3",
     "boar",
     "ork",
     "rat",

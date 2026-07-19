@@ -7,6 +7,9 @@ typedef enum
 {
     SPRITE_NONE = -1,
     SPRITE_PLAYER = 0,
+    SPRITE_SWORD_1,
+    SPRITE_SWORD_2,
+    SPRITE_SWORD_3,
     SPRITE_BOAR,
     SPRITE_ORK,
     SPRITE_RAT,

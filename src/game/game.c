@@ -23,6 +23,10 @@ static const float SPAWN_RIGHT_PADDING = 16.0f;
 static const int PLAYER_HIT_INVULNERABLE_MS = 900;
 static const int GAME_OVER_MIN_VISIBLE_MS = 1000;
 static const int SMASH_HITSTOP_MS = 70;
+static const int PLAYER_ATTACK_POSE_AFTER_SMASH_MS = 200;
+static const float PLAYER_ANIMATION_SPEED_BACKWARD = 0.5f;
+static const float PLAYER_ANIMATION_SPEED_IDLE = 1.0f;
+static const float PLAYER_ANIMATION_SPEED_FORWARD = 1.5f;
 static const int FLOATING_TEXT_LIFETIME_MS = 1300;
 static const float FLOATING_TEXT_RISE_SPEED = -125.0f;
 static const uint32_t FLOATING_TEXT_SCORE_COLOR = 0x64ff7dff;
@@ -102,6 +106,7 @@ static EntityAnimSlot game_player_animation_slot(const GameState* game) {
 static void game_update_player_animation(GameState* game, int32_t elapsed_ms) {
     EntityAnimSlot slot;
     int32_t animation_elapsed_ms = elapsed_ms;
+    float animation_speed_multiplier = PLAYER_ANIMATION_SPEED_IDLE;
 
     if (game->gameOver) {
         entity_animation_update(&game->playerAnimation, elapsed_ms);
@@ -112,10 +117,14 @@ static void game_update_player_animation(GameState* game, int32_t elapsed_ms) {
 
     if (slot == ENTITY_ANIM_WALK) {
         if (game->playerVelocityX < 0.0f) {
-            animation_elapsed_ms = 0;
+            animation_speed_multiplier = PLAYER_ANIMATION_SPEED_BACKWARD;
         } else if (game->playerVelocityX > 0.0f) {
-            animation_elapsed_ms *= 2;
+            animation_speed_multiplier = PLAYER_ANIMATION_SPEED_FORWARD;
         }
+
+        animation_elapsed_ms = (int32_t)(
+                (float)animation_elapsed_ms * animation_speed_multiplier
+        );
     }
 
     entity_animation_set(
@@ -176,6 +185,7 @@ static void game_clamp_player_to_ground(GameState* game) {
                 audio_play_sound("smash");
                 game_feedback_smash_land(&game->screenShake);
                 game_effects_spawn_smash_impact(impact_x, impact_y, effect_seed);
+                game->playerAttackPoseMs = PLAYER_ATTACK_POSE_AFTER_SMASH_MS;
             }
             #if LITTLE_ONE_DEBUG_SMASH
             LOGI("Landing");
@@ -680,7 +690,7 @@ static int game_player_overlaps_entity_hurt_zone(const GameState* game, const En
     );
 }
 
-static int game_player_boundary_overlaps_enemy_hurt_zone(const GameState* game, const Entity* enemy) {
+static int game_player_attack_zone_overlaps_enemy_hurt_zone(const GameState* game, const Entity* enemy) {
     if (enemy == 0 || enemy->config == 0
             || enemy->config->type == THREAT_STATIC_OBSTACLE) {
         return 0;
@@ -689,7 +699,7 @@ static int game_player_boundary_overlaps_enemy_hurt_zone(const GameState* game, 
     return rect_overlaps_hurt_zone(
             (int32_t)game->playerX,
             (int32_t)game->playerY,
-            &game_active_player_config(game)->boundary,
+            &game_active_player_config(game)->attack_zone,
             (int32_t)enemy->x,
             (int32_t)enemy->y,
             entity_get_width(enemy),
@@ -771,6 +781,7 @@ static void game_enter_game_over(GameState* game) {
     game->playerVelocityX = 0.0f;
     game->playerVelocityY = 0.0f;
     game->playerSmashing = 0;
+    game->playerAttackPoseMs = 0;
     game->playerCanSmash = 0;
     entity_animation_set(
             &game->playerAnimation,
@@ -837,7 +848,7 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
         if (entity->config != 0
                 && entity->config->type != THREAT_STATIC_OBSTACLE
                 && player_was_smashing
-                && game_player_boundary_overlaps_enemy_hurt_zone(game, entity)) {
+                && game_player_attack_zone_overlaps_enemy_hurt_zone(game, entity)) {
             game_kill_enemy_by_smash(game, entity);
             if (game->uiState != GAME_UI_PLAYING) {
                 return;
@@ -891,6 +902,7 @@ void game_init(GameState* game) {
     game->playerVelocityY = 0.0f;
     game->playerGrounded = 0;
     game->playerSmashing = 0;
+    game->playerAttackPoseMs = 0;
     game->playerCanSmash = 0;
     game->playerHp = player_config_get()->hp;
     game->playerInvulnerableMs = 0;
@@ -1095,6 +1107,12 @@ void game_update(GameState* game, const InputState* input, float dt) {
         game->playerInvulnerableMs -= elapsed_ms;
         if (game->playerInvulnerableMs < 0) {
             game->playerInvulnerableMs = 0;
+        }
+    }
+    if (game->playerAttackPoseMs > 0) {
+        game->playerAttackPoseMs -= elapsed_ms;
+        if (game->playerAttackPoseMs < 0) {
+            game->playerAttackPoseMs = 0;
         }
     }
 

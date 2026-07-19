@@ -19,6 +19,7 @@
 #define DEFAULT_SPRITE_FIT_MODE SPRITE_FIT_CONTAIN
 #define RENDERER_SIZE_WIREFRAME_COLOR 0xffff00ff
 #define RENDERER_HURT_ZONE_WIREFRAME_COLOR 0xff0000ff
+#define RENDERER_ATTACK_ZONE_WIREFRAME_COLOR 0x00ffffff
 #define RENDERER_GROUND_DEBUG_COLOR 0x00ffffff
 #define RENDERER_TRIG_SCALE 65536
 #define RENDERER_PI_MILLIRADIANS 3141
@@ -196,6 +197,18 @@ static int renderer_cos_q16(int rotation) {
     return renderer_sin_q16(rotation + RENDERER_HALF_PI_MILLIRADIANS);
 }
 
+static int renderer_sprite_tint_enabled = 0;
+static uint32_t renderer_sprite_tint_source = 0;
+static uint32_t renderer_sprite_tint_target = 0;
+
+static uint32_t renderer_apply_sprite_tint(uint32_t color) {
+    if (renderer_sprite_tint_enabled && color == renderer_sprite_tint_source) {
+        return renderer_sprite_tint_target;
+    }
+
+    return color;
+}
+
 static void renderer_write_sprite_pixel(
         Framebuffer* framebuffer,
         int target_x,
@@ -205,6 +218,7 @@ static void renderer_write_sprite_pixel(
 ) {
     uint32_t color;
 
+    source_color = renderer_apply_sprite_tint(source_color);
     source_color = renderer_multiply_alpha(source_color, alpha);
     if (rgba_a(source_color) == 0) {
         return;
@@ -523,6 +537,23 @@ static void renderer_draw_size_wireframe_rect(
     renderer_draw_color_rect(buffer, x, y, 1, height, RENDERER_SIZE_WIREFRAME_COLOR);
     renderer_draw_color_rect(buffer, x + width - 1, y, 1, height, RENDERER_SIZE_WIREFRAME_COLOR);
 }
+
+static void renderer_draw_attack_zone_wireframe(
+        Framebuffer* buffer,
+        int x,
+        int y,
+        int width,
+        int height
+) {
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+
+    renderer_draw_color_rect(buffer, x, y, width, 2, RENDERER_ATTACK_ZONE_WIREFRAME_COLOR);
+    renderer_draw_color_rect(buffer, x, y + height - 2, width, 2, RENDERER_ATTACK_ZONE_WIREFRAME_COLOR);
+    renderer_draw_color_rect(buffer, x, y, 2, height, RENDERER_ATTACK_ZONE_WIREFRAME_COLOR);
+    renderer_draw_color_rect(buffer, x + width - 2, y, 2, height, RENDERER_ATTACK_ZONE_WIREFRAME_COLOR);
+}
 #endif
 
 static void renderer_draw_generated_sprite_fit_alpha(
@@ -660,7 +691,8 @@ static void renderer_draw_generated_sprite_fit_alpha(
             for (int target_x = clip_left; target_x < clip_right; ++target_x) {
                 int64_t dst_local_x = (int64_t)target_x - draw_left;
                 int source_x = (int)(dst_local_x * (int64_t)sprite->width / draw_width);
-                uint32_t source_color = renderer_multiply_alpha(source_row[source_x], alpha);
+                uint32_t source_color = renderer_apply_sprite_tint(source_row[source_x]);
+                source_color = renderer_multiply_alpha(source_color, alpha);
                 uint8_t source_alpha = rgba_a(source_color);
                 uint32_t color;
 
@@ -696,7 +728,8 @@ static void renderer_draw_generated_sprite_fit_alpha(
         for (int target_x = clip_left; target_x < clip_right; ++target_x) {
             int64_t dst_local_x = (int64_t)target_x - draw_left;
             int source_x = (int)(dst_local_x * (int64_t)sprite->width / draw_width);
-            uint32_t source_color = renderer_multiply_alpha(source_row[source_x], alpha);
+            uint32_t source_color = renderer_apply_sprite_tint(source_row[source_x]);
+            source_color = renderer_multiply_alpha(source_color, alpha);
             uint8_t source_alpha = rgba_a(source_color);
             uint32_t color;
 
@@ -1738,35 +1771,107 @@ static void renderer_draw_player(
         int32_t shake_x,
         int32_t shake_y
 ) {
-    const EntityVisualConfig* visual = &game_player_config(game)->visual;
+    const PlayerConfig* player_config = game_player_config(game);
+    const EntityVisualConfig* visual = &player_config->visual;
+    const PlayerSwordPoseConfig* sword_pose = &player_config->sword.idle;
     const GeneratedSprite* sprite = generated_sprite_get(visual->sprite_id);
+    const GeneratedSprite* sword = 0;
     AnimationImpact impact = entity_animation_get_impact(&game->playerAnimation);
+    int sprite_width = sprite != 0
+            ? (int)((float)sprite->width * PLAYER_SPRITE_RENDER_SCALE)
+            : visual->width;
+    int sprite_height = sprite != 0
+            ? (int)((float)sprite->height * PLAYER_SPRITE_RENDER_SCALE)
+            : visual->height;
+    int sprite_x = (int)game->playerX + (visual->width - sprite_width) / 2;
+    int sprite_y = (int)game->playerY + visual->height - sprite_height;
+    int attack_pose_active = !game->gameOver
+            && (game->playerAnimation.slot == ENTITY_ANIM_SMASH
+                    || game->playerAttackPoseMs > 0);
+
+    if (attack_pose_active) {
+        sword_pose = &player_config->sword.attack;
+    } else if (game->playerAnimation.slot == ENTITY_ANIM_JUMP
+            || game->playerAnimation.slot == ENTITY_ANIM_FALL) {
+        sword_pose = &player_config->sword.jump;
+    }
 
     if (sprite == 0) {
         renderer_draw_color_rect(
                 buffer,
-                (int)game->playerX + shake_x + impact.offset_x,
-                (int)game->playerY + shake_y + impact.offset_y,
-                visual->width,
-                visual->height,
+                sprite_x + shake_x + impact.offset_x,
+                sprite_y + shake_y + impact.offset_y,
+                sprite_width,
+                sprite_height,
                 visual->color
         );
+    } else {
+        uint32_t eye_color;
+
+        if (game->playerHp >= 3) {
+            eye_color = player_config->eye_colors.hp_3_color;
+        } else if (game->playerHp == 2) {
+            eye_color = player_config->eye_colors.hp_2_color;
+        } else {
+            eye_color = player_config->eye_colors.hp_1_color;
+        }
+
+        renderer_sprite_tint_source = player_config->eye_colors.source_color;
+        renderer_sprite_tint_target = eye_color;
+        renderer_sprite_tint_enabled = 1;
+        renderer_draw_generated_sprite_fit_ex(
+                buffer,
+                sprite,
+                sprite_x + shake_x + impact.offset_x,
+                sprite_y + shake_y + impact.offset_y,
+                sprite_width,
+                sprite_height,
+                SPRITE_FIT_STRETCH,
+                impact.scale_x,
+                impact.scale_y,
+                impact.rotation,
+                impact.alpha
+        );
+        renderer_sprite_tint_enabled = 0;
+    }
+
+    if (game->gameOver || game->playerHp <= 0 || sprite == 0) {
         return;
     }
 
-    renderer_draw_generated_sprite_fit_ex(
-            buffer,
-            sprite,
-            (int)game->playerX + shake_x + impact.offset_x,
-            (int)game->playerY + shake_y + impact.offset_y,
-            visual->width,
-            visual->height,
-            DEFAULT_SPRITE_FIT_MODE,
-            impact.scale_x,
-            impact.scale_y,
-            impact.rotation,
-            impact.alpha
-    );
+    if (game->playerHp >= 3) {
+        sword = generated_sprite_get(SPRITE_SWORD_3);
+    } else if (game->playerHp == 2) {
+        sword = generated_sprite_get(SPRITE_SWORD_2);
+    } else {
+        sword = generated_sprite_get(SPRITE_SWORD_1);
+    }
+
+    if (sword != 0) {
+        int sword_width = (int)((float)sword->width * PLAYER_SWORD_RENDER_SCALE);
+        int sword_height = (int)((float)sword->height * PLAYER_SWORD_RENDER_SCALE);
+        int sword_x = sprite_x + sword_pose->offset_x
+                - (int)((float)sword_width * PLAYER_SWORD_PIVOT_X);
+        int sword_y = sprite_y + sword_pose->offset_y
+                - (int)((float)sword_height * PLAYER_SWORD_PIVOT_Y);
+        int16_t sword_rotation = impact.rotation + (int16_t)(
+                sword_pose->rotation_degrees * 17.45329252f
+        );
+
+        renderer_draw_generated_sprite_fit_ex(
+                buffer,
+                sword,
+                sword_x + shake_x + impact.offset_x,
+                sword_y + shake_y + impact.offset_y,
+                sword_width,
+                sword_height,
+                SPRITE_FIT_STRETCH,
+                impact.scale_x,
+                impact.scale_y,
+                sword_rotation,
+                impact.alpha
+        );
+    }
 }
 
 static void renderer_draw_bird_camera_hit_crack(
@@ -2039,7 +2144,9 @@ static void renderer_draw_player_wireframe(
         int32_t shake_x,
         int32_t shake_y
 ) {
-    const EntityVisualConfig* visual = &game_player_config(game)->visual;
+    const PlayerConfig* player_config = game_player_config(game);
+    const EntityVisualConfig* visual = &player_config->visual;
+    const CollisionBoundary* attack_zone = &player_config->attack_zone;
 
     renderer_draw_size_wireframe_rect(
             buffer,
@@ -2055,6 +2162,13 @@ static void renderer_draw_player_wireframe(
             visual->width,
             visual->height,
             &game_player_config(game)->hurt_zone
+    );
+    renderer_draw_attack_zone_wireframe(
+            buffer,
+            (int)game->playerX + attack_zone->x + shake_x,
+            (int)game->playerY + attack_zone->y + shake_y,
+            attack_zone->width,
+            attack_zone->height
     );
 }
 #endif
