@@ -13,8 +13,11 @@ The Little One.
 
 A tiny endless action game for Android written entirely in native C.
 
-[![Latest Release](https://img.shields.io/github/v/release/zarant77/little-one?style=for-the-badge&label=Latest%20Release)](https://github.com/zarant77/little-one/releases/latest)
-[![Download APK](https://img.shields.io/badge/Download-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/zarant77/little-one/releases/latest/download/LittleOne.apk)
+## Download
+
+**[Download the latest APK](https://github.com/zarant77/little-one/releases/latest/download/LittleOne.apk)**
+
+[View the latest release](https://github.com/zarant77/little-one/releases/latest)
 
 ## Features
 
@@ -33,7 +36,7 @@ A tiny endless action game for Android written entirely in native C.
 
 ## Tools
 
-[![Cat Meow Studio](https://img.shields.io/badge/Cat%20Meow%20Studio-Open-8A2BE2?style=for-the-badge)](https://cms.catemup.com)
+Assets are created with [Cat Meow Studio](https://cms.catemup.com).
 
 ## License
 
