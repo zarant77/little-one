@@ -5,19 +5,17 @@
 </p>
 
 ```text
-The world is dangerous.
-You are small.
-You are the .wwarrior.
-The Little One.
+The world is dangerous
+You are small
+You are the .wwarrior
+The Little One
 ```
 
 A tiny endless action game for Android written entirely in native C.
 
 ## Download
 
-**[Download the latest APK](https://github.com/zarant77/little-one/releases/latest/download/LittleOne.apk)**
-
-[View the latest release](https://github.com/zarant77/little-one/releases/latest)
+**[View the latest release](https://github.com/zarant77/little-one/releases/latest)**
 
 ## Features
 
