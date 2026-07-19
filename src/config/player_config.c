@@ -1,7 +1,7 @@
 #include "player_config.h"
 
 static const PlayerConfig PLAYER_CONFIG = {
-    .hp = 3,                  // Hit points
+    .max_hp = 5,              // Maximum hit points; supports values above 3
     .moveSpeed = 600.0f,      // Horizontal movement speed
     .jumpVelocity = -1800.0f, // Initial jump velocity
     .smashVelocity = 4000.0f, // Downward smash velocity
@@ -43,9 +43,9 @@ static const PlayerConfig PLAYER_CONFIG = {
     },
     .eye_colors = {
         .source_color = 0x00ff00ff,
-        .hp_3_color = 0xffffffff,
-        .hp_2_color = 0xff8c00ff,
-        .hp_1_color = 0xff0000ff,
+        .full_hp_color = 0xffffffff,
+        .medium_hp_color = 0xff8c00ff,
+        .low_hp_color = 0xff0000ff,
     },
 };
 

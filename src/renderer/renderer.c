@@ -2,11 +2,13 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "../config/background_config.h"
 #include "../fonts/font_renderer.h"
 #include "../game/game_effects.h"
 #include "../game/game_settings.h"
+#include "../localization/localization.h"
 #include "../sprites/animations/animation_evaluate.h"
 #include "../ui/hud.h"
 #include "../ui/menu.h"
@@ -29,6 +31,20 @@
 #define BIRD_CAMERA_HIT_CRACK_DURATION_MS 500
 #define FLOATING_TEXT_FONT_ID "vector_16_basic"
 #define FLOATING_TEXT_SCALE 4
+#define PLAYER_SMASH_SLASH_REVEAL_MS 150
+#define PLAYER_SMASH_SLASH_LIFETIME_MS 260
+#define PLAYER_SMASH_SLASH_SEGMENTS 18
+#define PLAYER_SMASH_SLASH_START_ANGLE -1350
+#define PLAYER_SMASH_SLASH_SWEEP_ANGLE 2550
+#define PLAYER_SMASH_SLASH_RADIUS_X 190
+#define PLAYER_SMASH_SLASH_RADIUS_Y 105
+#define PLAYER_SMASH_SLASH_GLOW_COLOR 0xf59e0b66u
+#define PLAYER_SMASH_SLASH_BODY_COLOR 0xffd166ddu
+#define PLAYER_SMASH_SLASH_CORE_COLOR 0xffffffffu
+#define PLAYER_HEART_RENDER_WIDTH 48
+#define PLAYER_HEARTS_PER_ORBIT_LAYER 6
+#define PLAYER_HEART_ORBIT_LAYER_STEP 16
+#define PLAYER_BERSERK_AURA_RAYS 12
 
 /* Canonical Little One colors are 0xRRGGBBAA:
  * 0xff0000ff red, 0x00ff00ff green, 0x0000ffff blue,
@@ -1727,16 +1743,43 @@ static void renderer_draw_entities(
             continue;
         }
 
-        if (entity->config != 0) {
+        impact = animation_impact_default();
+        sprite = 0;
+
+        if (entity->type == ENTITY_THREAT && entity->config != 0) {
             color = entity->config->visual.color;
             sprite_id = entity->config->visual.sprite_id;
+            impact = entity_animation_get_impact(&entity->animation);
+            sprite = generated_sprite_get(sprite_id);
+        } else if (entity->type == ENTITY_POWERUP && entity->powerup_config != 0) {
+            const PowerupTuning* tuning = powerup_tuning_get();
+
+            color = entity->powerup_config->type == POWERUP_HP
+                    ? 0x55ff70ff : 0xff7a18ff;
+            sprite = generated_sprite_get_by_id(entity->powerup_config->sprite_id);
+            if (entity->grounded && tuning->idle_cycle_ms > 0) {
+                int phase = (entity->ground_age_ms % tuning->idle_cycle_ms)
+                        * RENDERER_TWO_PI_MILLIRADIANS / tuning->idle_cycle_ms;
+                int wave = renderer_sin_q16(phase);
+
+                impact.offset_y = (int16_t)(-tuning->idle_bob_px / 2
+                        - wave * tuning->idle_bob_px / (2 * RENDERER_TRIG_SCALE));
+                impact.scale_x = impact.scale_y = (int16_t)(1000
+                        + wave * tuning->idle_pulse_permille / RENDERER_TRIG_SCALE);
+                impact.rotation = (int16_t)(
+                        renderer_sin_q16(phase + RENDERER_HALF_PI_MILLIRADIANS)
+                        * 70 / RENDERER_TRIG_SCALE
+                );
+            } else {
+                impact.rotation = (int16_t)(
+                        (entity->age_ms * 5) % RENDERER_TWO_PI_MILLIRADIANS
+                        - RENDERER_PI_MILLIRADIANS
+                );
+            }
         }
 
         entity_width = entity_get_width(entity);
         entity_height = entity_get_height(entity);
-        impact = entity_animation_get_impact(&entity->animation);
-
-        sprite = generated_sprite_get(sprite_id);
         if (sprite != 0) {
             renderer_draw_generated_sprite_fit_ex(
                     buffer,
@@ -1765,6 +1808,508 @@ static void renderer_draw_entities(
     }
 }
 
+static void renderer_draw_effect_line(
+        Framebuffer* framebuffer,
+        int x0,
+        int y0,
+        int x1,
+        int y1,
+        int width,
+        uint32_t color
+) {
+    int dx;
+    int sx;
+    int dy;
+    int sy;
+    int error;
+    int half_width;
+
+    if (framebuffer == 0 || width <= 0 || (color & 0xffu) == 0u) {
+        return;
+    }
+
+    dx = x1 > x0 ? x1 - x0 : x0 - x1;
+    sx = x0 < x1 ? 1 : -1;
+    dy = y1 > y0 ? y0 - y1 : y1 - y0;
+    sy = y0 < y1 ? 1 : -1;
+    error = dx + dy;
+    half_width = width / 2;
+
+    for (;;) {
+        renderer_draw_color_rect(
+                framebuffer,
+                x0 - half_width,
+                y0 - half_width,
+                width,
+                width,
+                color
+        );
+        if (x0 == x1 && y0 == y1) {
+            break;
+        }
+
+        {
+            int doubled_error = error * 2;
+
+            if (doubled_error >= dy) {
+                error += dy;
+                x0 += sx;
+            }
+            if (doubled_error <= dx) {
+                error += dx;
+                y0 += sy;
+            }
+        }
+    }
+}
+
+static void renderer_draw_player_smash_slash(
+        Framebuffer* framebuffer,
+        const GameState* game,
+        const EntityVisualConfig* visual,
+        const PlayerSwordPoseConfig* sword_pose,
+        int sprite_x,
+        int sprite_y,
+        int32_t shake_x,
+        int32_t shake_y,
+        AnimationImpact impact
+) {
+    int time_ms;
+    int reveal_ms;
+    int visible_segments;
+    int effect_alpha;
+    int center_x;
+    int center_y;
+
+    if (game->playerAnimation.slot != ENTITY_ANIM_SMASH) {
+        return;
+    }
+
+    time_ms = game->playerAnimation.time_ms;
+    if (time_ms < 0 || time_ms >= PLAYER_SMASH_SLASH_LIFETIME_MS) {
+        return;
+    }
+
+    reveal_ms = time_ms;
+    if (reveal_ms > PLAYER_SMASH_SLASH_REVEAL_MS) {
+        reveal_ms = PLAYER_SMASH_SLASH_REVEAL_MS;
+    }
+    visible_segments = (PLAYER_SMASH_SLASH_SEGMENTS * reveal_ms
+            + PLAYER_SMASH_SLASH_REVEAL_MS - 1) / PLAYER_SMASH_SLASH_REVEAL_MS;
+    if (visible_segments <= 0) {
+        return;
+    }
+
+    effect_alpha = 255;
+    if (time_ms > PLAYER_SMASH_SLASH_REVEAL_MS) {
+        effect_alpha = 255
+                * (PLAYER_SMASH_SLASH_LIFETIME_MS - time_ms)
+                / (PLAYER_SMASH_SLASH_LIFETIME_MS - PLAYER_SMASH_SLASH_REVEAL_MS);
+    }
+
+    /* Keep the whole crescent in front of the player, matching the attack zone. */
+    center_x = sprite_x + sword_pose->offset_x + shake_x + impact.offset_x;
+    center_y = sprite_y + sword_pose->offset_y - visual->height / 5
+            + shake_y + impact.offset_y;
+
+    for (int segment = 0; segment < visible_segments; ++segment) {
+        int angle_0 = PLAYER_SMASH_SLASH_START_ANGLE
+                + PLAYER_SMASH_SLASH_SWEEP_ANGLE * segment / PLAYER_SMASH_SLASH_SEGMENTS;
+        int angle_1 = PLAYER_SMASH_SLASH_START_ANGLE
+                + PLAYER_SMASH_SLASH_SWEEP_ANGLE * (segment + 1) / PLAYER_SMASH_SLASH_SEGMENTS;
+        int x0 = center_x
+                + renderer_cos_q16(angle_0) * PLAYER_SMASH_SLASH_RADIUS_X / RENDERER_TRIG_SCALE;
+        int y0 = center_y
+                + renderer_sin_q16(angle_0) * PLAYER_SMASH_SLASH_RADIUS_Y / RENDERER_TRIG_SCALE;
+        int x1 = center_x
+                + renderer_cos_q16(angle_1) * PLAYER_SMASH_SLASH_RADIUS_X / RENDERER_TRIG_SCALE;
+        int y1 = center_y
+                + renderer_sin_q16(angle_1) * PLAYER_SMASH_SLASH_RADIUS_Y / RENDERER_TRIG_SCALE;
+        int taper = (segment + 1) * 1000 / PLAYER_SMASH_SLASH_SEGMENTS;
+        int segment_alpha = effect_alpha * (90 + taper * 165 / 1000) / 255;
+        int body_width = 7 + taper * 9 / 1000;
+
+        renderer_draw_effect_line(
+                framebuffer,
+                x0,
+                y0,
+                x1,
+                y1,
+                body_width + 14,
+                renderer_multiply_alpha(
+                        PLAYER_SMASH_SLASH_GLOW_COLOR,
+                        (uint8_t)segment_alpha
+                )
+        );
+        renderer_draw_effect_line(
+                framebuffer,
+                x0,
+                y0,
+                x1,
+                y1,
+                body_width,
+                renderer_multiply_alpha(
+                        PLAYER_SMASH_SLASH_BODY_COLOR,
+                        (uint8_t)segment_alpha
+                )
+        );
+        renderer_draw_effect_line(
+                framebuffer,
+                x0,
+                y0,
+                x1,
+                y1,
+                3,
+                renderer_multiply_alpha(
+                        PLAYER_SMASH_SLASH_CORE_COLOR,
+                        (uint8_t)segment_alpha
+                )
+        );
+    }
+}
+
+static void renderer_draw_player_berserk_aura(
+        Framebuffer* framebuffer,
+        const GameState* game,
+        const EntityVisualConfig* visual,
+        int32_t shake_x,
+        int32_t shake_y
+) {
+    const TimedPowerupState* berserk = game_timed_powerup_get(
+            game,
+            POWERUP_BERSERK
+    );
+    int center_x;
+    int center_y;
+    int phase;
+    int alpha = 185;
+
+    if (framebuffer == 0 || game == 0 || visual == 0
+            || berserk == 0 || game->gameOver) {
+        return;
+    }
+
+    if (berserk->remaining_ms < 2000
+            && ((game->visualTimeMs / 100) & 1) != 0) {
+        alpha = 90;
+    }
+    center_x = (int)game->playerX + visual->width / 2 + shake_x;
+    center_y = (int)game->playerY + visual->height / 2 + shake_y;
+    phase = (game->visualTimeMs * 6) % RENDERER_TWO_PI_MILLIRADIANS;
+
+    for (int ray = 0; ray < PLAYER_BERSERK_AURA_RAYS; ++ray) {
+        int angle = phase
+                + ray * RENDERER_TWO_PI_MILLIRADIANS / PLAYER_BERSERK_AURA_RAYS;
+        int pulse = renderer_sin_q16(angle * 2 + phase);
+        int inner_x_radius = visual->width / 2 + 16
+                + pulse * 5 / RENDERER_TRIG_SCALE;
+        int inner_y_radius = visual->height / 2 + 8
+                + pulse * 5 / RENDERER_TRIG_SCALE;
+        int ray_length = 24 + pulse * 8 / RENDERER_TRIG_SCALE;
+        int x0 = center_x
+                + renderer_cos_q16(angle) * inner_x_radius / RENDERER_TRIG_SCALE;
+        int y0 = center_y
+                + renderer_sin_q16(angle) * inner_y_radius / RENDERER_TRIG_SCALE;
+        int x1 = center_x
+                + renderer_cos_q16(angle) * (inner_x_radius + ray_length)
+                        / RENDERER_TRIG_SCALE;
+        int y1 = center_y
+                + renderer_sin_q16(angle) * (inner_y_radius + ray_length)
+                        / RENDERER_TRIG_SCALE;
+        uint32_t color = (ray & 1) == 0 ? 0xff5b1fb0u : 0xffc21f90u;
+
+        renderer_draw_effect_line(
+                framebuffer,
+                x0,
+                y0,
+                x1,
+                y1,
+                5,
+                renderer_multiply_alpha(color, (uint8_t)alpha)
+        );
+    }
+}
+
+typedef enum {
+    PLAYER_HP_TIER_LOW = 0,
+    PLAYER_HP_TIER_MEDIUM = 1,
+    PLAYER_HP_TIER_FULL = 2
+} PlayerHpTier;
+
+static PlayerHpTier renderer_player_hp_tier(
+        const GameState* game,
+        const PlayerConfig* player_config
+) {
+    int max_hp;
+    int current_hp;
+
+    if (game == 0 || player_config == 0) {
+        return PLAYER_HP_TIER_LOW;
+    }
+
+    max_hp = player_config->max_hp;
+    current_hp = game->playerHp;
+    if (max_hp <= 0 || current_hp <= 0) {
+        return PLAYER_HP_TIER_LOW;
+    }
+
+    if ((int64_t)current_hp * 3 > (int64_t)max_hp * 2) {
+        return PLAYER_HP_TIER_FULL;
+    }
+    if ((int64_t)current_hp * 3 > (int64_t)max_hp) {
+        return PLAYER_HP_TIER_MEDIUM;
+    }
+
+    return PLAYER_HP_TIER_LOW;
+}
+
+static uint32_t renderer_player_heart_seed(int heart_index)
+{
+    uint32_t value = (uint32_t)(heart_index + 1) * 0x9e3779b9u;
+
+    value ^= value >> 16;
+    value *= 0x7feb352du;
+    value ^= value >> 15;
+    value *= 0x846ca68bu;
+    value ^= value >> 16;
+    return value;
+}
+
+static int renderer_player_heart_angle(
+        int run_time_ms,
+        int phase,
+        int speed,
+        int reverse
+) {
+    int64_t angle = (int64_t)phase
+            + (int64_t)run_time_ms * (int64_t)speed * (reverse ? -1 : 1) / 1000;
+
+    angle %= RENDERER_TWO_PI_MILLIRADIANS;
+    if (angle < 0) angle += RENDERER_TWO_PI_MILLIRADIANS;
+    return (int)angle;
+}
+
+typedef struct {
+    int offset_x;
+    int offset_y;
+    int scale;
+    int16_t rotation;
+} PlayerHeartPose;
+
+static PlayerHeartPose renderer_player_heart_pose(
+        int heart_index,
+        int time_ms,
+        const EntityVisualConfig* visual
+) {
+    uint32_t seed = renderer_player_heart_seed(heart_index);
+    int orbit_layer = heart_index / PLAYER_HEARTS_PER_ORBIT_LAYER;
+    int radius_x = visual->width / 2 + 34
+            + orbit_layer * PLAYER_HEART_ORBIT_LAYER_STEP;
+    int radius_y = visual->height / 2 + 24
+            + orbit_layer * PLAYER_HEART_ORBIT_LAYER_STEP;
+    int angle_x = renderer_player_heart_angle(
+            time_ms,
+            (int)(seed % RENDERER_TWO_PI_MILLIRADIANS),
+            360 + (int)((seed >> 8) % 420u),
+            (seed & 1u) != 0u
+    );
+    int angle_y = renderer_player_heart_angle(
+            time_ms,
+            (int)((seed >> 12) % RENDERER_TWO_PI_MILLIRADIANS),
+            430 + (int)((seed >> 20) % 380u),
+            (seed & 2u) != 0u
+    );
+    PlayerHeartPose pose;
+
+    pose.offset_x = renderer_cos_q16(angle_x) * radius_x / RENDERER_TRIG_SCALE
+            + renderer_sin_q16(angle_y) * 13 / RENDERER_TRIG_SCALE;
+    pose.offset_y = renderer_sin_q16(angle_x) * radius_y / RENDERER_TRIG_SCALE
+            + renderer_cos_q16(angle_y) * 9 / RENDERER_TRIG_SCALE;
+    pose.scale = 940
+            + renderer_sin_q16(angle_x + angle_y) * 90 / RENDERER_TRIG_SCALE;
+    pose.rotation = (int16_t)(
+            renderer_sin_q16(angle_x) * 140 / RENDERER_TRIG_SCALE
+    );
+    return pose;
+}
+
+static void renderer_draw_player_hearts(
+        Framebuffer* framebuffer,
+        const GameState* game,
+        const EntityVisualConfig* visual,
+        int sprite_x,
+        int sprite_y,
+        int32_t shake_x,
+        int32_t shake_y,
+        AnimationImpact impact,
+        int draw_front
+) {
+    const GeneratedSprite* heart;
+    int heart_width;
+    int heart_height;
+    int center_x;
+    int center_y;
+
+    if (game == 0 || visual == 0 || game->playerHp <= 0 || game->gameOver) {
+        return;
+    }
+
+    heart = generated_sprite_get_by_id("heart");
+    if (heart == 0 || heart->width <= 0 || heart->height <= 0) {
+        return;
+    }
+
+    heart_width = PLAYER_HEART_RENDER_WIDTH;
+    heart_height = heart_width * heart->height / heart->width;
+    center_x = sprite_x + visual->width / 2 + shake_x + impact.offset_x;
+    center_y = sprite_y + visual->height / 2 + shake_y + impact.offset_y;
+
+    for (int heart_index = 0; heart_index < game->playerHp; ++heart_index) {
+        PlayerHeartPose pose = renderer_player_heart_pose(
+                heart_index,
+                game->visualTimeMs,
+                visual
+        );
+        int is_front = pose.offset_y >= 0;
+        int draw_x;
+        int draw_y;
+
+        if (is_front != draw_front) {
+            continue;
+        }
+
+        draw_x = center_x + pose.offset_x - heart_width / 2;
+        draw_y = center_y + pose.offset_y - heart_height / 2;
+        if (draw_x < 0) {
+            draw_x = 0;
+        } else if (draw_x + heart_width > framebuffer->width) {
+            draw_x = framebuffer->width - heart_width;
+        }
+        if (draw_y < 0) {
+            draw_y = 0;
+        } else if (draw_y + heart_height > framebuffer->height) {
+            draw_y = framebuffer->height - heart_height;
+        }
+
+        renderer_draw_generated_sprite_fit_ex(
+                framebuffer,
+                heart,
+                draw_x,
+                draw_y,
+                heart_width,
+                heart_height,
+                SPRITE_FIT_STRETCH,
+                (int16_t)pose.scale,
+                (int16_t)pose.scale,
+                pose.rotation,
+                255
+        );
+    }
+}
+
+static void renderer_draw_player_lost_heart(
+        Framebuffer* framebuffer,
+        const GameState* game,
+        const EntityVisualConfig* visual,
+        int32_t shake_x,
+        int32_t shake_y
+) {
+    const GeneratedSprite* heart;
+    PlayerHeartPose start_pose;
+    uint32_t seed;
+    int heart_width;
+    int heart_height;
+    int age_ms;
+    int progress;
+    int inverse;
+    int eased_progress;
+    int direction;
+    int back_distance;
+    int rise_distance;
+    int drift_angle;
+    int draw_x;
+    int draw_y;
+    int scale;
+    int alpha;
+    int16_t rotation;
+
+    if (framebuffer == 0
+            || game == 0
+            || visual == 0
+            || !game->playerLostHeartActive
+            || game->playerLostHeartIndex < 0) {
+        return;
+    }
+
+    heart = generated_sprite_get_by_id("heart");
+    if (heart == 0 || heart->width <= 0 || heart->height <= 0) {
+        return;
+    }
+
+    age_ms = game->playerLostHeartAgeMs;
+    if (age_ms < 0 || age_ms >= PLAYER_LOST_HEART_LIFETIME_MS) {
+        return;
+    }
+
+    start_pose = renderer_player_heart_pose(
+            game->playerLostHeartIndex,
+            game->playerLostHeartStartTimeMs,
+            visual
+    );
+    seed = renderer_player_heart_seed(game->playerLostHeartIndex);
+    progress = age_ms * 1000 / PLAYER_LOST_HEART_LIFETIME_MS;
+    inverse = 1000 - progress;
+    eased_progress = 1000 - inverse * inverse / 1000;
+    direction = -1;
+    drift_angle = renderer_player_heart_angle(
+            age_ms,
+            (int)((seed >> 10) % RENDERER_TWO_PI_MILLIRADIANS),
+            2600,
+            direction < 0
+    );
+    heart_width = PLAYER_HEART_RENDER_WIDTH;
+    heart_height = heart_width * heart->height / heart->width;
+    back_distance = visual->width + 80;
+    rise_distance = framebuffer->height * 9 / 10;
+    draw_x = (int)game->playerLostHeartOriginX
+            + visual->width / 2
+            + start_pose.offset_x
+            + direction * back_distance * progress / 1000
+            + renderer_sin_q16(drift_angle) * 18 / RENDERER_TRIG_SCALE
+            + shake_x
+            - heart_width / 2;
+    draw_y = (int)game->playerLostHeartOriginY
+            + visual->height / 2
+            + start_pose.offset_y
+            - rise_distance * eased_progress / 1000
+            + shake_y
+            - heart_height / 2;
+    scale = start_pose.scale * (1100 - progress * 180 / 1000) / 1000;
+    rotation = (int16_t)(
+            start_pose.rotation + direction * age_ms * 3
+    );
+    alpha = 255;
+    if (age_ms > 1100) {
+        alpha = 255
+                * (PLAYER_LOST_HEART_LIFETIME_MS - age_ms)
+                / (PLAYER_LOST_HEART_LIFETIME_MS - 1100);
+    }
+
+    renderer_draw_generated_sprite_fit_ex(
+            framebuffer,
+            heart,
+            draw_x,
+            draw_y,
+            heart_width,
+            heart_height,
+            SPRITE_FIT_STRETCH,
+            (int16_t)scale,
+            (int16_t)scale,
+            rotation,
+            (uint8_t)alpha
+    );
+}
+
 static void renderer_draw_player(
         ANativeWindow_Buffer* buffer,
         const GameState* game,
@@ -1776,6 +2321,7 @@ static void renderer_draw_player(
     const PlayerSwordPoseConfig* sword_pose = &player_config->sword.idle;
     const GeneratedSprite* sprite = generated_sprite_get(visual->sprite_id);
     const GeneratedSprite* sword = 0;
+    PlayerHpTier hp_tier = renderer_player_hp_tier(game, player_config);
     AnimationImpact impact = entity_animation_get_impact(&game->playerAnimation);
     int sprite_width = sprite != 0
             ? (int)((float)sprite->width * PLAYER_SPRITE_RENDER_SCALE)
@@ -1789,12 +2335,55 @@ static void renderer_draw_player(
             && (game->playerAnimation.slot == ENTITY_ANIM_SMASH
                     || game->playerAttackPoseMs > 0);
 
+    {
+        const TimedPowerupState* berserk =
+                game_timed_powerup_get(game, POWERUP_BERSERK);
+
+        if (berserk != 0) {
+            const PowerupTuning* tuning = powerup_tuning_get();
+            int berserk_scale = tuning->berserk_player_scale_permille;
+            int elapsed = berserk->age_ms;
+
+            if (elapsed >= 0 && elapsed < tuning->berserk_activation_punch_ms
+                    && tuning->berserk_activation_punch_ms > 0) {
+                int punch_phase = elapsed * RENDERER_PI_MILLIRADIANS
+                        / tuning->berserk_activation_punch_ms;
+
+                berserk_scale += renderer_sin_q16(punch_phase)
+                        * tuning->berserk_activation_punch_permille
+                        / RENDERER_TRIG_SCALE;
+            }
+            impact.scale_x = (int16_t)(impact.scale_x * berserk_scale / 1000);
+            impact.scale_y = (int16_t)(impact.scale_y * berserk_scale / 1000);
+        }
+    }
+
+    renderer_draw_player_berserk_aura(
+            buffer,
+            game,
+            visual,
+            shake_x,
+            shake_y
+    );
+
     if (attack_pose_active) {
         sword_pose = &player_config->sword.attack;
     } else if (game->playerAnimation.slot == ENTITY_ANIM_JUMP
             || game->playerAnimation.slot == ENTITY_ANIM_FALL) {
         sword_pose = &player_config->sword.jump;
     }
+
+    renderer_draw_player_hearts(
+            buffer,
+            game,
+            visual,
+            sprite_x,
+            sprite_y,
+            shake_x,
+            shake_y,
+            impact,
+            0
+    );
 
     if (sprite == 0) {
         renderer_draw_color_rect(
@@ -1808,12 +2397,12 @@ static void renderer_draw_player(
     } else {
         uint32_t eye_color;
 
-        if (game->playerHp >= 3) {
-            eye_color = player_config->eye_colors.hp_3_color;
-        } else if (game->playerHp == 2) {
-            eye_color = player_config->eye_colors.hp_2_color;
+        if (hp_tier == PLAYER_HP_TIER_FULL) {
+            eye_color = player_config->eye_colors.full_hp_color;
+        } else if (hp_tier == PLAYER_HP_TIER_MEDIUM) {
+            eye_color = player_config->eye_colors.medium_hp_color;
         } else {
-            eye_color = player_config->eye_colors.hp_1_color;
+            eye_color = player_config->eye_colors.low_hp_color;
         }
 
         renderer_sprite_tint_source = player_config->eye_colors.source_color;
@@ -1836,12 +2425,19 @@ static void renderer_draw_player(
     }
 
     if (game->gameOver || game->playerHp <= 0 || sprite == 0) {
+        renderer_draw_player_lost_heart(
+                buffer,
+                game,
+                visual,
+                shake_x,
+                shake_y
+        );
         return;
     }
 
-    if (game->playerHp >= 3) {
+    if (hp_tier == PLAYER_HP_TIER_FULL) {
         sword = generated_sprite_get(SPRITE_SWORD_3);
-    } else if (game->playerHp == 2) {
+    } else if (hp_tier == PLAYER_HP_TIER_MEDIUM) {
         sword = generated_sprite_get(SPRITE_SWORD_2);
     } else {
         sword = generated_sprite_get(SPRITE_SWORD_1);
@@ -1858,6 +2454,18 @@ static void renderer_draw_player(
                 sword_pose->rotation_degrees * 17.45329252f
         );
 
+        renderer_draw_player_smash_slash(
+                buffer,
+                game,
+                visual,
+                sword_pose,
+                sprite_x,
+                sprite_y,
+                shake_x,
+                shake_y,
+                impact
+        );
+
         renderer_draw_generated_sprite_fit_ex(
                 buffer,
                 sword,
@@ -1872,6 +2480,25 @@ static void renderer_draw_player(
                 impact.alpha
         );
     }
+
+    renderer_draw_player_hearts(
+            buffer,
+            game,
+            visual,
+            sprite_x,
+            sprite_y,
+            shake_x,
+            shake_y,
+            impact,
+            1
+    );
+    renderer_draw_player_lost_heart(
+            buffer,
+            game,
+            visual,
+            shake_x,
+            shake_y
+    );
 }
 
 static void renderer_draw_bird_camera_hit_crack(
@@ -2097,6 +2724,99 @@ static void renderer_draw_floating_texts(
     }
 }
 
+static void renderer_draw_timed_powerup_indicators(
+        ANativeWindow_Buffer* buffer,
+        const GameState* game
+) {
+    static const PackedFont* indicator_font = 0;
+    const PowerupTuning* tuning;
+    int row = 0;
+
+    if (buffer == 0 || game == 0 || game->gameOver) return;
+
+    if (indicator_font == 0) {
+        indicator_font = font_registry_find(FLOATING_TEXT_FONT_ID);
+    }
+    if (indicator_font == 0) return;
+
+    tuning = powerup_tuning_get();
+    for (int index = 0; index < MAX_TIMED_POWERUPS; ++index) {
+        const TimedPowerupState* state = game->timedPowerups + index;
+        const char* name;
+        char text[32];
+        int scale = 4;
+        int center_x = buffer->width / 2;
+        int center_y = 64 + row * 76;
+        int alpha = 255;
+        uint32_t color = 0xffb020ff;
+
+        if (!state->active || state->config == 0 || state->remaining_ms <= 0) {
+            continue;
+        }
+
+        name = localization_text(
+                game_settings_normalize_locale(game->settings.locale),
+                state->config->display_name_text_id
+        );
+        if (name == 0 || name[0] == 0) {
+            name = state->config->display_name != 0
+                    ? state->config->display_name : state->config->id;
+        }
+        if (name == 0) name = "POWERUP";
+
+        if (tuning->timed_indicator_flight_ms > 0
+                && state->age_ms < tuning->timed_indicator_flight_ms) {
+            int progress = state->age_ms * 1000 / tuning->timed_indicator_flight_ms;
+            int inverse = 1000 - progress;
+            int eased = 1000 - inverse * inverse / 1000;
+
+            center_x = (int)state->origin_x
+                    + (buffer->width / 2 - (int)state->origin_x) * eased / 1000;
+            center_y = (int)state->origin_y
+                    + (64 + row * 76 - (int)state->origin_y) * eased / 1000;
+            scale = 4 + eased / 700;
+            snprintf(text, sizeof(text), "%s", name);
+        } else {
+            int seconds = (state->remaining_ms + 999) / 1000;
+            int tick_phase = state->remaining_ms % 1000;
+
+            snprintf(text, sizeof(text), "%s %d", name, seconds);
+            if (tick_phase > 800) scale = 5;
+            if (seconds <= 3) {
+                color = 0xff4938ff;
+                if (((state->remaining_ms / 125) & 1) != 0) alpha = 180;
+            }
+        }
+
+        {
+            int text_width = font_measure_text(indicator_font, scale, text);
+            int text_height = (int)indicator_font->grid_size * scale;
+            int draw_x = center_x - text_width / 2;
+            int draw_y = center_y - text_height / 2;
+
+            font_draw_text(
+                    buffer,
+                    indicator_font,
+                    draw_x + 3,
+                    draw_y + 3,
+                    scale,
+                    renderer_color_with_alpha(0x000000ddu, (uint8_t)alpha),
+                    text
+            );
+            font_draw_text(
+                    buffer,
+                    indicator_font,
+                    draw_x,
+                    draw_y,
+                    scale,
+                    renderer_color_with_alpha(color, (uint8_t)alpha),
+                    text
+            );
+        }
+        row += 1;
+    }
+}
+
 #if LITTLE_ONE_SHOW_WIREFRAMES
 static void renderer_draw_entity_wireframes(
         ANativeWindow_Buffer* buffer,
@@ -2113,7 +2833,7 @@ static void renderer_draw_entity_wireframes(
             continue;
         }
 
-        if (entity->type != ENTITY_THREAT) {
+        if (entity->type != ENTITY_THREAT && entity->type != ENTITY_POWERUP) {
             continue;
         }
 
@@ -2241,5 +2961,6 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
     }
     renderer_draw_bird_camera_hit_crack(buffer, game, shake_x, shake_y);
     hud_render(buffer, game);
+    renderer_draw_timed_powerup_indicators(buffer, game);
     menu_render(buffer, game);
 }

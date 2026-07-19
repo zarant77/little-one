@@ -22,7 +22,7 @@ static const EntityAnimationConfig PLAYER_ANIMATIONS = {
                 [ENTITY_ANIM_FALL] = "fall",
                 [ENTITY_ANIM_SMASH] = "smash",
                 [ENTITY_ANIM_LAND] = "land",
-                [ENTITY_ANIM_DAMAGE] = "damage",
+                [ENTITY_ANIM_DAMAGE] = "player_damage",
                 [ENTITY_ANIM_DEATH] = "death",
         },
 };

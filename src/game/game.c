@@ -5,10 +5,12 @@
 
 #include "../audio/audio.h"
 #include "../config.h"
+#include "../config/powerup_config.h"
 #include "../config/threat_config.h"
 #include "../config/foreground_decoration_config.h"
 #include "../config/player_config.h"
 #include "../feedback/game_feedback.h"
+#include "../localization/localization.h"
 #include "../sprites/animations/animation_evaluate.h"
 #include "game_effects.h"
 #include "game_settings.h"
@@ -20,8 +22,7 @@ static const double WORLD_SCROLL_WRAP = 80539200.0;
 static const float SPAWN_MIN_SECONDS = 1.5f;
 static const float SPAWN_SECONDS_RANGE = 1.0f;
 static const float SPAWN_RIGHT_PADDING = 16.0f;
-static const int PLAYER_HIT_INVULNERABLE_MS = 900;
-static const int GAME_OVER_MIN_VISIBLE_MS = 1000;
+static const int PLAYER_HIT_INVULNERABLE_MS = 1000;
 static const int SMASH_HITSTOP_MS = 70;
 static const int PLAYER_ATTACK_POSE_AFTER_SMASH_MS = 200;
 static const float PLAYER_ANIMATION_SPEED_BACKWARD = 0.5f;
@@ -30,7 +31,6 @@ static const float PLAYER_ANIMATION_SPEED_FORWARD = 1.5f;
 static const int FLOATING_TEXT_LIFETIME_MS = 1300;
 static const float FLOATING_TEXT_RISE_SPEED = -125.0f;
 static const uint32_t FLOATING_TEXT_SCORE_COLOR = 0x64ff7dff;
-static const uint32_t FLOATING_TEXT_DAMAGE_COLOR = 0xff4f5cff;
 static unsigned int game_random_state = 12345;
 
 static void game_set_music(const char* music_id) {
@@ -56,6 +56,110 @@ static float game_player_height(const GameState* game) {
 
 static float game_ground_y(const GameState* game) {
     return (float)game->screenHeight - LITTLE_ONE_GROUND_BOTTOM_MARGIN_PX;
+}
+
+const TimedPowerupState* game_timed_powerup_get(
+        const GameState* game,
+        PowerupType type
+) {
+    if (game == 0) return 0;
+
+    for (int index = 0; index < MAX_TIMED_POWERUPS; ++index) {
+        const TimedPowerupState* state = game->timedPowerups + index;
+
+        if (state->active && state->config != 0 && state->config->type == type) {
+            return state;
+        }
+    }
+    return 0;
+}
+
+static void game_clear_timed_powerups(GameState* game) {
+    if (game == 0) return;
+
+    for (int index = 0; index < MAX_TIMED_POWERUPS; ++index) {
+        TimedPowerupState* state = game->timedPowerups + index;
+
+        state->active = 0;
+        state->config = 0;
+        state->duration_ms = 0;
+        state->remaining_ms = 0;
+        state->age_ms = 0;
+        state->origin_x = 0.0f;
+        state->origin_y = 0.0f;
+    }
+}
+
+static void game_activate_timed_powerup(
+        GameState* game,
+        const PowerupConfig* config,
+        float origin_x,
+        float origin_y
+) {
+    TimedPowerupState* target = 0;
+    TimedPowerupState* replacement = 0;
+
+    if (game == 0 || config == 0 || config->duration_ms <= 0) return;
+
+    for (int index = 0; index < MAX_TIMED_POWERUPS; ++index) {
+        TimedPowerupState* state = game->timedPowerups + index;
+
+        if (state->active && state->config != 0
+                && state->config->type == config->type) {
+            target = state;
+            break;
+        }
+        if (!state->active && target == 0) {
+            target = state;
+        }
+        if (state->active && (replacement == 0
+                || state->remaining_ms < replacement->remaining_ms)) {
+            replacement = state;
+        }
+    }
+    if (target == 0) target = replacement;
+    if (target == 0) return;
+
+    target->active = 1;
+    target->config = config;
+    target->duration_ms = config->duration_ms;
+    target->remaining_ms = config->duration_ms;
+    target->age_ms = 0;
+    target->origin_x = origin_x;
+    target->origin_y = origin_y;
+
+    if (config->type == POWERUP_BERSERK) {
+        audio_set_music_speed(powerup_tuning_get()->berserk_music_speed_multiplier);
+    }
+}
+
+static void game_update_timed_powerups(GameState* game, int elapsed_ms) {
+    if (game == 0) return;
+
+    for (int index = 0; index < MAX_TIMED_POWERUPS; ++index) {
+        TimedPowerupState* state = game->timedPowerups + index;
+        PowerupType expired_type;
+
+        if (!state->active || state->config == 0) continue;
+
+        state->age_ms += elapsed_ms;
+        state->remaining_ms -= elapsed_ms;
+        if (state->remaining_ms > 0) continue;
+
+        expired_type = state->config->type;
+        state->active = 0;
+        state->remaining_ms = 0;
+        if (expired_type == POWERUP_BERSERK) {
+            audio_set_music_speed(1.0f);
+        }
+    }
+}
+
+static float game_effective_world_speed(const GameState* game) {
+    if (game_timed_powerup_get(game, POWERUP_BERSERK) != 0) {
+        return game->worldSpeed * powerup_tuning_get()->berserk_world_speed_multiplier;
+    }
+    return game != 0 ? game->worldSpeed : 0.0f;
 }
 
 static float game_random_01(void) {
@@ -316,6 +420,7 @@ static void game_shift_entities_y(GameState* game, float y_delta) {
 
         if (entity->active) {
             entity->y += y_delta;
+            entity->movement_origin_y += y_delta;
         }
     }
 }
@@ -377,6 +482,7 @@ static void game_update_spawn_timer(GameState* game, float dt) {
 
 static void game_update_entities(GameState* game, float dt) {
     int active_count = 0;
+    float world_speed = game_effective_world_speed(game);
 
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         Entity* entity = game->entities + entity_index;
@@ -385,7 +491,11 @@ static void game_update_entities(GameState* game, float dt) {
             continue;
         }
 
-        entity_update(entity, game->worldSpeed, dt);
+        if (entity->type == ENTITY_POWERUP) {
+            entity_update_powerup(entity, world_speed, game_ground_y(game), dt);
+        } else {
+            entity_update(entity, world_speed, dt);
+        }
         if (!entity->active) {
             continue;
         }
@@ -409,7 +519,7 @@ static void game_update_dead_entities(GameState* game, float dt) {
     for (int entity_index = 0; entity_index < MAX_ENTITIES; ++entity_index) {
         Entity* entity = game->entities + entity_index;
 
-        if (entity->active && entity->dead) {
+        if (entity->active && entity->type == ENTITY_THREAT && entity->dead) {
             entity_update(entity, 0.0f, dt);
         }
     }
@@ -640,7 +750,8 @@ static float game_foreground_decoration_alpha(
 #endif
 
 static void game_update_foreground_decorations(GameState* game, float dt) {
-    float scroll_distance = game->worldSpeed * FOREGROUND_SCROLL_MULTIPLIER * dt;
+    float scroll_distance = game_effective_world_speed(game)
+            * FOREGROUND_SCROLL_MULTIPLIER * dt;
 
     for (int decoration_index = 0;
             decoration_index < FOREGROUND_MAX_INSTANCES;
@@ -745,8 +856,66 @@ static void game_award_score(GameState* game, int score)
     game->progressDirty = 1;
 }
 
-static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
-    if (entity->config != 0) {
+static void game_spawn_powerup_drop(GameState* game, const Entity* enemy) {
+    const PowerupConfig* config;
+    const PowerupTuning* tuning;
+    Entity* powerup;
+    float spawn_x;
+    float spawn_y;
+    float target_x;
+    float forward_min;
+    float forward_max;
+    float flight_seconds;
+    float velocity_x;
+
+    if (game == 0 || enemy == 0 || enemy->type != ENTITY_THREAT
+            || enemy->config == 0
+            || enemy->config->type == THREAT_STATIC_OBSTACLE) {
+        return;
+    }
+
+    config = powerup_config_pick(game_random_01());
+    if (config == 0) return;
+
+    powerup = game_find_free_entity(game);
+    if (powerup == 0) return;
+
+    tuning = powerup_tuning_get();
+    spawn_x = enemy->x
+            + ((float)entity_get_width(enemy) - (float)config->width) * 0.5f;
+    spawn_y = enemy->y
+            + ((float)entity_get_height(enemy) - (float)config->height) * 0.5f;
+    forward_min = tuning->drop_forward_min;
+    forward_max = tuning->drop_forward_max >= forward_min
+            ? tuning->drop_forward_max : forward_min;
+    target_x = game->playerX + game_player_width(game) + forward_min
+            + game_random_01() * (forward_max - forward_min);
+    if (target_x < spawn_x) {
+        target_x = spawn_x;
+    }
+
+    flight_seconds = tuning->drop_flight_seconds > 0.05f
+            ? tuning->drop_flight_seconds : 0.05f;
+    velocity_x = game_effective_world_speed(game)
+            + (target_x - spawn_x) / flight_seconds;
+    entity_spawn_powerup(
+            powerup,
+            config,
+            spawn_x,
+            spawn_y,
+            velocity_x,
+            tuning->drop_upward_velocity
+    );
+}
+
+static void game_kill_enemy(GameState* game, Entity* entity, int add_hitstop) {
+    if (game == 0 || entity == 0 || entity->type != ENTITY_THREAT
+            || entity->dead || entity->config == 0
+            || entity->config->type == THREAT_STATIC_OBSTACLE) {
+        return;
+    }
+
+    {
         char score_text[12];
         int score_value = entity->config->scoreValue;
 
@@ -760,14 +929,69 @@ static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
         );
         game_award_score(game, entity->config->scoreValue);
     }
+    game_spawn_powerup_drop(game, entity);
     audio_play_sound(game_enemy_death_sound_id(entity));
     entity_kill(entity);
-    if (game->hitstopMs < SMASH_HITSTOP_MS) {
+    if (add_hitstop && game->hitstopMs < SMASH_HITSTOP_MS) {
         game->hitstopMs = SMASH_HITSTOP_MS;
     }
+}
+
+static void game_kill_enemy_by_smash(GameState* game, Entity* entity) {
+    game_kill_enemy(game, entity, 1);
     #if LITTLE_ONE_DEBUG_SMASH
     LOGI("Enemy killed by smash");
     #endif
+}
+
+static int game_collect_powerup(GameState* game, Entity* entity) {
+    const PowerupConfig* config;
+    float pickup_x;
+    float pickup_y;
+
+    if (game == 0 || entity == 0 || entity->type != ENTITY_POWERUP
+            || !entity->active || entity->powerup_config == 0) {
+        return 0;
+    }
+
+    config = entity->powerup_config;
+    pickup_x = entity->x + (float)entity_get_width(entity) * 0.5f;
+    pickup_y = entity->y + (float)entity_get_height(entity) * 0.5f;
+    switch (config->type) {
+        case POWERUP_HP:
+            if (game->playerHp >= game_active_player_config(game)->max_hp) {
+                game_spawn_floating_text(
+                        game,
+                        pickup_x,
+                        entity->y,
+                        FLOATING_TEXT_SCORE_COLOR,
+                        localization_text(
+                                game_settings_normalize_locale(game->settings.locale),
+                                LOCALIZED_TEXT_FULL_HP
+                        )
+                );
+                break;
+            }
+            game->playerHp += 1;
+            game_spawn_floating_text(
+                    game,
+                    entity->x + (float)entity_get_width(entity) * 0.5f,
+                    entity->y,
+                    FLOATING_TEXT_SCORE_COLOR,
+                    "+1HP"
+            );
+            break;
+
+        case POWERUP_BERSERK:
+            break;
+
+        default:
+            return 0;
+    }
+
+    game_activate_timed_powerup(game, config, pickup_x, pickup_y);
+    entity_clear(entity);
+    return 1;
 }
 
 static void game_enter_game_over(GameState* game) {
@@ -781,6 +1005,8 @@ static void game_enter_game_over(GameState* game) {
     game->playerVelocityX = 0.0f;
     game->playerVelocityY = 0.0f;
     game->playerSmashing = 0;
+    game_clear_timed_powerups(game);
+    audio_set_music_speed(1.0f);
     game->playerAttackPoseMs = 0;
     game->playerCanSmash = 0;
     entity_animation_set(
@@ -810,18 +1036,19 @@ static void game_enter_game_over(GameState* game) {
 }
 
 static int game_damage_player(GameState* game) {
-    if (game->playerInvulnerableMs > 0 || game->playerHp <= 0) {
+    if (game->playerInvulnerableMs > 0
+            || game_timed_powerup_get(game, POWERUP_BERSERK) != 0
+            || game->playerHp <= 0) {
         return 0;
     }
 
+    game->playerLostHeartActive = 1;
+    game->playerLostHeartIndex = game->playerHp - 1;
+    game->playerLostHeartAgeMs = 0;
+    game->playerLostHeartStartTimeMs = game->visualTimeMs;
+    game->playerLostHeartOriginX = game->playerX;
+    game->playerLostHeartOriginY = game->playerY;
     game->playerHp -= 1;
-    game_spawn_floating_text(
-            game,
-            game->playerX + (float)game_active_player_config(game)->visual.width * 0.5f,
-            game->playerY - 20.0f,
-            FLOATING_TEXT_DAMAGE_COLOR,
-            "-1HP"
-    );
     if (game->playerHp <= 0) {
         game_enter_game_over(game);
         return 1;
@@ -845,6 +1072,18 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
             continue;
         }
 
+        if (entity->type == ENTITY_POWERUP) {
+            if (entity->age_ms >= powerup_tuning_get()->pickup_delay_ms
+                    && game_player_overlaps_entity_hurt_zone(game, entity)) {
+                game_collect_powerup(game, entity);
+            }
+            continue;
+        }
+
+        if (entity->type != ENTITY_THREAT || entity->config == 0) {
+            continue;
+        }
+
         if (entity->config != 0
                 && entity->config->type != THREAT_STATIC_OBSTACLE
                 && player_was_smashing
@@ -857,6 +1096,13 @@ static void game_handle_collisions(GameState* game, int player_was_smashing) {
         }
 
         if (!game_player_overlaps_entity_hurt_zone(game, entity)) {
+            continue;
+        }
+
+        if (game_timed_powerup_get(game, POWERUP_BERSERK) != 0) {
+            if (entity->config->type != THREAT_STATIC_OBSTACLE) {
+                game_kill_enemy(game, entity, 0);
+            }
             continue;
         }
 
@@ -904,8 +1150,15 @@ void game_init(GameState* game) {
     game->playerSmashing = 0;
     game->playerAttackPoseMs = 0;
     game->playerCanSmash = 0;
-    game->playerHp = player_config_get()->hp;
+    game->playerHp = player_config_get()->max_hp;
     game->playerInvulnerableMs = 0;
+    game_clear_timed_powerups(game);
+    game->playerLostHeartActive = 0;
+    game->playerLostHeartIndex = 0;
+    game->playerLostHeartAgeMs = 0;
+    game->playerLostHeartStartTimeMs = 0;
+    game->playerLostHeartOriginX = 0.0f;
+    game->playerLostHeartOriginY = 0.0f;
     game->hitstopMs = 0;
     game->playerAnimation.slot = ENTITY_ANIM_IDLE;
     game->playerAnimation.clip = 0;
@@ -933,6 +1186,7 @@ void game_init(GameState* game) {
     game->bestScore = progress.best_score;
     game->newRecord = 0;
     game->runTimeMs = 0;
+    game->visualTimeMs = 0;
     game->fps = 0;
     game->averageFrameMs = 0;
     game->activeEntityCount = 0;
@@ -940,11 +1194,12 @@ void game_init(GameState* game) {
     game->runStarted = 0;
     screen_shake_start(&game->screenShake, 0, 0, 1u);
     game_effects_init();
-    game->uiState = GAME_UI_MENU;
     if (!settings_initialized) {
         game_settings_init(&settings);
         settings_initialized = 1;
     }
+    game->helpReturnState = GAME_UI_MENU;
+    game->uiState = settings.help_seen ? GAME_UI_MENU : GAME_UI_HELP;
     game->settings = settings;
     game->settingsInitialized = settings_initialized;
     game->settingsDirty = settings_dirty;
@@ -953,6 +1208,7 @@ void game_init(GameState* game) {
     game->progressDirty = progress_dirty;
     audio_set_music_volume(game->settings.music_volume);
     audio_set_sfx_volume(game->settings.sfx_volume);
+    audio_set_music_speed(1.0f);
     game_set_music("game_loop");
 }
 
@@ -979,14 +1235,19 @@ void game_restart_run(GameState* game) {
 
 int game_try_restart_after_game_over(GameState* game) {
     if (game == 0
-            || !game->gameOver
-            || game->gameOverElapsedMs < GAME_OVER_MIN_VISIBLE_MS
+            || !game_is_game_over_screen_visible(game)
             || !game->gameOverInputArmed) {
         return 0;
     }
 
     game_restart_run(game);
     return 1;
+}
+
+int game_is_game_over_screen_visible(const GameState* game) {
+    return game != 0
+            && game->gameOver
+            && game->gameOverElapsedMs >= LITTLE_ONE_GAME_OVER_DELAY_MS;
 }
 
 int game_start_run(GameState* game) {
@@ -1096,6 +1357,8 @@ void game_update(GameState* game, const InputState* input, float dt) {
         elapsed_ms = 0;
     }
 
+    game->visualTimeMs += elapsed_ms;
+
     if (game->uiState != GAME_UI_PLAYING) {
         return;
     }
@@ -1103,12 +1366,19 @@ void game_update(GameState* game, const InputState* input, float dt) {
     screen_shake_update(&game->screenShake, elapsed_ms);
     game_effects_update(elapsed_ms);
     game_update_floating_texts(game, elapsed_ms);
+    if (game->playerLostHeartActive) {
+        game->playerLostHeartAgeMs += elapsed_ms;
+        if (game->playerLostHeartAgeMs >= PLAYER_LOST_HEART_LIFETIME_MS) {
+            game->playerLostHeartActive = 0;
+        }
+    }
     if (game->playerInvulnerableMs > 0) {
         game->playerInvulnerableMs -= elapsed_ms;
         if (game->playerInvulnerableMs < 0) {
             game->playerInvulnerableMs = 0;
         }
     }
+    game_update_timed_powerups(game, elapsed_ms);
     if (game->playerAttackPoseMs > 0) {
         game->playerAttackPoseMs -= elapsed_ms;
         if (game->playerAttackPoseMs < 0) {
@@ -1125,7 +1395,7 @@ void game_update(GameState* game, const InputState* input, float dt) {
             game->gameOverInputArmed = 1;
         }
 
-        if (game->gameOverElapsedMs >= GAME_OVER_MIN_VISIBLE_MS
+        if (game_is_game_over_screen_visible(game)
                 && game->gameOverInputArmed
                 && input != 0
                 && input->actionPressed) {
@@ -1146,7 +1416,7 @@ void game_update(GameState* game, const InputState* input, float dt) {
 
     game->runTimeMs += elapsed_ms;
 
-    game->worldScrollX += game->worldSpeed * dt;
+    game->worldScrollX += game_effective_world_speed(game) * dt;
     while (game->worldScrollX >= WORLD_SCROLL_WRAP) {
         game->worldScrollX -= WORLD_SCROLL_WRAP;
     }

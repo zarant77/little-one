@@ -6,6 +6,7 @@ void audio_shutdown(void);
 void audio_pause(void);
 void audio_resume(void);
 void audio_set_music_volume(int volume);
+void audio_set_music_speed(float multiplier);
 void audio_set_sfx_volume(int volume);
 void audio_play_sound(const char* id);
 void audio_play_music(const char* id);

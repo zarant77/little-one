@@ -10,7 +10,7 @@ static uint32_t game_feedback_next_seed(void)
 
 void game_feedback_smash_land(ScreenShake *shake)
 {
-    screen_shake_start(shake, 8, 150, game_feedback_next_seed());
+    screen_shake_start(shake, 20, 240, game_feedback_next_seed());
 }
 
 void game_feedback_player_death(ScreenShake *shake)

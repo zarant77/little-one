@@ -12,8 +12,10 @@
 #include "../config/player_config.h"
 #include "progression.h"
 
-#define MAX_ENTITIES 16
+#define MAX_ENTITIES 24
 #define MAX_FLOATING_TEXTS 12
+#define MAX_TIMED_POWERUPS 4
+#define PLAYER_LOST_HEART_LIFETIME_MS 1500
 
 typedef struct {
     int active;
@@ -23,7 +25,7 @@ typedef struct {
     int age_ms;
     int lifetime_ms;
     uint32_t color;
-    char text[12];
+    char text[32];
 } FloatingText;
 
 typedef struct {
@@ -37,10 +39,21 @@ typedef struct {
     int height;
 } ForegroundDecoration;
 
+typedef struct {
+    int active;
+    const PowerupConfig* config;
+    int duration_ms;
+    int remaining_ms;
+    int age_ms;
+    float origin_x;
+    float origin_y;
+} TimedPowerupState;
+
 typedef enum {
     GAME_UI_PLAYING = 0,
     GAME_UI_SETTINGS = 1,
-    GAME_UI_MENU = 2
+    GAME_UI_MENU = 2,
+    GAME_UI_HELP = 3
 } GameUiState;
 
 typedef struct {
@@ -54,6 +67,12 @@ typedef struct {
     int playerCanSmash;
     int playerHp;
     int playerInvulnerableMs;
+    int playerLostHeartActive;
+    int playerLostHeartIndex;
+    int playerLostHeartAgeMs;
+    int playerLostHeartStartTimeMs;
+    float playerLostHeartOriginX;
+    float playerLostHeartOriginY;
     int hitstopMs;
     EntityAnimationState playerAnimation;
     int screenWidth;
@@ -65,6 +84,7 @@ typedef struct {
     ForegroundDecoration foregroundDecorations[FOREGROUND_MAX_INSTANCES];
     float foregroundSpawnGap;
     FloatingText floatingTexts[MAX_FLOATING_TEXTS];
+    TimedPowerupState timedPowerups[MAX_TIMED_POWERUPS];
     int gameOver;
     int gameOverElapsedMs;
     int gameOverInputArmed;
@@ -72,6 +92,7 @@ typedef struct {
     int bestScore;
     int newRecord;
     int runTimeMs;
+    int visualTimeMs;
     int fps;
     int averageFrameMs;
     int activeEntityCount;
@@ -79,6 +100,7 @@ typedef struct {
     int runStarted;
     ScreenShake screenShake;
     GameUiState uiState;
+    GameUiState helpReturnState;
     GameSettings settings;
     int settingsInitialized;
     int settingsDirty;
@@ -90,11 +112,16 @@ typedef struct {
 void game_init(GameState* game);
 void game_restart_run(GameState* game);
 int game_try_restart_after_game_over(GameState* game);
+int game_is_game_over_screen_visible(const GameState* game);
 int game_start_run(GameState* game);
 void game_show_menu(GameState* game);
 const PlayerConfig* game_player_config(const GameState* game);
 const EntityVisualConfig* game_player_visual_config(void);
 const HurtZone* game_player_hurt_zone_config(void);
+const TimedPowerupState* game_timed_powerup_get(
+        const GameState* game,
+        PowerupType type
+);
 void game_set_screen_size(GameState* game, float width, float height);
 void game_update(GameState* game, const InputState* input, float dt);
 

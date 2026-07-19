@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#define GAME_SETTINGS_SAVE_VERSION 1
+#define GAME_SETTINGS_SAVE_VERSION 2
 
 int game_settings_clamp_volume(int value)
 {
@@ -34,6 +34,7 @@ void game_settings_init_with_locale(GameSettings* settings, GameLocale locale)
     settings->music_volume = 70;
     settings->sfx_volume = 80;
     settings->locale = game_settings_normalize_locale(locale);
+    settings->help_seen = 0;
 }
 
 GameLocale game_settings_normalize_locale(int value)
@@ -76,6 +77,16 @@ void game_settings_set_locale(GameSettings* settings, GameLocale locale)
     settings->locale = game_settings_normalize_locale(locale);
 }
 
+void game_settings_mark_help_seen(GameSettings* settings)
+{
+    if (settings == 0)
+    {
+        return;
+    }
+
+    settings->help_seen = 1;
+}
+
 void game_settings_toggle_locale(GameSettings* settings)
 {
     if (settings == 0)
@@ -110,27 +121,54 @@ int game_settings_load_from_path(const char* path, GameSettings* settings)
     }
 
     game_settings_init(&loaded);
-    if (fscanf(
-            file,
-            "little_one_settings %d\nmusic %d\nsfx %d\nlocale %d\n",
-            &version,
-            &loaded.music_volume,
-            &loaded.sfx_volume,
-            &loaded.locale) != 4)
+    if (fscanf(file, "little_one_settings %d\n", &version) != 1)
+    {
+        fclose(file);
+        return 0;
+    }
+
+    if (version == 1)
+    {
+        if (fscanf(
+                file,
+                "music %d\nsfx %d\nlocale %d\n",
+                &loaded.music_volume,
+                &loaded.sfx_volume,
+                &loaded.locale) != 3)
+        {
+            fclose(file);
+            return 0;
+        }
+
+        /* Existing players already know the controls; only new installs
+         * should receive the first-launch help popup. */
+        loaded.help_seen = 1;
+    }
+    else if (version == GAME_SETTINGS_SAVE_VERSION)
+    {
+        if (fscanf(
+                file,
+                "music %d\nsfx %d\nlocale %d\nhelp_seen %d\n",
+                &loaded.music_volume,
+                &loaded.sfx_volume,
+                &loaded.locale,
+                &loaded.help_seen) != 4)
+        {
+            fclose(file);
+            return 0;
+        }
+    }
+    else
     {
         fclose(file);
         return 0;
     }
 
     fclose(file);
-    if (version != GAME_SETTINGS_SAVE_VERSION)
-    {
-        return 0;
-    }
-
     loaded.music_volume = game_settings_clamp_volume(loaded.music_volume);
     loaded.sfx_volume = game_settings_clamp_volume(loaded.sfx_volume);
     loaded.locale = game_settings_normalize_locale(loaded.locale);
+    loaded.help_seen = loaded.help_seen != 0;
     *settings = loaded;
     return 1;
 }
@@ -153,11 +191,12 @@ int game_settings_save_to_path(const char* path, const GameSettings* settings)
 
     result = fprintf(
             file,
-            "little_one_settings %d\nmusic %d\nsfx %d\nlocale %d\n",
+            "little_one_settings %d\nmusic %d\nsfx %d\nlocale %d\nhelp_seen %d\n",
             GAME_SETTINGS_SAVE_VERSION,
             game_settings_clamp_volume(settings->music_volume),
             game_settings_clamp_volume(settings->sfx_volume),
-            game_settings_normalize_locale(settings->locale));
+            game_settings_normalize_locale(settings->locale),
+            settings->help_seen != 0);
 
     fclose(file);
     return result > 0;

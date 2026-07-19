@@ -24,13 +24,13 @@ typedef struct {
 
 typedef struct {
     uint32_t source_color;
-    uint32_t hp_3_color;
-    uint32_t hp_2_color;
-    uint32_t hp_1_color;
+    uint32_t full_hp_color;
+    uint32_t medium_hp_color;
+    uint32_t low_hp_color;
 } PlayerEyeColorConfig;
 
 typedef struct {
-    int hp;
+    int max_hp;
     float moveSpeed;
     float jumpVelocity;
     float smashVelocity;

@@ -296,7 +296,21 @@ static void platform_handle_motion_event(
         float x = AMotionEvent_getX(event, action_index);
         float y = AMotionEvent_getY(event, action_index);
 
-        if (!menu_handle_touch(&platform->game, INPUT_TOUCH_DOWN, pointer_id, (int)x, (int)y)) {
+        GameUiState previous_ui_state = platform->game.uiState;
+        int menu_handled = menu_handle_touch(
+                &platform->game,
+                INPUT_TOUCH_DOWN,
+                pointer_id,
+                (int)x,
+                (int)y
+        );
+
+        if (previous_ui_state == GAME_UI_PLAYING
+                && platform->game.uiState != GAME_UI_PLAYING) {
+            input_init(&platform->input);
+        }
+
+        if (!menu_handled) {
             input_handle_touch(
                     &platform->input,
                     INPUT_TOUCH_DOWN,
@@ -390,7 +404,11 @@ static void platform_process_input(AndroidPlatform* platform, float screen_width
     queue = platform->input_queue;
 
     if (platform->pause_requested) {
-        menu_pause(&platform->game);
+        /* Lifecycle pauses must not dismiss first-launch help. Only an
+         * explicit Back press or the popup button marks it as seen. */
+        if (platform->game.uiState == GAME_UI_PLAYING) {
+            menu_pause(&platform->game);
+        }
         input_init(&platform->input);
         platform->pause_requested = 0;
     }

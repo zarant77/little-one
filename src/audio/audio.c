@@ -23,6 +23,8 @@ static SLAndroidSimpleBufferQueueItf audio_queue = 0;
 static int audio_initialized = 0;
 static const GeneratedMusic* audio_music = 0;
 static int audio_music_cursor = 0;
+static int audio_music_rate_permille = 1000;
+static int audio_music_rate_accumulator = 0;
 static const GeneratedSound* audio_sound = 0;
 static int audio_sound_cursor = 0;
 static int audio_next_mix_buffer = 0;
@@ -84,6 +86,40 @@ static int audio_clamp_volume(int volume)
     return volume;
 }
 
+static void audio_advance_music_cursor(void)
+{
+    int advance;
+
+    if (audio_music == 0 || audio_music->sample_count <= 0)
+    {
+        return;
+    }
+
+    audio_music_rate_accumulator += audio_music_rate_permille;
+    advance = audio_music_rate_accumulator / 1000;
+    audio_music_rate_accumulator %= 1000;
+    audio_music_cursor += advance;
+
+    if (audio_music->loop_enabled
+            && audio_music->loop_end_sample > audio_music->loop_start_sample)
+    {
+        int loop_length = audio_music->loop_end_sample - audio_music->loop_start_sample;
+
+        while (audio_music_cursor >= audio_music->loop_end_sample)
+        {
+            audio_music_cursor = audio_music->loop_start_sample
+                    + (audio_music_cursor - audio_music->loop_end_sample) % loop_length;
+        }
+    }
+    else
+    {
+        while (audio_music_cursor >= audio_music->sample_count)
+        {
+            audio_music_cursor -= audio_music->sample_count;
+        }
+    }
+}
+
 static void audio_fill_mix_buffer(int buffer_index)
 {
     int16_t* buffer;
@@ -106,16 +142,7 @@ static void audio_fill_mix_buffer(int buffer_index)
             mixed += (audio_music->samples[audio_music_cursor]
                     * audio_music_volume
                     * track_volume) / 10000;
-            audio_music_cursor += 1;
-            if (audio_music->loop_enabled
-                    && audio_music_cursor >= audio_music->loop_end_sample)
-            {
-                audio_music_cursor = audio_music->loop_start_sample;
-            }
-            else if (audio_music_cursor >= audio_music->sample_count)
-            {
-                audio_music_cursor = 0;
-            }
+            audio_advance_music_cursor();
         }
 
         if (audio_sound != 0
@@ -175,6 +202,8 @@ void audio_shutdown(void)
 
     audio_music = 0;
     audio_music_cursor = 0;
+    audio_music_rate_permille = 1000;
+    audio_music_rate_accumulator = 0;
     audio_sound = 0;
     audio_sound_cursor = 0;
     audio_next_mix_buffer = 0;
@@ -363,6 +392,21 @@ void audio_set_music_volume(int volume)
     audio_music_volume = audio_clamp_volume(volume);
 }
 
+void audio_set_music_speed(float multiplier)
+{
+    int permille = (int)(multiplier * 1000.0f + 0.5f);
+
+    if (permille < 250)
+    {
+        permille = 250;
+    }
+    else if (permille > 4000)
+    {
+        permille = 4000;
+    }
+    audio_music_rate_permille = permille;
+}
+
 void audio_set_sfx_volume(int volume)
 {
     audio_sfx_volume = audio_clamp_volume(volume);
@@ -414,6 +458,7 @@ void audio_play_music(const char* id)
 
     audio_music = music;
     audio_music_cursor = 0;
+    audio_music_rate_accumulator = 0;
     LOGI("Music playback start: %s", music->id);
 }
 
@@ -421,6 +466,7 @@ void audio_stop_music(void)
 {
     audio_music = 0;
     audio_music_cursor = 0;
+    audio_music_rate_accumulator = 0;
     LOGI("Music playback stop");
 }
 
@@ -451,6 +497,11 @@ void audio_resume(void)
 void audio_set_music_volume(int volume)
 {
     (void)volume;
+}
+
+void audio_set_music_speed(float multiplier)
+{
+    (void)multiplier;
 }
 
 void audio_set_sfx_volume(int volume)

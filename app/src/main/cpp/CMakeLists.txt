@@ -55,6 +55,7 @@ add_library(littleone SHARED
     ../../../../src/audio/sound_registry.c
     ../../../../src/config/background_config.c
     ../../../../src/config/foreground_decoration_config.c
+    ../../../../src/config/powerup_config.c
     ../../../../src/config/threat_config.c
     ../../../../src/config/player_config.c
     ../../../../src/entity/entity.c

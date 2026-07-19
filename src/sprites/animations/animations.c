@@ -1032,6 +1032,120 @@ static const AnimTrack ORK_WALK_TRACKS[] = {
     },
 };
 
+// Source: src/assets/animations/player_damage.anim.json
+static const AnimKey PLAYER_DAMAGE_OFFSET_X_KEYS[] = {
+    { 0, 0, ANIM_EASE_LINEAR },
+    { 28, -24, ANIM_EASE_OUT },
+    { 58, 22, ANIM_EASE_STEP },
+    { 88, -19, ANIM_EASE_STEP },
+    { 122, 16, ANIM_EASE_STEP },
+    { 160, -12, ANIM_EASE_STEP },
+    { 205, 8, ANIM_EASE_STEP },
+    { 260, -7, ANIM_EASE_OUT },
+    { 320, 7, ANIM_EASE_STEP },
+    { 380, -7, ANIM_EASE_STEP },
+    { 440, 6, ANIM_EASE_STEP },
+    { 500, -6, ANIM_EASE_STEP },
+    { 560, 5, ANIM_EASE_STEP },
+    { 620, -5, ANIM_EASE_STEP },
+    { 680, 4, ANIM_EASE_STEP },
+    { 740, -4, ANIM_EASE_STEP },
+    { 800, 4, ANIM_EASE_STEP },
+    { 860, -3, ANIM_EASE_STEP },
+    { 920, 3, ANIM_EASE_STEP },
+    { 980, -2, ANIM_EASE_STEP },
+    { 1000, 0, ANIM_EASE_OUT },
+};
+
+static const AnimKey PLAYER_DAMAGE_OFFSET_Y_KEYS[] = {
+    { 0, 0, ANIM_EASE_LINEAR },
+    { 28, -8, ANIM_EASE_OUT },
+    { 58, 7, ANIM_EASE_STEP },
+    { 88, -6, ANIM_EASE_STEP },
+    { 122, 5, ANIM_EASE_STEP },
+    { 160, -4, ANIM_EASE_STEP },
+    { 205, 3, ANIM_EASE_STEP },
+    { 260, 3, ANIM_EASE_OUT },
+    { 320, -3, ANIM_EASE_STEP },
+    { 380, 3, ANIM_EASE_STEP },
+    { 440, -3, ANIM_EASE_STEP },
+    { 500, 3, ANIM_EASE_STEP },
+    { 560, -3, ANIM_EASE_STEP },
+    { 620, 2, ANIM_EASE_STEP },
+    { 680, -2, ANIM_EASE_STEP },
+    { 740, 2, ANIM_EASE_STEP },
+    { 800, -2, ANIM_EASE_STEP },
+    { 860, 2, ANIM_EASE_STEP },
+    { 920, -2, ANIM_EASE_STEP },
+    { 980, 1, ANIM_EASE_STEP },
+    { 1000, 0, ANIM_EASE_OUT },
+};
+
+static const AnimKey PLAYER_DAMAGE_SCALE_X_KEYS[] = {
+    { 0, 1000, ANIM_EASE_LINEAR },
+    { 35, 1320, ANIM_EASE_OUT },
+    { 90, 760, ANIM_EASE_OUT },
+    { 145, 1240, ANIM_EASE_OUT },
+    { 205, 860, ANIM_EASE_OUT },
+    { 285, 1000, ANIM_EASE_OUT },
+    { 1000, 1000, ANIM_EASE_LINEAR },
+};
+
+static const AnimKey PLAYER_DAMAGE_SCALE_Y_KEYS[] = {
+    { 0, 1000, ANIM_EASE_LINEAR },
+    { 35, 760, ANIM_EASE_OUT },
+    { 90, 1320, ANIM_EASE_OUT },
+    { 145, 820, ANIM_EASE_OUT },
+    { 205, 1160, ANIM_EASE_OUT },
+    { 285, 1000, ANIM_EASE_OUT },
+    { 1000, 1000, ANIM_EASE_LINEAR },
+};
+
+static const AnimKey PLAYER_DAMAGE_ALPHA_KEYS[] = {
+    { 0, 255, ANIM_EASE_LINEAR },
+    { 300, 85, ANIM_EASE_STEP },
+    { 365, 255, ANIM_EASE_STEP },
+    { 430, 85, ANIM_EASE_STEP },
+    { 495, 255, ANIM_EASE_STEP },
+    { 560, 85, ANIM_EASE_STEP },
+    { 625, 255, ANIM_EASE_STEP },
+    { 690, 85, ANIM_EASE_STEP },
+    { 735, 255, ANIM_EASE_STEP },
+    { 800, 85, ANIM_EASE_STEP },
+    { 865, 255, ANIM_EASE_STEP },
+    { 930, 85, ANIM_EASE_STEP },
+    { 985, 255, ANIM_EASE_STEP },
+    { 1000, 255, ANIM_EASE_LINEAR },
+};
+
+static const AnimTrack PLAYER_DAMAGE_TRACKS[] = {
+    {
+        .property = ANIM_PROP_OFFSET_X,
+        .keys = PLAYER_DAMAGE_OFFSET_X_KEYS,
+        .key_count = sizeof(PLAYER_DAMAGE_OFFSET_X_KEYS) / sizeof(PLAYER_DAMAGE_OFFSET_X_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_OFFSET_Y,
+        .keys = PLAYER_DAMAGE_OFFSET_Y_KEYS,
+        .key_count = sizeof(PLAYER_DAMAGE_OFFSET_Y_KEYS) / sizeof(PLAYER_DAMAGE_OFFSET_Y_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_SCALE_X,
+        .keys = PLAYER_DAMAGE_SCALE_X_KEYS,
+        .key_count = sizeof(PLAYER_DAMAGE_SCALE_X_KEYS) / sizeof(PLAYER_DAMAGE_SCALE_X_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_SCALE_Y,
+        .keys = PLAYER_DAMAGE_SCALE_Y_KEYS,
+        .key_count = sizeof(PLAYER_DAMAGE_SCALE_Y_KEYS) / sizeof(PLAYER_DAMAGE_SCALE_Y_KEYS[0]),
+    },
+    {
+        .property = ANIM_PROP_ALPHA,
+        .keys = PLAYER_DAMAGE_ALPHA_KEYS,
+        .key_count = sizeof(PLAYER_DAMAGE_ALPHA_KEYS) / sizeof(PLAYER_DAMAGE_ALPHA_KEYS[0]),
+    },
+};
+
 // Source: src/assets/animations/player_death_fall.anim.json
 static const AnimKey PLAYER_DEATH_FALL_OFFSET_Y_KEYS[] = {
     { 0, 0, ANIM_EASE_LINEAR },
@@ -1656,6 +1770,13 @@ const AnimationClip ANIMATION_CLIPS[] = {
         .loop = true,
         .tracks = ORK_WALK_TRACKS,
         .track_count = sizeof(ORK_WALK_TRACKS) / sizeof(ORK_WALK_TRACKS[0]),
+    },
+    {
+        .id = "player_damage",
+        .duration_ms = 1000,
+        .loop = false,
+        .tracks = PLAYER_DAMAGE_TRACKS,
+        .track_count = sizeof(PLAYER_DAMAGE_TRACKS) / sizeof(PLAYER_DAMAGE_TRACKS[0]),
     },
     {
         .id = "player_death_fall",

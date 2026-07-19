@@ -1,6 +1,7 @@
 #include "menu.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "../audio/audio.h"
 #include "../fonts/font_renderer.h"
@@ -21,6 +22,10 @@
 #define MENU_BUTTON_HEIGHT 92
 #define MENU_PAUSE_BUTTON_SIZE 180
 #define MENU_PAUSE_BUTTON_MARGIN 70
+#define MENU_TOP_BUTTON_GAP 24
+#define MENU_HELP_PANEL_MARGIN 36
+#define MENU_HELP_CONTENT_MAX_WIDTH 2200
+#define MENU_HELP_TWO_COLUMN_MIN_WIDTH 1600
 #define MENU_NO_POINTER -1
 
 typedef enum {
@@ -43,6 +48,7 @@ typedef struct {
 
 static const PackedFont* menu_font;
 static const GeneratedSprite* pause_sprite;
+static const GeneratedSprite* help_sprite;
 static int menu_pointer_id = MENU_NO_POINTER;
 static MenuDragTarget menu_drag_target = MENU_DRAG_NONE;
 
@@ -69,6 +75,43 @@ static UiRect menu_pause_button_rect(const GameState* game)
         .width = MENU_PAUSE_BUTTON_SIZE,
         .height = MENU_PAUSE_BUTTON_SIZE,
     };
+    return rect;
+}
+
+static UiRect menu_help_button_rect(const GameState* game)
+{
+    UiRect rect = menu_pause_button_rect(game);
+
+    rect.x -= MENU_TOP_BUTTON_GAP + MENU_PAUSE_BUTTON_SIZE;
+    if (rect.x < MENU_PAUSE_BUTTON_MARGIN) rect.x = MENU_PAUSE_BUTTON_MARGIN;
+    return rect;
+}
+
+static UiRect menu_help_panel_rect(const GameState* game)
+{
+    int margin = MENU_HELP_PANEL_MARGIN;
+    UiRect rect;
+
+    if (game->screenWidth < margin * 2 + 1 || game->screenHeight < margin * 2 + 1) margin = 0;
+    rect = (UiRect){
+        .x = margin,
+        .y = margin,
+        .width = game->screenWidth - margin * 2,
+        .height = game->screenHeight - margin * 2,
+    };
+    return rect;
+}
+
+static UiRect menu_help_back_rect(const GameState* game)
+{
+    UiRect panel = menu_help_panel_rect(game);
+    UiRect rect = {
+        .x = panel.x + MENU_PANEL_PADDING,
+        .y = panel.y + panel.height - MENU_PANEL_PADDING - MENU_BUTTON_HEIGHT,
+        .width = panel.width - MENU_PANEL_PADDING * 2,
+        .height = MENU_BUTTON_HEIGHT,
+    };
+
     return rect;
 }
 
@@ -140,6 +183,107 @@ static void menu_draw_base(Framebuffer* framebuffer, UiRect panel)
     ui_draw_panel(framebuffer, panel);
 }
 
+static int menu_draw_wrapped_text(
+        Framebuffer* framebuffer,
+        UiRect content,
+        int y,
+        int scale,
+        int line_height,
+        uint32_t color,
+        const char* text)
+{
+    const char* cursor = text;
+    char line[256];
+    size_t line_length = 0;
+
+    line[0] = 0;
+    while (cursor != 0 && *cursor != 0) {
+        const char* word_start;
+        size_t word_length;
+        char candidate[256];
+        size_t candidate_length;
+
+        while (*cursor == ' ') cursor += 1;
+        if (*cursor == 0) break;
+
+        word_start = cursor;
+        while (*cursor != 0 && *cursor != ' ') cursor += 1;
+        word_length = (size_t)(cursor - word_start);
+        if (word_length == 0 || word_length >= sizeof(line)) continue;
+
+        if (line_length == 0) {
+            memcpy(line, word_start, word_length);
+            line_length = word_length;
+            line[line_length] = 0;
+            continue;
+        }
+
+        candidate_length = line_length + 1 + word_length;
+        if (candidate_length >= sizeof(candidate)) {
+            font_draw_text(framebuffer, menu_font, content.x, y, scale, color, line);
+            y += line_height;
+            memcpy(line, word_start, word_length);
+            line_length = word_length;
+            line[line_length] = 0;
+            continue;
+        }
+
+        memcpy(candidate, line, line_length);
+        candidate[line_length] = ' ';
+        memcpy(candidate + line_length + 1, word_start, word_length);
+        candidate[candidate_length] = 0;
+        if (font_measure_text(menu_font, scale, candidate) <= content.width) {
+            memcpy(line, candidate, candidate_length + 1);
+            line_length = candidate_length;
+            continue;
+        }
+
+        font_draw_text(framebuffer, menu_font, content.x, y, scale, color, line);
+        y += line_height;
+        memcpy(line, word_start, word_length);
+        line_length = word_length;
+        line[line_length] = 0;
+    }
+
+    if (line_length > 0) {
+        font_draw_text(framebuffer, menu_font, content.x, y, scale, color, line);
+        y += line_height;
+    }
+
+    return y;
+}
+
+static int menu_render_help_section(
+        Framebuffer* framebuffer,
+        const GameState* game,
+        UiRect content,
+        int y,
+        int heading_scale,
+        int body_scale,
+        int body_line_height,
+        int heading_gap,
+        LocalizedTextId heading_id,
+        LocalizedTextId body_id)
+{
+    font_draw_text(
+            framebuffer,
+            menu_font,
+            content.x,
+            y,
+            heading_scale,
+            MENU_ACCENT_COLOR,
+            menu_text(game, heading_id));
+    y += (int)menu_font->grid_size * heading_scale + heading_gap;
+    return menu_draw_wrapped_text(
+            framebuffer,
+            content,
+            y,
+            body_scale,
+            body_line_height,
+            MENU_TEXT_COLOR,
+            menu_text(game, body_id));
+}
+
 static void menu_render_main(Framebuffer* framebuffer, const GameState* game)
 {
     MenuLayout layout = menu_layout(game, 530);
@@ -171,6 +315,86 @@ static void menu_render_settings(Framebuffer* framebuffer, const GameState* game
     ui_draw_button_colored(framebuffer, menu_font, layout.language_en, "EN", menu_locale(game) == GAME_LOCALE_ENGLISH ? MENU_ACCENT_COLOR : 0x111827ff, MENU_TEXT_COLOR);
     ui_draw_button_colored(framebuffer, menu_font, layout.language_uk, "UK", menu_locale(game) == GAME_LOCALE_UKRAINIAN ? MENU_ACCENT_COLOR : 0x111827ff, MENU_TEXT_COLOR);
     ui_draw_button(framebuffer, menu_font, back, menu_text(game, LOCALIZED_TEXT_BACK));
+}
+
+static void menu_render_help(Framebuffer* framebuffer, const GameState* game)
+{
+    UiRect panel = menu_help_panel_rect(game);
+    UiRect back = menu_help_back_rect(game);
+    UiRect content;
+    int compact = panel.height < 850;
+    int body_scale = compact ? 2 : 3;
+    int body_line_height = (int)menu_font->grid_size * body_scale + (compact ? 4 : 12);
+    int heading_gap = compact ? 8 : 20;
+    int section_gap = compact ? 12 : 24;
+    int y;
+
+    content.width = panel.width - MENU_PANEL_PADDING * 2;
+    if (content.width > MENU_HELP_CONTENT_MAX_WIDTH) content.width = MENU_HELP_CONTENT_MAX_WIDTH;
+    content.x = panel.x + (panel.width - content.width) / 2;
+    content.y = 0;
+    content.height = 0;
+
+    menu_draw_base(framebuffer, panel);
+    menu_title(framebuffer, panel, menu_text(game, LOCALIZED_TEXT_HELP_TITLE));
+
+    y = panel.y + MENU_PANEL_PADDING + (compact ? 64 : 88);
+    if (content.width >= MENU_HELP_TWO_COLUMN_MIN_WIDTH) {
+        UiRect movement = content;
+        UiRect action = content;
+
+        movement.width = (content.width - MENU_GAP) / 2;
+        action.x = movement.x + movement.width + MENU_GAP;
+        action.width = content.width - movement.width - MENU_GAP;
+        menu_render_help_section(
+                framebuffer,
+                game,
+                movement,
+                y,
+                2,
+                body_scale,
+                body_line_height,
+                heading_gap,
+                LOCALIZED_TEXT_HELP_MOVE_TITLE,
+                LOCALIZED_TEXT_HELP_MOVE_BODY);
+        menu_render_help_section(
+                framebuffer,
+                game,
+                action,
+                y,
+                2,
+                body_scale,
+                body_line_height,
+                heading_gap,
+                LOCALIZED_TEXT_HELP_ACTION_TITLE,
+                LOCALIZED_TEXT_HELP_ACTION_BODY);
+    } else {
+        y = menu_render_help_section(
+                framebuffer,
+                game,
+                content,
+                y,
+                2,
+                body_scale,
+                body_line_height,
+                heading_gap,
+                LOCALIZED_TEXT_HELP_MOVE_TITLE,
+                LOCALIZED_TEXT_HELP_MOVE_BODY);
+        y += section_gap;
+        menu_render_help_section(
+                framebuffer,
+                game,
+                content,
+                y,
+                2,
+                body_scale,
+                body_line_height,
+                heading_gap,
+                LOCALIZED_TEXT_HELP_ACTION_TITLE,
+                LOCALIZED_TEXT_HELP_ACTION_BODY);
+    }
+
+    ui_draw_button(framebuffer, menu_font, back, menu_text(game, LOCALIZED_TEXT_CLOSE));
 }
 
 static void menu_render_game_over(Framebuffer* framebuffer, const GameState* game)
@@ -216,26 +440,56 @@ static void menu_update_slider(GameState* game, MenuDragTarget target, UiRect re
     game->settingsDirty = 1;
 }
 
+static void menu_close_help(GameState* game)
+{
+    GameUiState return_state;
+
+    if (game == 0 || game->uiState != GAME_UI_HELP) return;
+
+    return_state = game->helpReturnState;
+    if (return_state == GAME_UI_HELP) return_state = GAME_UI_MENU;
+    if (!game->settings.help_seen) {
+        game_settings_mark_help_seen(&game->settings);
+        game->settingsDirty = 1;
+    }
+    game->uiState = return_state;
+}
+
 void menu_initialize(void)
 {
     menu_font = font_registry_find(MENU_FONT_ID);
     pause_sprite = generated_sprite_get_by_id("btn_pause");
+    help_sprite = generated_sprite_get_by_id("btn_help");
 }
 
 void menu_pause(GameState* game)
 {
+    if (game != 0 && game->uiState == GAME_UI_HELP) {
+        menu_close_help(game);
+        return;
+    }
     if (game != 0 && game->uiState == GAME_UI_PLAYING && !game->gameOver) game->uiState = GAME_UI_MENU;
 }
 
 void menu_render(Framebuffer* framebuffer, const GameState* game)
 {
     if (framebuffer == 0 || game == 0 || menu_font == 0) return;
-    if (game->gameOver) { menu_render_game_over(framebuffer, game); return; }
+    if (game->gameOver) {
+        if (game_is_game_over_screen_visible(game)) menu_render_game_over(framebuffer, game);
+        return;
+    }
     if (game->uiState == GAME_UI_MENU) { menu_render_main(framebuffer, game); return; }
     if (game->uiState == GAME_UI_SETTINGS) { menu_render_settings(framebuffer, game); return; }
-    if (game->uiState == GAME_UI_PLAYING && pause_sprite != 0) {
-        UiRect rect = menu_pause_button_rect(game);
-        renderer_draw_generated_sprite_fit(framebuffer, pause_sprite, rect.x, rect.y, rect.width, rect.height, SPRITE_FIT_STRETCH);
+    if (game->uiState == GAME_UI_HELP) { menu_render_help(framebuffer, game); return; }
+    if (game->uiState == GAME_UI_PLAYING) {
+        if (help_sprite != 0) {
+            UiRect rect = menu_help_button_rect(game);
+            renderer_draw_generated_sprite_fit(framebuffer, help_sprite, rect.x, rect.y, rect.width, rect.height, SPRITE_FIT_STRETCH);
+        }
+        if (pause_sprite != 0) {
+            UiRect rect = menu_pause_button_rect(game);
+            renderer_draw_generated_sprite_fit(framebuffer, pause_sprite, rect.x, rect.y, rect.width, rect.height, SPRITE_FIT_STRETCH);
+        }
     }
 }
 
@@ -249,6 +503,7 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
         return game->uiState != GAME_UI_PLAYING || game->gameOver;
     }
     if (game->gameOver) {
+        if (!game_is_game_over_screen_visible(game)) return 1;
         if (action_type != INPUT_TOUCH_DOWN) return 1;
         layout = menu_layout(game, 620);
         layout.first.y += 214;
@@ -263,8 +518,19 @@ int menu_handle_touch(GameState* game, int action_type, int pointer_id, int x, i
     }
     if (game->uiState == GAME_UI_PLAYING) {
         UiRect pause = menu_pause_button_rect(game);
+        UiRect help = menu_help_button_rect(game);
+        if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&help, x, y)) {
+            game->helpReturnState = GAME_UI_PLAYING;
+            game->uiState = GAME_UI_HELP;
+            return 1;
+        }
         if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&pause, x, y)) { menu_pause(game); return 1; }
         return 0;
+    }
+    if (game->uiState == GAME_UI_HELP) {
+        UiRect back = menu_help_back_rect(game);
+        if (action_type == INPUT_TOUCH_DOWN && ui_rect_contains(&back, x, y)) menu_close_help(game);
+        return 1;
     }
     if (game->uiState == GAME_UI_MENU) {
         if (action_type != INPUT_TOUCH_DOWN) return 1;
