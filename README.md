@@ -5,10 +5,10 @@
 </p>
 
 ```text
-The world is dangerous.
-You are small.
-You are the warrior.
-The Little One.
+The world is dangerous
+You are small
+You are the .wwarrior
+The Little One
 ```
 
 A tiny endless action game for Android written entirely in native C.
